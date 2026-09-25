@@ -1,4 +1,4 @@
-# 🧾 invoice2ERP
+# ▶️ invoice2ERP
 ### Intelligent Financial Document Ingestion & ERP Booking Engine
 
 ![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
@@ -13,7 +13,7 @@ Unlike standard OCR or basic LLM extractors that merely convert images to text, 
 
 ---
 
-## 💡 The Problem & The Solution
+## ▶️ The Problem & The Solution
 
 ### The Industry Challenge
 In enterprise procurement systems (such as SAP, Oracle, Zycus, or NetSuite), processing incoming supplier invoices and credit notes is a major operational bottleneck:
@@ -31,7 +31,7 @@ In enterprise procurement systems (such as SAP, Oracle, Zycus, or NetSuite), pro
 
 ---
 
-## 🏗️ System Architecture
+## ▶️ System Architecture
 
 ```mermaid
 flowchart TD
@@ -53,7 +53,7 @@ flowchart TD
 
 ---
 
-## ✨ Key Features
+## ▶️ Key Features
 
 ### 1. Multi-Provider LLM Cascade & Deterministic Fallback
 The extraction router ([src/extractor.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/extractor.py)) automatically fails over between active providers if rate limits or quota errors occur:
@@ -73,16 +73,15 @@ Raw document strings are dynamically matched against enterprise reference tables
 * **Tax Codes** ([master_data/tax_master.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/tax_master.json)): Mapped by country code and tax rate.
 * **Payment Terms** ([master_data/payment_terms.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/payment_terms.json)): Matched via text aliases or calculated date differences in days (`due_date - invoice_date`).
 
-### 4. Interactive Developer Control Panel
-Includes a full-featured Streamlit UI ([app.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/app.py)) featuring:
-* Batch vs. Single Document selection.
-* Real-time 7-phase step trace inspector.
-* Dual `sys.stdout` log streaming feed.
-* Live ERP booking pass/fail metrics.
+### 4. Multi-Document Segmentation & Sub-Document Boundary Detection
+Automatically analyzes multi-page PDF document streams to detect sub-document boundary breaks ([src/segmenter.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/segmenter.py)):
+* **Page Restart Detection**: Identifies page header sequence restarts (e.g. "Page 1 of N", "Page 1/1").
+* **Sub-Document Header Breaks**: Recognizes distinct document titles embedded within multi-page PDF files.
+* **PO/SO Identifier Continuity**: Cross-references Purchase Order / Sales Order header identifiers across page boundaries to ensure multi-page continuation invoices are preserved as single payables.
 
 ---
 
-## 🚀 Quick Start
+## ▶️ Quick Start
 
 ### Prerequisites
 * **Python 3.10+**
@@ -92,7 +91,7 @@ Includes a full-featured Streamlit UI ([app.py](file:///c:/Users/chitr/Desktop/c
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/invoice2ERP.git
+   git clone https://github.com/CSroseX/invoice2ERP.git
    cd invoice2ERP
    ```
 
@@ -119,7 +118,7 @@ Includes a full-featured Streamlit UI ([app.py](file:///c:/Users/chitr/Desktop/c
 
 ---
 
-## 💻 Usage
+## ▶️ Usage
 
 ### 1. Launch the Streamlit Control Panel (GUI)
 Experience live step-by-step pipeline execution and visualization:
@@ -153,35 +152,20 @@ python example_check.py sample_autodraft.json
 
 ---
 
-## 📂 Repository Structure
+## ▶️ Limitations and Considerations
 
-```
-invoice2ERP/
-├── app.py                   # Streamlit Developer Control Panel UI
-├── main.py                  # Single-command batch pipeline orchestrator
-├── run_single.py            # CLI inspector for single-document debugging
-├── erp.py                   # ERP oracle booking recomputation engine
-├── example_check.py         # Usage example for ERP booking recomputation
-├── requirements.txt         # Core Python dependencies
-├── .env.example             # Environment configuration template
-├── AUTODRAFT_SCHEMA.md      # Output JSON schema specification
-├── ARCHITECTURE.md          # Technical design & engineering whitepaper
-├── src/
-│   ├── classifier.py        # Phase 3: Document classification engine
-│   ├── extractor.py         # Phase 4: Structured LLM extraction cascade & fallbacks
-│   ├── grounding.py         # Phase 4b: Rule-1 anti-hallucination verifier
-│   ├── master_matcher.py    # Phase 5: Master data resolution engine
-│   ├── ocr_engine.py        # Phase 1: PDF rendering & 2D spatial layout OCR
-│   └── segmenter.py         # Phase 2: Multi-document PDF pre-segmenter
-├── documents/               # Input sample PDF documents
-├── master_data/             # Master reference datasets (JSON)
-├── parsed_files/            # Cached 2D spatial layout text files
-└── output/                  # Generated JSON autodraft payloads
-```
+### API Tokens & Bring Your Own Key (BYOK)
+* **Self-Contained Test Environment**: This project uses a Bring Your Own Key (BYOK) architecture via a local `.env` configuration file.
+* **Multi-Provider Cascade Rationale**: Multiple LLM API providers (OpenRouter, Groq, Cloudflare Workers AI, Google Gemini) were integrated into an automated fallback cascade ([src/extractor.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/extractor.py)). This design choice was specifically implemented to overcome free-tier rate limits, requests-per-minute (RPM) throttling, and daily quota exhaustion during multi-document batch evaluations.
+
+### Technical Limitations & Trade-offs
+* **Strict Grounding Enforcement**: Rule-1 anti-hallucination verification intentionally leaves unprinted fields blank (e.g. unprinted unit prices) rather than backward-deriving figures from line totals. While this prevents financial hallucinations and ensures audit compliance, documents with unprinted line prices will fail complete ERP booking footprint validation.
+* **Multi-Page Continuation Tables**: Complex multi-page continuation tables with ambiguous header repeats or non-standard spatial table breaks across page boundaries can occasionally drop line item boundaries.
+* **Master Data Scale**: Master data resolution currently uses local reference datasets in `master_data/` with exact matches and string similarity thresholds ($\ge 85\%$). Production-scale deployments with $100k+$ master records would require dedicated vector indexing (e.g. Qdrant / Pinecone) or elastic search indexing.
 
 ---
 
-## 📊 Output Contract (`output/*.json`)
+## ▶️ Output Contract (`output/*.json`)
 
 For each processed document `X.pdf`, invoice2ERP outputs a structured payload `output/X.json`:
 
@@ -226,6 +210,6 @@ For each processed document `X.pdf`, invoice2ERP outputs a structured payload `o
 
 ---
 
-## 🛡️ License
+## ▶️ License
 
 Distributed under the MIT License. See `LICENSE` for more information.
