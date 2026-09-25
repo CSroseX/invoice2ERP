@@ -430,8 +430,24 @@ def run_pipeline_generator(target_files: list[Path]):
 # Sidebar UI: Controls & Scope Selection
 # ---------------------------------------------------------------------------
 with st.sidebar:
-    st.title("⚙️ Zycus Control Panel")
-    st.caption("Developer-Facing Bookable Payable Pipeline Evaluator")
+    st.title("⚙️ invoice2ERP Control Panel")
+    st.caption("Intelligent Financial Document Ingestion & ERP Booking Engine")
+
+    # Optional Bring Your Own Key (BYOK) Input Section
+    with st.expander("🔑 Custom API Keys (BYOK)", expanded=False):
+        st.caption("Optionally input your custom API keys for testing:")
+        custom_groq = st.text_input("Groq API Key:", type="password", help="Overrides default GROQ_API_KEY")
+        custom_openrouter = st.text_input("OpenRouter API Key:", type="password", help="Overrides default OPEN_ROUTER_API")
+        custom_gemini = st.text_input("Gemini API Key:", type="password", help="Overrides default GEMINI_API_KEY")
+        
+        if custom_groq.strip():
+            os.environ["GROQ_API_KEY"] = custom_groq.strip()
+        if custom_openrouter.strip():
+            os.environ["OPEN_ROUTER_API"] = custom_openrouter.strip()
+        if custom_gemini.strip():
+            os.environ["GEMINI_API_KEY"] = custom_gemini.strip()
+
+    st.divider()
 
     # 1. Processing Scope Selector (Batch vs Single Document)
     processing_mode = st.radio(
