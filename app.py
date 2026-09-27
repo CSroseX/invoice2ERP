@@ -30,6 +30,9 @@ from src.classifier import classify_document_text
 from src.extractor import extract_payable_from_text, QuotaExhaustedError
 from src.grounding import verify_payable_grounding
 from src.master_matcher import MasterDataMatcher
+from src.logging_config import get_audit_logger
+
+audit_logger = get_audit_logger('pipeline')
 from erp import erp_book, num, _line_base, _line_taxes, _header_taxes
 import pymupdf as fitz
 
@@ -354,7 +357,7 @@ def run_pipeline_generator(target_files: list[Path]):
             trace = []
             
             print(f"\n" + "=" * 80, flush=True)
-            print(f"DOCUMENT [{idx:02d}/{len(target_files)}]: {filename}", flush=True)
+            audit_logger.info(f"DOCUMENT [{idx:02d}/{len(target_files)}]: {filename}", extra={"filename": filename, "status": "START"})
             print("=" * 80, flush=True)
 
             yield {
@@ -373,7 +376,7 @@ def run_pipeline_generator(target_files: list[Path]):
                 if txt_cache.exists():
                     full_ocr_text = txt_cache.read_text(encoding="utf-8", errors="ignore")
                     path_used = "Cached OCR Text (300 DPI Spatial Layout)"
-                    print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", flush=True)
+                    audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", extra={"filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text)})
                 else:
                     doc = fitz.open(str(pdf))
                     page_count = len(doc)
@@ -383,7 +386,7 @@ def run_pipeline_generator(target_files: list[Path]):
                     text_pages = extract_text(str(pdf))
                     full_ocr_text = "\n\n--- PAGE BREAK ---\n\n".join(text_pages)
                     path_used = "PyMuPDF Direct Text Extraction" if is_dig else "PyMuPDF Render (300 DPI) + EasyOCR"
-                    print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", flush=True)
+                    audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", extra={"filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text), "page_count": page_count})
     
                 step1_event = {
                     "step": 1,
@@ -399,7 +402,7 @@ def run_pipeline_generator(target_files: list[Path]):
     
                 # Phase 2: Multi-Document Pre-Segmentation
                 subdoc_texts = segment_document_text(full_ocr_text)
-                print(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", flush=True)
+                audit_logger.info(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", extra={"filename": filename, "step": 2, "subdoc_count": len(subdoc_texts)})
     
                 step2_event = {
                     "step": 2,
@@ -424,7 +427,7 @@ def run_pipeline_generator(target_files: list[Path]):
                     # Phase 3: Classification
                     class_res = classify_document_text(seg_text, filename=sub_label)
                     confidence_score = getattr(class_res, 'confidence', getattr(class_res, 'score', 1.0))
-                    print(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", flush=True)
+                    audit_logger.info(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", extra={"filename": filename, "sub_label": sub_label, "step": 3, "is_payable": class_res.is_payable, "doc_type": class_res.doc_type, "confidence": confidence_score})
     
                     step3_event = {
                         "step": 3,
@@ -443,7 +446,7 @@ def run_pipeline_generator(target_files: list[Path]):
                         doc_has_payable = True
                         try:
                             # Phase 4: AI Model Extraction (Groq)
-                            print(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", flush=True)
+                            audit_logger.info(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", extra={"filename": filename, "sub_label": sub_label, "step": 4})
                             raw_payable = extract_payable_from_text(seg_text, filename=sub_label, allow_fallback=False)
                             if class_res.doc_type == "CREDIT_MEMO":
                                 raw_payable["invoice_type"] = "CREDIT_MEMO"
@@ -476,7 +479,7 @@ def run_pipeline_generator(target_files: list[Path]):
                             
                             supp_id = resolved_payable.get("supplier", {}).get("supplier_id", "")
                             comp_code = resolved_payable.get("buyer", {}).get("company_code", "")
-                            print(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", flush=True)
+                            audit_logger.info(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", extra={"filename": filename, "sub_label": sub_label, "step": 5, "supplier_id": supp_id, "company_code": comp_code})
     
                             master_summary = {
                                 "supplier_id": supp_id,
@@ -521,7 +524,7 @@ def run_pipeline_generator(target_files: list[Path]):
     
                             is_match = abs(booked_gross - target_gross) < 0.05
                             erp_status = "PASS" if is_match else "FAIL"
-                            print(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", flush=True)
+                            audit_logger.info(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", extra={"filename": filename, "sub_label": sub_label, "step": 7, "erp_status": erp_status, "gross": printed_gross_str, "currency": resolved_payable.get("currency")})
     
                             step7_event = {
                                 "step": 7,
@@ -537,14 +540,14 @@ def run_pipeline_generator(target_files: list[Path]):
                             yield {"type": "STEP_7", "filename": filename, "data": step7_event}
     
                         except QuotaExhaustedError as qe:
-                            print(f"[QUOTA EXHAUSTED]: {qe}", flush=True)
+                            audit_logger.error(f"[QUOTA EXHAUSTED]: {qe}", extra={"filename": filename, "sub_label": sub_label, "error": str(qe)})
                             st.session_state.doc_status[filename] = "FAIL"
                             return
                         except Exception as e:
-                            print(f"  [EXTRACTION FAILED]: {e}", flush=True)
+                            audit_logger.error(f"  [EXTRACTION FAILED]: {e}", extra={"filename": filename, "sub_label": sub_label, "error": str(e)})
                             declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction exception: {e}"})
                     else:
-                        print(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", flush=True)
+                        audit_logger.warning(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", extra={"filename": filename, "sub_label": sub_label, "reasons": class_res.reasons})
                         declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
     
                 # Save final payload to output/<pdf_stem>.json
@@ -555,7 +558,7 @@ def run_pipeline_generator(target_files: list[Path]):
                 }
                 out_json_path = out_dir / f"{pdf.stem}.json"
                 out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding="utf-8")
-                print(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", flush=True)
+                audit_logger.info(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", extra={"filename": filename, "step": "SAVE_JSON", "payload_path": str(out_json_path)})
     
                 # Determine overall document status (100% consistent with ERP booking check)
                 if payables:
@@ -583,7 +586,7 @@ def run_pipeline_generator(target_files: list[Path]):
                 dlq_dir = Path("output/dlq")
                 dlq_dir.mkdir(parents=True, exist_ok=True)
                 error_msg = f"Fatal Document Error: {e}\n{traceback.format_exc()}"
-                print(error_msg, flush=True)
+                audit_logger.critical(f"Fatal Document Error: {e}", extra={"filename": filename, "dlq": True, "traceback": traceback.format_exc()}); audit_logger.critical(f"Fatal Document Error: {e}", extra={"doc_filename": filename, "dlq": True, "traceback": traceback.format_exc()}); print(error_msg, flush=True)
                 try:
                     shutil.copy(pdf, dlq_dir / pdf.name)
                     dlq_meta = {
