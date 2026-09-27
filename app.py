@@ -17,6 +17,7 @@ import json
 import os
 import sys
 import time
+import textwrap
 from pathlib import Path
 import streamlit as st
 
@@ -29,7 +30,7 @@ from src.classifier import classify_document_text
 from src.extractor import extract_payable_from_text, QuotaExhaustedError
 from src.grounding import verify_payable_grounding
 from src.master_matcher import MasterDataMatcher
-from erp import erp_book
+from erp import erp_book, num, _line_base, _line_taxes, _header_taxes
 import pymupdf as fitz
 
 
@@ -51,8 +52,8 @@ st.markdown("""
         color: #e0e6ed;
     }
     .metric-card {
-        background-color: #1a1f2c;
-        border: 1px solid #2d3748;
+        background-color: #161b22;
+        border: 1px solid #30363d;
         border-radius: 8px;
         padding: 16px;
         text-align: center;
@@ -60,37 +61,108 @@ st.markdown("""
     .metric-value {
         font-size: 28px;
         font-weight: bold;
-        color: #4361ee;
+        color: #38bdf8;
     }
     .metric-label {
-        font-size: 13px;
-        color: #a0aec0;
+        font-size: 12px;
+        color: #94a3b8;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     .status-pass {
-        color: #38a169;
+        color: #34d399;
         font-weight: bold;
     }
     .status-declined {
-        color: #d69e2e;
+        color: #fbbf24;
         font-weight: bold;
     }
     .status-fail {
-        color: #e53e3e;
+        color: #f87171;
         font-weight: bold;
     }
     .status-processing {
-        color: #3182ce;
+        color: #38bdf8;
         font-weight: bold;
     }
     .status-queued {
-        color: #718096;
+        color: #64748b;
     }
     div[data-testid="stSidebar"] {
         background-color: #161b22;
         border-right: 1px solid #30363d;
     }
+    /* Flowchart Stepper Cards */
+    .step-card {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 10px 4px;
+        text-align: center;
+        min-height: 85px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease-in-out;
+    }
+    .step-card.active {
+        border-color: #38bdf8 !important;
+        background-color: #0c4a6e33 !important;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .step-card.completed {
+        border-color: #34d399 !important;
+        background-color: #064e3b22 !important;
+    }
+    .step-card.pass {
+        border-color: #10b981 !important;
+        background-color: #064e3b33 !important;
+    }
+    .step-card.fail {
+        border-color: #f87171 !important;
+        background-color: #7f1d1d33 !important;
+    }
+    .step-card.declined {
+        border-color: #fbbf24 !important;
+        background-color: #78350f22 !important;
+    }
+    .step-card.skipped {
+        border-color: #334155 !important;
+        background-color: #1e293b33 !important;
+        opacity: 0.6;
+    }
+    .step-card.pending {
+        border-color: #2d3748 !important;
+        background-color: #161b22 !important;
+        opacity: 0.7;
+    }
+    .step-num {
+        font-size: 10px;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+    }
+    .step-name {
+        font-size: 11px;
+        font-weight: 600;
+        color: #f8fafc;
+        margin: 2px 0;
+        line-height: 1.2;
+    }
+    .step-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 10px;
+    }
+    .step-badge.active { background-color: #0284c7; color: #ffffff; }
+    .step-badge.completed { background-color: #059669; color: #ffffff; }
+    .step-badge.pass { background-color: #059669; color: #ffffff; }
+    .step-badge.fail { background-color: #dc2626; color: #ffffff; }
+    .step-badge.declined { background-color: #d97706; color: #ffffff; }
+    .step-badge.skipped { background-color: #334155; color: #94a3b8; }
+    .step-badge.pending { background-color: #1e293b; color: #64748b; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -164,6 +236,93 @@ for name in pdf_names:
         st.session_state.doc_status[name] = "QUEUED"
     if name not in st.session_state.doc_traces:
         st.session_state.doc_traces[name] = []
+
+# Auto-load pre-existing autodraft JSON payloads from output/ if available
+out_dir_path = Path("output")
+if out_dir_path.exists():
+    for name in pdf_names:
+        pdf_stem = Path(name).stem
+        json_path = out_dir_path / f"{pdf_stem}.json"
+        
+        if st.session_state.doc_status.get(name) == "QUEUED" and not st.session_state.doc_traces.get(name) and json_path.exists():
+            try:
+                data = json.loads(json_path.read_text(encoding="utf-8"))
+                payables = data.get("payables", [])
+                declined = data.get("declined", [])
+
+                if payables:
+                    all_pass = True
+                    for p in payables:
+                        erp_res = erp_book(p)
+                        booked_g = erp_res.get("will_book_gross", 0.0)
+                        target_s = str(p.get("gross_total") or "").strip()
+                        try:
+                            target_g = float(target_s) if target_s else 0.0
+                        except ValueError:
+                            target_g = 0.0
+                        if abs(booked_g - target_g) >= 0.05:
+                            all_pass = False
+
+                    status = "PASS" if all_pass else "FAIL"
+                elif declined:
+                    status = "DECLINED"
+                else:
+                    status = "PASS"
+
+                st.session_state.doc_status[name] = status
+
+                synthetic_trace = []
+                synthetic_trace.append({"step": 1, "title": "Phase 1: OCR & Spatial Layout Extraction", "path_used": "Cached Output Payload", "char_count": len(json.dumps(data)), "page_count": 1, "raw_text": json.dumps(data, indent=2, ensure_ascii=False)})
+                synthetic_trace.append({"step": 2, "title": "Phase 2: Multi-Document Pre-Segmentation", "status_msg": "Loaded existing pre-segmented output payload."})
+                
+                if status == "DECLINED":
+                    synthetic_trace.append({"step": 3, "title": "Phase 3: Classification", "is_payable": False, "doc_type": declined[0].get("doc_type", "DECLINED") if declined else "NON_PAYABLE", "score": 1.0, "reasons": [declined[0].get("reason", "Declined non-payable document")] if declined else ["Non-payable document"]})
+                else:
+                    synthetic_trace.append({"step": 3, "title": "Phase 3: Classification", "is_payable": True, "doc_type": payables[0].get("invoice_type", "INVOICE") if payables else "INVOICE", "score": 1.0, "reasons": ["Valid Payable Document"]})
+                    synthetic_trace.append({"step": 4, "title": "Phase 4: AI Model Extraction", "raw_json": payables[0] if payables else {}})
+                    synthetic_trace.append({"step": "4b", "title": "Phase 4b: Grounding Verification", "warnings": [], "sanitized_json": payables[0] if payables else {}})
+                    synthetic_trace.append({"step": 5, "title": "Phase 5: Master Data Resolution", "master_matched": {
+                        "supplier_id": payables[0].get("supplier", {}).get("supplier_id", "") if payables else "",
+                        "company_code": payables[0].get("buyer", {}).get("company_code", "") if payables else "",
+                        "business_unit_code": payables[0].get("buyer", {}).get("business_unit_code", "") if payables else "",
+                        "location_code": payables[0].get("buyer", {}).get("location_code", "") if payables else "",
+                        "po_id": payables[0].get("po_id", "") if payables else "",
+                        "payment_term_id": payables[0].get("payment_term_id", "") if payables else ""
+                    }, "resolved_json": payables[0] if payables else {}})
+                    synthetic_trace.append({"step": 6, "title": "Phase 6: Pre-ERP Payload Assembly", "payload": payables[0] if payables else {}})
+                    
+                    if payables:
+                        p0 = payables[0]
+                        erp_res0 = erp_book(p0)
+                        booked_g0 = erp_res0.get("will_book_gross", 0.0)
+                        target_s0 = str(p0.get("gross_total") or "").strip()
+                        try:
+                            target_g0 = float(target_s0) if target_s0 else 0.0
+                        except ValueError:
+                            target_g0 = 0.0
+                        is_m0 = abs(booked_g0 - target_g0) < 0.05
+                        synthetic_trace.append({
+                            "step": 7,
+                            "title": "Phase 7: ERP Oracle Booking Verification",
+                            "target_gross": f"{target_g0:.2f}",
+                            "booked_gross": f"{booked_g0:.2f}",
+                            "status": "PASS" if is_m0 else "FAIL",
+                            "erp_details": erp_res0
+                        })
+
+                st.session_state.doc_traces[name] = synthetic_trace
+
+                st.session_state.stats["total"] += 1
+                if payables:
+                    st.session_state.stats["payables"] += len(payables)
+                    if status == "PASS":
+                        st.session_state.stats["first_try_pass"] += len(payables)
+                    else:
+                        st.session_state.stats["failed"] += len(payables)
+                if declined:
+                    st.session_state.stats["declined"] += len(declined)
+            except Exception:
+                pass
 
 if not st.session_state.selected_doc and pdf_names:
     st.session_state.selected_doc = pdf_names[0]
@@ -496,6 +655,15 @@ with st.sidebar:
 
     # 4. Live Document Queue Status List
     st.subheader("📄 Document Queue")
+    
+    # Quick Autodraft Readiness Badge in Sidebar
+    out_dir_path = Path("output")
+    json_autodraft_count = len(list(out_dir_path.glob("*.json"))) if out_dir_path.exists() else 0
+    if json_autodraft_count > 0:
+        st.success(f"📦 **{json_autodraft_count} Autodrafts Ready** (`output/`)", icon="✅")
+    else:
+        st.info("📦 **Autodrafts Pending**", icon="⏳")
+
     status_container = st.container()
     with status_container:
         display_list = pdf_names if processing_mode.startswith("All") else ([single_file_selected] if single_file_selected else pdf_names)
@@ -521,33 +689,606 @@ with st.sidebar:
 
 
 # ---------------------------------------------------------------------------
-# Main Region: Metrics Header & Live Step-by-Step Trace View
+# Helper UI Component Functions: Process Status & Horizontal Flowchart Stepper
 # ---------------------------------------------------------------------------
 
-# Top Header Metrics
-m1, m2, m3, m4 = st.columns(4)
-with m1:
-    st.markdown(f"<div class='metric-card'><div class='metric-value'>{len(pdf_files)}</div><div class='metric-label'>Total PDFs</div></div>", unsafe_allow_html=True)
-with m2:
-    st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#38a169;'>{st.session_state.stats['payables']}</div><div class='metric-label'>Payables Extracted</div></div>", unsafe_allow_html=True)
-with m3:
-    st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#d69e2e;'>{st.session_state.stats['declined']}</div><div class='metric-label'>Declined Segments</div></div>", unsafe_allow_html=True)
-with m4:
-    total_p = max(1, st.session_state.stats['payables'])
-    pass_rate = (st.session_state.stats['first_try_pass'] / total_p) * 100 if st.session_state.stats['payables'] > 0 else 0.0
-    st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#4361ee;'>{pass_rate:.1f}%</div><div class='metric-label'>ERP Booking Pass Rate</div></div>", unsafe_allow_html=True)
+def render_process_status_dashboard(pdf_names_list: list[str]):
+    """Renders the top process status banner, progress bar, and autodraft readiness indicator."""
+    total_docs = len(pdf_names_list)
+    processed_count = sum(
+        1 for name in pdf_names_list if st.session_state.doc_status.get(name, "QUEUED") in ("PASS", "FAIL", "DECLINED")
+    )
+    queued_count = sum(
+        1 for name in pdf_names_list if st.session_state.doc_status.get(name, "QUEUED") == "QUEUED"
+    )
 
+    out_dir = Path("output")
+    json_files_count = len(list(out_dir.glob("*.json"))) if out_dir.exists() else 0
+
+    # Determine Pipeline Status
+    if st.session_state.is_processing:
+        status_title = "⚡ PARSING IN PROGRESS"
+        status_color = "#38bdf8"
+        bg_color = "#0c4a6e22"
+        border_color = "#0284c7"
+        status_desc = f"Ingesting document stream ({processed_count + 1} of {total_docs} active)"
+    elif st.session_state.processing_complete:
+        status_title = "✅ PIPELINE PARSING COMPLETED"
+        status_color = "#34d399"
+        bg_color = "#064e3b22"
+        border_color = "#059669"
+        status_desc = f"Finished ingestion pipeline for all {processed_count} target document(s)."
+    elif st.session_state.stop_requested:
+        status_title = "⏹️ EXECUTION HALTED"
+        status_color = "#fbbf24"
+        bg_color = "#78350f22"
+        border_color = "#d97706"
+        status_desc = f"Halted by user request ({processed_count} completed, {queued_count} remaining)."
+    else:
+        status_title = "🟢 IDLE / READY TO PROCESS"
+        status_color = "#94a3b8"
+        bg_color = "#161b22"
+        border_color = "#30363d"
+        status_desc = f"Ready to ingest {total_docs} document(s). Select scope in sidebar and click Start."
+
+    # Autodraft Readiness Status
+    if json_files_count > 0:
+        draft_title = "✅ AUTODRAFTS READY"
+        draft_color = "#34d399"
+        draft_bg = "#064e3b22"
+        draft_border = "#059669"
+        draft_desc = f"<strong>{json_files_count}</strong> JSON autodraft file(s) available in <code>output/</code>"
+    else:
+        draft_title = "⏳ AUTODRAFTS PENDING"
+        draft_color = "#94a3b8"
+        draft_bg = "#161b22"
+        draft_border = "#30363d"
+        draft_desc = "JSON autodraft payloads will be saved in <code>output/</code> upon Phase 6."
+
+    col1, col2 = st.columns([1.5, 1])
+
+    with col1:
+        st.markdown(textwrap.dedent(f"""
+            <div style="background-color: {bg_color}; border: 1px solid {border_color}; border-radius: 10px; padding: 14px 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Pipeline Execution Status</div>
+                <div style="font-size: 17px; font-weight: 800; color: {status_color}; margin: 4px 0;">{status_title}</div>
+                <div style="font-size: 12px; color: #cbd5e1;">{status_desc}</div>
+            </div>
+        """), unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(textwrap.dedent(f"""
+            <div style="background-color: {draft_bg}; border: 1px solid {draft_border}; border-radius: 10px; padding: 14px 18px;">
+                <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Autodraft Storage Status</div>
+                <div style="font-size: 17px; font-weight: 800; color: {draft_color}; margin: 4px 0;">{draft_title}</div>
+                <div style="font-size: 12px; color: #cbd5e1;">{draft_desc}</div>
+            </div>
+        """), unsafe_allow_html=True)
+
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    progress_val = min(1.0, max(0.0, processed_count / total_docs)) if total_docs > 0 else 0.0
+    st.progress(progress_val, text=f"Parsing Progress: {processed_count}/{total_docs} Documents Ingested ({progress_val*100:.0f}%)")
+
+
+def get_flowchart_steps_status(doc_name: str | None) -> list[dict]:
+    """Computes completion status for each of the 7 pipeline phases for doc_name."""
+    steps_info = [
+        {"num": 1, "name": "OCR & Layout"},
+        {"num": 2, "name": "Segmentation"},
+        {"num": 3, "name": "Classifier"},
+        {"num": 4, "name": "AI Grounding"},
+        {"num": 5, "name": "Master Match"},
+        {"num": 6, "name": "Autodraft JSON"},
+        {"num": 7, "name": "ERP Oracle"},
+    ]
+
+    if not doc_name:
+        for s in steps_info:
+            s["status"] = "PENDING"
+        return steps_info
+
+    doc_status = st.session_state.doc_status.get(doc_name, "QUEUED")
+    traces = st.session_state.doc_traces.get(doc_name, [])
+
+    executed_steps = set()
+    erp_status = None
+
+    for ev in traces:
+        st_val = ev.get("step")
+        if st_val == 1:
+            executed_steps.add(1)
+        elif st_val == 2:
+            executed_steps.add(2)
+        elif st_val == 3:
+            executed_steps.add(3)
+        elif st_val in (4, "4b"):
+            executed_steps.add(4)
+        elif st_val == 5:
+            executed_steps.add(5)
+        elif st_val == 6:
+            executed_steps.add(6)
+        elif st_val == 7:
+            executed_steps.add(7)
+            erp_status = ev.get("status")
+
+    is_curr_processing = (doc_status == "PROCESSING")
+
+    for s in steps_info:
+        n = s["num"]
+        if doc_status == "QUEUED":
+            s["status"] = "PENDING"
+        elif is_curr_processing:
+            if n in executed_steps:
+                max_step = max(executed_steps) if executed_steps else 0
+                s["status"] = "ACTIVE" if n == max_step else "COMPLETED"
+            else:
+                s["status"] = "PENDING"
+        elif doc_status in ("PASS", "FAIL"):
+            if n < 7:
+                s["status"] = "COMPLETED" if n in executed_steps else "SKIPPED"
+            else:
+                s["status"] = "PASS" if erp_status == "PASS" else "FAIL"
+        elif doc_status == "DECLINED":
+            if n <= 3:
+                s["status"] = "DECLINED" if n == 3 else ("COMPLETED" if n in executed_steps else "SKIPPED")
+            else:
+                s["status"] = "SKIPPED"
+        else:
+            s["status"] = "COMPLETED" if n in executed_steps else "PENDING"
+
+    return steps_info
+
+
+def render_flowchart_stepper(doc_name: str | None):
+    """Renders a horizontal visual flowchart stepper showing pipeline procedure phases."""
+    steps = get_flowchart_steps_status(doc_name)
+
+    st.markdown(textwrap.dedent(f"""
+        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span>🗺️ Pipeline Execution Procedure Flowchart</span>
+            <span style="font-size: 11px; background-color: #1e293b; padding: 3px 10px; border-radius: 12px; color: #38bdf8; border: 1px solid #334155;">
+                Selected Target: <strong>{doc_name or 'None Selected'}</strong>
+            </span>
+        </div>
+    """), unsafe_allow_html=True)
+
+    cols = st.columns(7)
+
+    badge_labels = {
+        "COMPLETED": "✓ Done",
+        "ACTIVE": "⚙ Active",
+        "PASS": "✅ PASS",
+        "FAIL": "❌ FAIL",
+        "DECLINED": "⛔ Declined",
+        "SKIPPED": "— Skipped",
+        "PENDING": "⏳ Pending"
+    }
+
+    for idx, (col, step) in enumerate(zip(cols, steps)):
+        st_val = step["status"].lower()
+        badge_txt = badge_labels.get(step["status"], step["status"])
+
+        with col:
+            html_card = textwrap.dedent(f"""
+                <div class="step-card {st_val}">
+                    <div class="step-num">STEP 0{step['num']}</div>
+                    <div class="step-name">{step['name']}</div>
+                    <div class="step-badge {st_val}">{badge_txt}</div>
+                </div>
+            """)
+            st.markdown(html_card, unsafe_allow_html=True)
+
+
+def render_metrics():
+    """Renders top header summary metric cards."""
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown(f"<div class='metric-card'><div class='metric-value'>{len(pdf_files)}</div><div class='metric-label'>Total PDFs</div></div>", unsafe_allow_html=True)
+    with m2:
+        st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#34d399;'>{st.session_state.stats['payables']}</div><div class='metric-label'>Payables Extracted</div></div>", unsafe_allow_html=True)
+    with m3:
+        st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#fbbf24;'>{st.session_state.stats['declined']}</div><div class='metric-label'>Declined Segments</div></div>", unsafe_allow_html=True)
+    with m4:
+        total_p = max(1, st.session_state.stats['payables'])
+        pass_rate = (st.session_state.stats['first_try_pass'] / total_p) * 100 if st.session_state.stats['payables'] > 0 else 0.0
+        st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#38bdf8;'>{pass_rate:.1f}%</div><div class='metric-label'>ERP Booking Pass Rate</div></div>", unsafe_allow_html=True)
+
+
+
+def run_batch_erp_audit():
+    """Iterates over all output/*.json files and calculates ERP oracle booking for every payable."""
+    out_dir = Path("output")
+    if not out_dir.exists():
+        return [], {"total": 0, "pass": 0, "fail": 0, "pass_rate": 0.0}
+
+    json_files = sorted(list(out_dir.glob("*.json")))
+    records = []
+    pass_count = 0
+    fail_count = 0
+
+    for jf in json_files:
+        try:
+            data = json.loads(jf.read_text(encoding="utf-8"))
+            payables = data.get("payables", [])
+            file_name = data.get("file", jf.name)
+
+            for p_idx, p in enumerate(payables, 1):
+                erp_res = erp_book(p)
+                booked_gross = erp_res.get("will_book_gross", 0.0)
+                currency = erp_res.get("currency", "") or "EUR"
+
+                target_str = str(p.get("gross_total") or "").strip()
+                try:
+                    target_gross = float(target_str) if target_str else 0.0
+                except ValueError:
+                    target_gross = 0.0
+
+                delta = round(abs(booked_gross - target_gross), 2)
+                is_match = delta < 0.05
+                verdict = "PASS" if is_match else "FAIL"
+
+                if is_match:
+                    pass_count += 1
+                else:
+                    fail_count += 1
+
+                records.append({
+                    "File": file_name,
+                    "Sub-Doc": f"#{p_idx}" if len(payables) > 1 else "1",
+                    "Invoice #": p.get("invoice_number", "N/A"),
+                    "Supplier": p.get("supplier", {}).get("name", "N/A"),
+                    "Stated Gross": f"{target_gross:.2f} {currency}",
+                    "ERP Booked Gross": f"{booked_gross:.2f} {currency}",
+                    "Delta": f"{delta:.2f}",
+                    "Verdict": verdict
+                })
+        except Exception:
+            pass
+
+    total = pass_count + fail_count
+    pass_rate = (pass_count / total * 100.0) if total > 0 else 0.0
+    summary = {
+        "total": total,
+        "pass": pass_count,
+        "fail": fail_count,
+        "pass_rate": pass_rate
+    }
+    return records, summary
+
+
+def render_erp_playground():
+    """Renders an interactive ERP calculation playground with single payload editing AND batch ERP audit over all payables."""
+    with st.expander("🧮 Interactive ERP Oracle Calculator & Batch Audit Suite", expanded=False):
+        tab_single, tab_batch = st.tabs(["🔍 Single Payload Inspector & Editor", "📊 Batch ERP Audit (All Payables)"])
+
+        with tab_single:
+            st.markdown("<div style='font-size: 12px; color: #94a3b8; margin-bottom: 10px;'>Select any generated autodraft from <code>output/</code>, <code>sample_autodraft.json</code>, or paste custom JSON. Tweak line prices, quantities, taxes, or discounts and re-run the ERP Oracle booking calculation live.</div>", unsafe_allow_html=True)
+            
+            out_dir = Path("output")
+            output_files = sorted([f.name for f in out_dir.glob("*.json")]) if out_dir.exists() else []
+            options = []
+            if Path("sample_autodraft.json").exists():
+                options.append("sample_autodraft.json")
+            options.extend([f"output/{f}" for f in output_files])
+            options.append("Custom JSON Input")
+
+            selected_source = st.selectbox("Select Payload Source:", options=options, index=0 if options else 0, key="erp_payload_source_sel")
+
+            initial_json_str = ""
+            if selected_source == "sample_autodraft.json":
+                sample_p = Path("sample_autodraft.json")
+                if sample_p.exists():
+                    initial_json_str = sample_p.read_text(encoding="utf-8")
+            elif selected_source.startswith("output/"):
+                file_name = selected_source.replace("output/", "")
+                target_p = out_dir / file_name
+                if target_p.exists():
+                    initial_json_str = target_p.read_text(encoding="utf-8")
+            else:
+                initial_json_str = json.dumps({
+                    "invoice_number": "INV-TEST-001",
+                    "currency": "EUR",
+                    "gross_total": "100.00",
+                    "discount_amount": "0.00",
+                    "freight_charges": "0.00",
+                    "insurance_charges": "0.00",
+                    "extra_charges": "0.00",
+                    "excise_duties": "0.00",
+                    "line_items": [
+                        {
+                            "description": "Sample Line Item",
+                            "quantity": "2.00",
+                            "unit_price": "50.00",
+                            "discount": "0.00",
+                            "discount_percentage": "0.00",
+                            "tax_rate": "0.00",
+                            "tax_amount": "0.00"
+                        }
+                    ]
+                }, indent=2)
+
+            edited_json_str = st.text_area(
+                "Editable Payable JSON Payload:",
+                value=initial_json_str,
+                height=240,
+                key=f"json_editor_{selected_source}"
+            )
+
+            recalc_btn = st.button("⚡ Run ERP Oracle Recompute", type="primary", key="recalc_single_btn")
+
+            if recalc_btn or edited_json_str:
+                try:
+                    payload = json.loads(edited_json_str)
+                    payables_list = []
+                    if isinstance(payload, dict):
+                        if "payables" in payload and isinstance(payload["payables"], list):
+                            payables_list = payload["payables"]
+                        else:
+                            payables_list = [payload]
+
+                    if not payables_list:
+                        st.warning("No payable objects found in the provided JSON payload.")
+                    else:
+                        for p_idx, p in enumerate(payables_list, 1):
+                            if len(payables_list) > 1:
+                                st.markdown(f"#### Payable #{p_idx}")
+
+                            erp_res = erp_book(p)
+                            booked_gross = erp_res.get("will_book_gross", 0.0)
+                            currency = erp_res.get("currency", "") or "EUR"
+
+                            target_str = str(p.get("gross_total") or "").strip()
+                            try:
+                                target_gross = float(target_str) if target_str else 0.0
+                            except ValueError:
+                                target_gross = 0.0
+
+                            delta = round(abs(booked_gross - target_gross), 2)
+                            is_match = delta < 0.05
+
+                            item_discounted_total = sum(_line_base(li) for li in (p.get("line_items") or []) if isinstance(li, dict))
+                            line_tax_total = sum(_line_taxes(li, _line_base(li)) for li in (p.get("line_items") or []) if isinstance(li, dict))
+                            header_discount = abs(num(p.get("discount_amount")))
+                            net_base = item_discounted_total - header_discount
+                            header_tax = _header_taxes(p.get("taxes"), net_base)
+                            other_charges = (
+                                num(p.get("freight_charges"))
+                                + num(p.get("insurance_charges"))
+                                + num(p.get("extra_charges"))
+                                + num(p.get("excise_duties"))
+                            )
+
+                            verdict_text = "✅ PASS — CENT-EXACT MATCH" if is_match else "❌ FAIL — DISCREPANCY DETECTED"
+                            verdict_color = "#34d399" if is_match else "#f87171"
+                            bg_color = "#064e3b22" if is_match else "#7f1d1d33"
+                            border_color = "#059669" if is_match else "#dc2626"
+
+                            st.markdown(textwrap.dedent(f"""
+                                <div style="background-color: {bg_color}; border: 1px solid {border_color}; border-radius: 8px; padding: 14px 18px; margin: 12px 0;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Oracle Calculation Verdict</div>
+                                    <div style="font-size: 18px; font-weight: 800; color: {verdict_color}; margin: 4px 0;">{verdict_text}</div>
+                                    <div style="font-size: 12px; color: #cbd5e1;">Stated Gross: <strong>{target_gross:.2f} {currency}</strong> | ERP Recomputed: <strong>{booked_gross:.2f} {currency}</strong> | Delta: <strong>{delta:.2f} {currency}</strong></div>
+                                </div>
+                            """), unsafe_allow_html=True)
+
+                            c1, c2 = st.columns(2)
+                            c1.metric("Stated Target Gross", f"{target_gross:.2f} {currency}")
+                            c2.metric("ERP Booked Gross", f"{booked_gross:.2f} {currency}", delta=f"-{delta:.2f}" if delta > 0 else "0.00", delta_color="inverse" if not is_match else "normal")
+
+                            st.markdown("**📐 Itemized Accounting Ledger Breakdown**")
+                            st.table([
+                                {"Accounting Component": "Line Items Base Total (Net)", "Amount": f"{item_discounted_total:.2f} {currency}"},
+                                {"Accounting Component": "Header Discount Deduction", "Amount": f"-{header_discount:.2f} {currency}"},
+                                {"Accounting Component": "Item-Level Line Taxes Total", "Amount": f"+{line_tax_total:.2f} {currency}"},
+                                {"Accounting Component": "Header Taxes Total", "Amount": f"+{header_tax:.2f} {currency}"},
+                                {"Accounting Component": "Freight & Extra Charges", "Amount": f"+{other_charges:.2f} {currency}"},
+                                {"Accounting Component": "Final ERP Recomputed Gross", "Amount": f"{booked_gross:.2f} {currency}"}
+                            ])
+                except Exception as ex:
+                    st.error(f"JSON Parsing / Calculation Error: {ex}")
+
+        with tab_batch:
+            st.markdown("<div style='font-size: 12px; color: #94a3b8; margin-bottom: 12px;'>Execute batch ERP calculation across <strong>all generated autodraft payloads</strong> in <code>output/</code> to audit complete accounting footprint correctness.</div>", unsafe_allow_html=True)
+            
+            records, summary = run_batch_erp_audit()
+
+            # Top Batch Audit Summary Metrics
+            bm1, bm2, bm3, bm4 = st.columns(4)
+            with bm1:
+                st.markdown(f"<div class='metric-card'><div class='metric-value'>{summary['total']}</div><div class='metric-label'>Payables Audited</div></div>", unsafe_allow_html=True)
+            with bm2:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#34d399;'>{summary['pass']}</div><div class='metric-label'>Cent-Exact Passed</div></div>", unsafe_allow_html=True)
+            with bm3:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#f87171;'>{summary['fail']}</div><div class='metric-label'>Discrepancies</div></div>", unsafe_allow_html=True)
+            with bm4:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#38bdf8;'>{summary['pass_rate']:.1f}%</div><div class='metric-label'>Batch Pass Rate</div></div>", unsafe_allow_html=True)
+
+            st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
+
+            # Filter options for the table
+            filter_choice = st.radio(
+                "Filter Batch Payables:",
+                options=["All Audited Payables", "✅ PASS Only", "❌ FAIL Discrepancies Only"],
+                horizontal=True,
+                key="batch_erp_filter_choice"
+            )
+
+            filtered_records = records
+            if filter_choice == "✅ PASS Only":
+                filtered_records = [r for r in records if r["Verdict"] == "PASS"]
+            elif filter_choice == "❌ FAIL Discrepancies Only":
+                filtered_records = [r for r in records if r["Verdict"] == "FAIL"]
+
+            if filtered_records:
+                st.dataframe(
+                    filtered_records,
+                    use_container_width=True,
+                    hide_index=True,
+                    column_config={
+                        "Verdict": st.column_config.TextColumn("Verdict", help="ERP Oracle Cent-Exact Match Status")
+                    }
+                )
+
+                # Download JSON Report
+                json_report_bytes = json.dumps({"summary": summary, "records": records}, indent=2).encode("utf-8")
+                st.download_button(
+                    label="📥 Download Full Batch ERP Audit Report (JSON)",
+                    data=json_report_bytes,
+                    file_name="erp_batch_audit_report.json",
+                    mime="application/json",
+                    key="dl_batch_erp_report"
+                )
+            else:
+                st.info("No payables match the selected filter criteria.")
+
+
+def render_rerun_erp_section():
+    """Renders a dedicated subsequent section allowing users to trigger ERP Oracle re-runs based on Single or Batch scope."""
+    st.markdown("### 🔄 Re-run ERP Calculation Suite")
+    st.caption("Re-execute the ERP accounting oracle dynamically for either the currently selected document or across all batch payloads.")
+
+    curr_doc = st.session_state.selected_doc or "DU-02.pdf"
+    
+    c_scope, c_btn = st.columns([2.5, 1])
+
+    with c_scope:
+        scope_choice = st.radio(
+            "Select Re-run Execution Scope:",
+            options=[f"Single Document (`{curr_doc}`)", "Batch Mode (All Output Payloads)"],
+            horizontal=True,
+            key="radio_rerun_erp_scope"
+        )
+
+    with c_btn:
+        st.write("")
+        st.write("")
+        trigger_btn = st.button("⚡ Re-run ERP Oracle", type="primary", use_container_width=True, key="btn_trigger_rerun_erp")
+
+    if trigger_btn:
+        if scope_choice.startswith("Single"):
+            out_dir = Path("output")
+            stem = Path(curr_doc).stem
+            json_p = out_dir / f"{stem}.json"
+
+            if json_p.exists():
+                try:
+                    data = json.loads(json_p.read_text(encoding="utf-8"))
+                    payables = data.get("payables", [])
+                    if not payables:
+                        st.warning(f"Document `{curr_doc}` contains no payables (Declined document).")
+                    else:
+                        st.success(f"✅ Successfully re-ran ERP Oracle on `{curr_doc}` ({len(payables)} payable object(s))")
+                        for p_idx, p in enumerate(payables, 1):
+                            if len(payables) > 1:
+                                st.markdown(f"#### Payable #{p_idx}")
+
+                            erp_res = erp_book(p)
+                            booked_gross = erp_res.get("will_book_gross", 0.0)
+                            currency = erp_res.get("currency", "") or "EUR"
+
+                            target_str = str(p.get("gross_total") or "").strip()
+                            try:
+                                target_gross = float(target_str) if target_str else 0.0
+                            except ValueError:
+                                target_gross = 0.0
+
+                            delta = round(abs(booked_gross - target_gross), 2)
+                            is_match = delta < 0.05
+
+                            item_discounted_total = sum(_line_base(li) for li in (p.get("line_items") or []) if isinstance(li, dict))
+                            line_tax_total = sum(_line_taxes(li, _line_base(li)) for li in (p.get("line_items") or []) if isinstance(li, dict))
+                            header_discount = abs(num(p.get("discount_amount")))
+                            net_base = item_discounted_total - header_discount
+                            header_tax = _header_taxes(p.get("taxes"), net_base)
+                            other_charges = (
+                                num(p.get("freight_charges"))
+                                + num(p.get("insurance_charges"))
+                                + num(p.get("extra_charges"))
+                                + num(p.get("excise_duties"))
+                            )
+
+                            verdict_text = "✅ PASS — CENT-EXACT MATCH" if is_match else "❌ FAIL — DISCREPANCY DETECTED"
+                            verdict_color = "#34d399" if is_match else "#f87171"
+                            bg_color = "#064e3b22" if is_match else "#7f1d1d33"
+                            border_color = "#059669" if is_match else "#dc2626"
+
+                            st.markdown(textwrap.dedent(f"""
+                                <div style="background-color: {bg_color}; border: 1px solid {border_color}; border-radius: 8px; padding: 14px 18px; margin: 10px 0;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Re-run Calculation Verdict (`{curr_doc}`)</div>
+                                    <div style="font-size: 18px; font-weight: 800; color: {verdict_color}; margin: 4px 0;">{verdict_text}</div>
+                                    <div style="font-size: 12px; color: #cbd5e1;">Stated Target Gross: <strong>{target_gross:.2f} {currency}</strong> | ERP Recomputed: <strong>{booked_gross:.2f} {currency}</strong> | Delta: <strong>{delta:.2f} {currency}</strong></div>
+                                </div>
+                            """), unsafe_allow_html=True)
+
+                            col_a, col_b = st.columns(2)
+                            col_a.metric("Stated Target Gross", f"{target_gross:.2f} {currency}")
+                            col_b.metric("ERP Booked Gross", f"{booked_gross:.2f} {currency}", delta=f"-{delta:.2f}" if delta > 0 else "0.00", delta_color="inverse" if not is_match else "normal")
+
+                            st.table([
+                                {"Accounting Component": "Line Items Base Total (Net)", "Amount": f"{item_discounted_total:.2f} {currency}"},
+                                {"Accounting Component": "Header Discount Deduction", "Amount": f"-{header_discount:.2f} {currency}"},
+                                {"Accounting Component": "Item-Level Line Taxes Total", "Amount": f"+{line_tax_total:.2f} {currency}"},
+                                {"Accounting Component": "Header Taxes Total", "Amount": f"+{header_tax:.2f} {currency}"},
+                                {"Accounting Component": "Freight & Extra Charges", "Amount": f"+{other_charges:.2f} {currency}"},
+                                {"Accounting Component": "Final ERP Recomputed Gross", "Amount": f"{booked_gross:.2f} {currency}"}
+                            ])
+                except Exception as ex:
+                    st.error(f"Failed to read/calculate payload for `{curr_doc}`: {ex}")
+            else:
+                st.warning(f"No generated JSON output found for `{curr_doc}` in `output/`.")
+        else:
+            records, summary = run_batch_erp_audit()
+            st.success(f"✅ Successfully re-ran Batch ERP Oracle across all {summary['total']} payables!")
+
+            bm1, bm2, bm3, bm4 = st.columns(4)
+            with bm1:
+                st.markdown(f"<div class='metric-card'><div class='metric-value'>{summary['total']}</div><div class='metric-label'>Payables Audited</div></div>", unsafe_allow_html=True)
+            with bm2:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#34d399;'>{summary['pass']}</div><div class='metric-label'>Cent-Exact Passed</div></div>", unsafe_allow_html=True)
+            with bm3:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#f87171;'>{summary['fail']}</div><div class='metric-label'>Discrepancies</div></div>", unsafe_allow_html=True)
+            with bm4:
+                st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#38bdf8;'>{summary['pass_rate']:.1f}%</div><div class='metric-label'>Batch Pass Rate</div></div>", unsafe_allow_html=True)
+
+            st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+            st.dataframe(records, use_container_width=True, hide_index=True)
+
+
+# ---------------------------------------------------------------------------
+# Main Region: UI Layout & Placeholders
+# ---------------------------------------------------------------------------
+
+status_dashboard_placeholder = st.empty()
+metrics_placeholder = st.empty()
 st.divider()
-
-# Selected Document Header
-curr_doc = st.session_state.selected_doc
-curr_status = st.session_state.doc_status.get(curr_doc, "QUEUED") if curr_doc else "QUEUED"
-
-st.header(f"🔍 Pipeline Step Trace: `{curr_doc or 'Ready'}`")
-st.markdown(f"**Current Status:** `{curr_status}`")
-
-# Render Active Document's Step-by-Step Trace
+flowchart_placeholder = st.empty()
+erp_playground_placeholder = st.empty()
+st.divider()
+rerun_erp_placeholder = st.empty()
+st.divider()
+trace_header_placeholder = st.empty()
 trace_placeholder = st.container()
+log_expander_placeholder = st.empty()
+
+
+def refresh_live_ui():
+    """Refreshes all top status banners, metrics, flowchart, calculator, and headers."""
+    with status_dashboard_placeholder.container():
+        render_process_status_dashboard(pdf_names)
+    with metrics_placeholder.container():
+        render_metrics()
+    with flowchart_placeholder.container():
+        render_flowchart_stepper(st.session_state.selected_doc)
+    with erp_playground_placeholder.container():
+        render_erp_playground()
+    with rerun_erp_placeholder.container():
+        render_rerun_erp_section()
+    with trace_header_placeholder.container():
+        curr_doc = st.session_state.selected_doc
+        curr_status = st.session_state.doc_status.get(curr_doc, "QUEUED") if curr_doc else "QUEUED"
+        st.header(f"🔍 Pipeline Step Trace: `{curr_doc or 'Ready'}`")
+        st.markdown(f"**Current Status:** `{curr_status}`")
+
 
 def render_trace(doc_name: str | None):
     if not doc_name:
@@ -649,7 +1390,6 @@ def render_trace(doc_name: str | None):
 # ---------------------------------------------------------------------------
 # Trigger Live Generator Execution on Start Click
 # ---------------------------------------------------------------------------
-log_expander_placeholder = st.empty()
 
 if start_btn:
     st.session_state.is_processing = True
@@ -674,7 +1414,9 @@ if start_btn:
             status_banner.warning("⏹️ Processing stopped by user request.")
             break
 
-        # Re-render trace & log feed live in placeholders
+        # Re-render UI components live
+        refresh_live_ui()
+
         with trace_placeholder.container():
             render_trace(st.session_state.selected_doc)
 
@@ -688,11 +1430,13 @@ if start_btn:
         status_banner.success("✅ Pipeline processing complete!")
     st.rerun()
 else:
+    refresh_live_ui()
     with trace_placeholder.container():
-        render_trace(curr_doc)
+        render_trace(st.session_state.selected_doc)
     with log_expander_placeholder.container():
         with st.expander("🖥️ Live Terminal Log Feed (stdout)", expanded=False):
             if st.session_state.raw_logs:
                 st.code("\n".join(st.session_state.raw_logs[-100:]), language="text")
             else:
                 st.code("No stdout logs recorded yet. Start processing to view terminal logs live.", language="text")
+
