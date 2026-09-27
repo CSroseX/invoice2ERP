@@ -364,222 +364,251 @@ def run_pipeline_generator(target_files: list[Path]):
                 "total": len(target_files)
             }
 
-            txt_cache = Path("parsed_files") / f"{pdf.stem}.txt"
-            path_used = "PyMuPDF Native Vector Text"
-            page_count = 1
-
-            # Phase 1: OCR Extraction & Layout
-            if txt_cache.exists():
-                full_ocr_text = txt_cache.read_text(encoding="utf-8", errors="ignore")
-                path_used = "Cached OCR Text (300 DPI Spatial Layout)"
-                print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", flush=True)
-            else:
-                doc = fitz.open(str(pdf))
-                page_count = len(doc)
-                is_dig = any(is_digital_vector_page(doc[i]) for i in range(len(doc)))
-                doc.close()
-                
-                text_pages = extract_text(str(pdf))
-                full_ocr_text = "\n\n--- PAGE BREAK ---\n\n".join(text_pages)
-                path_used = "PyMuPDF Direct Text Extraction" if is_dig else "PyMuPDF Render (300 DPI) + EasyOCR"
-                print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", flush=True)
-
-            step1_event = {
-                "step": 1,
-                "title": "Phase 1: OCR & Spatial Layout Extraction",
-                "path_used": path_used,
-                "char_count": len(full_ocr_text),
-                "page_count": page_count,
-                "raw_text": full_ocr_text
-            }
-            trace.append(step1_event)
-            st.session_state.doc_traces[filename].append(step1_event)
-            yield {"type": "STEP_1", "filename": filename, "data": step1_event}
-
-            # Phase 2: Multi-Document Pre-Segmentation
-            subdoc_texts = segment_document_text(full_ocr_text)
-            print(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", flush=True)
-
-            step2_event = {
-                "step": 2,
-                "title": "Phase 2: Multi-Document Pre-Segmentation",
-                "subdoc_count": len(subdoc_texts),
-                "status_msg": f"Detected {len(subdoc_texts)} distinct sub-document segment(s)."
-            }
-            trace.append(step2_event)
-            st.session_state.doc_traces[filename].append(step2_event)
-            yield {"type": "STEP_2", "filename": filename, "data": step2_event}
-
-            payables = []
-            declined = []
-            doc_has_payable = False
-
-            for s_idx, seg_text in enumerate(subdoc_texts, 1):
-                if st.session_state.stop_requested:
-                    break
-
-                sub_label = f"{filename}#subdoc{s_idx}" if len(subdoc_texts) > 1 else filename
-                
-                # Phase 3: Classification
-                class_res = classify_document_text(seg_text, filename=sub_label)
-                confidence_score = getattr(class_res, 'confidence', getattr(class_res, 'score', 1.0))
-                print(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", flush=True)
-
-                step3_event = {
-                    "step": 3,
-                    "subdoc_idx": s_idx,
-                    "title": f"Phase 3: Classification [{sub_label}]",
-                    "is_payable": class_res.is_payable,
-                    "doc_type": class_res.doc_type,
-                    "score": confidence_score,
-                    "reasons": class_res.reasons
+            try:
+                txt_cache = Path("parsed_files") / f"{pdf.stem}.txt"
+                path_used = "PyMuPDF Native Vector Text"
+                page_count = 1
+    
+                # Phase 1: OCR Extraction & Layout
+                if txt_cache.exists():
+                    full_ocr_text = txt_cache.read_text(encoding="utf-8", errors="ignore")
+                    path_used = "Cached OCR Text (300 DPI Spatial Layout)"
+                    print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", flush=True)
+                else:
+                    doc = fitz.open(str(pdf))
+                    page_count = len(doc)
+                    is_dig = any(is_digital_vector_page(doc[i]) for i in range(len(doc)))
+                    doc.close()
+                    
+                    text_pages = extract_text(str(pdf))
+                    full_ocr_text = "\n\n--- PAGE BREAK ---\n\n".join(text_pages)
+                    path_used = "PyMuPDF Direct Text Extraction" if is_dig else "PyMuPDF Render (300 DPI) + EasyOCR"
+                    print(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", flush=True)
+    
+                step1_event = {
+                    "step": 1,
+                    "title": "Phase 1: OCR & Spatial Layout Extraction",
+                    "path_used": path_used,
+                    "char_count": len(full_ocr_text),
+                    "page_count": page_count,
+                    "raw_text": full_ocr_text
                 }
-                trace.append(step3_event)
-                st.session_state.doc_traces[filename].append(step3_event)
-                yield {"type": "STEP_3", "filename": filename, "data": step3_event}
-
-                if class_res.is_payable:
-                    doc_has_payable = True
-                    try:
-                        # Phase 4: AI Model Extraction (Groq)
-                        print(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", flush=True)
-                        raw_payable = extract_payable_from_text(seg_text, filename=sub_label, allow_fallback=False)
-                        if class_res.doc_type == "CREDIT_MEMO":
-                            raw_payable["invoice_type"] = "CREDIT_MEMO"
-
-                        step4_event = {
-                            "step": 4,
-                            "subdoc_idx": s_idx,
-                            "title": f"Phase 4: AI Model Extraction (Groq) [{sub_label}]",
-                            "raw_json": raw_payable
-                        }
-                        trace.append(step4_event)
-                        st.session_state.doc_traces[filename].append(step4_event)
-                        yield {"type": "STEP_4", "filename": filename, "data": step4_event}
-
-                        # Phase 4b: Grounding Verification
-                        grounded_payable, g_warns = verify_payable_grounding(raw_payable, seg_text)
-                        step4b_event = {
-                            "step": "4b",
-                            "subdoc_idx": s_idx,
-                            "title": f"Phase 4b: Grounding & Anti-Hallucination Verification [{sub_label}]",
-                            "warnings": g_warns,
-                            "sanitized_json": grounded_payable
-                        }
-                        trace.append(step4b_event)
-                        st.session_state.doc_traces[filename].append(step4b_event)
-                        yield {"type": "STEP_4B", "filename": filename, "data": step4b_event}
-
-                        # Phase 5: Master Data Matching
-                        resolved_payable = matcher.resolve_payable(grounded_payable, text_context=seg_text)
-                        
-                        supp_id = resolved_payable.get("supplier", {}).get("supplier_id", "")
-                        comp_code = resolved_payable.get("buyer", {}).get("company_code", "")
-                        print(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", flush=True)
-
-                        master_summary = {
-                            "supplier_id": supp_id,
-                            "company_code": comp_code,
-                            "business_unit_code": resolved_payable.get("buyer", {}).get("business_unit_code", ""),
-                            "location_code": resolved_payable.get("buyer", {}).get("location_code", ""),
-                            "po_id": resolved_payable.get("po_id", ""),
-                            "payment_term_id": resolved_payable.get("payment_term_id", "")
-                        }
-                        
-                        step5_event = {
-                            "step": 5,
-                            "subdoc_idx": s_idx,
-                            "title": f"Phase 5: Master Data Resolution [{sub_label}]",
-                            "master_matched": master_summary,
-                            "resolved_json": resolved_payable
-                        }
-                        trace.append(step5_event)
-                        st.session_state.doc_traces[filename].append(step5_event)
-                        yield {"type": "STEP_5", "filename": filename, "data": step5_event}
-
-                        # Phase 6: Pre-ERP Payload Assembly
-                        payables.append(resolved_payable)
-                        step6_event = {
-                            "step": 6,
-                            "subdoc_idx": s_idx,
-                            "title": f"Phase 6: Pre-ERP Payload Assembly [{sub_label}]",
-                            "payload": resolved_payable
-                        }
-                        trace.append(step6_event)
-                        st.session_state.doc_traces[filename].append(step6_event)
-                        yield {"type": "STEP_6", "filename": filename, "data": step6_event}
-
-                        # Phase 7: ERP Oracle Booking Check
-                        erp_res = erp_book(resolved_payable)
-                        booked_gross = erp_res.get("will_book_gross", 0.0)
-                        printed_gross_str = str(resolved_payable.get("gross_total") or "").strip()
+                trace.append(step1_event)
+                st.session_state.doc_traces[filename].append(step1_event)
+                yield {"type": "STEP_1", "filename": filename, "data": step1_event}
+    
+                # Phase 2: Multi-Document Pre-Segmentation
+                subdoc_texts = segment_document_text(full_ocr_text)
+                print(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", flush=True)
+    
+                step2_event = {
+                    "step": 2,
+                    "title": "Phase 2: Multi-Document Pre-Segmentation",
+                    "subdoc_count": len(subdoc_texts),
+                    "status_msg": f"Detected {len(subdoc_texts)} distinct sub-document segment(s)."
+                }
+                trace.append(step2_event)
+                st.session_state.doc_traces[filename].append(step2_event)
+                yield {"type": "STEP_2", "filename": filename, "data": step2_event}
+    
+                payables = []
+                declined = []
+                doc_has_payable = False
+    
+                for s_idx, seg_text in enumerate(subdoc_texts, 1):
+                    if st.session_state.stop_requested:
+                        break
+    
+                    sub_label = f"{filename}#subdoc{s_idx}" if len(subdoc_texts) > 1 else filename
+                    
+                    # Phase 3: Classification
+                    class_res = classify_document_text(seg_text, filename=sub_label)
+                    confidence_score = getattr(class_res, 'confidence', getattr(class_res, 'score', 1.0))
+                    print(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", flush=True)
+    
+                    step3_event = {
+                        "step": 3,
+                        "subdoc_idx": s_idx,
+                        "title": f"Phase 3: Classification [{sub_label}]",
+                        "is_payable": class_res.is_payable,
+                        "doc_type": class_res.doc_type,
+                        "score": confidence_score,
+                        "reasons": class_res.reasons
+                    }
+                    trace.append(step3_event)
+                    st.session_state.doc_traces[filename].append(step3_event)
+                    yield {"type": "STEP_3", "filename": filename, "data": step3_event}
+    
+                    if class_res.is_payable:
+                        doc_has_payable = True
                         try:
-                            target_gross = float(printed_gross_str) if printed_gross_str else 0.0
-                        except ValueError:
-                            target_gross = 0.0
-
-                        is_match = abs(booked_gross - target_gross) < 0.05
-                        erp_status = "PASS" if is_match else "FAIL"
-                        print(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", flush=True)
-
-                        step7_event = {
-                            "step": 7,
-                            "subdoc_idx": s_idx,
-                            "title": f"Phase 7: ERP Oracle Booking Verification [{sub_label}]",
-                            "target_gross": f"{target_gross:.2f}",
-                            "booked_gross": f"{booked_gross:.2f}",
-                            "status": erp_status,
-                            "erp_details": erp_res
-                        }
-                        trace.append(step7_event)
-                        st.session_state.doc_traces[filename].append(step7_event)
-                        yield {"type": "STEP_7", "filename": filename, "data": step7_event}
-
-                    except QuotaExhaustedError as qe:
-                        print(f"[QUOTA EXHAUSTED]: {qe}", flush=True)
-                        st.session_state.doc_status[filename] = "FAIL"
-                        return
-                    except Exception as e:
-                        print(f"  [EXTRACTION FAILED]: {e}", flush=True)
-                        declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction exception: {e}"})
+                            # Phase 4: AI Model Extraction (Groq)
+                            print(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", flush=True)
+                            raw_payable = extract_payable_from_text(seg_text, filename=sub_label, allow_fallback=False)
+                            if class_res.doc_type == "CREDIT_MEMO":
+                                raw_payable["invoice_type"] = "CREDIT_MEMO"
+    
+                            step4_event = {
+                                "step": 4,
+                                "subdoc_idx": s_idx,
+                                "title": f"Phase 4: AI Model Extraction (Groq) [{sub_label}]",
+                                "raw_json": raw_payable
+                            }
+                            trace.append(step4_event)
+                            st.session_state.doc_traces[filename].append(step4_event)
+                            yield {"type": "STEP_4", "filename": filename, "data": step4_event}
+    
+                            # Phase 4b: Grounding Verification
+                            grounded_payable, g_warns = verify_payable_grounding(raw_payable, seg_text)
+                            step4b_event = {
+                                "step": "4b",
+                                "subdoc_idx": s_idx,
+                                "title": f"Phase 4b: Grounding & Anti-Hallucination Verification [{sub_label}]",
+                                "warnings": g_warns,
+                                "sanitized_json": grounded_payable
+                            }
+                            trace.append(step4b_event)
+                            st.session_state.doc_traces[filename].append(step4b_event)
+                            yield {"type": "STEP_4B", "filename": filename, "data": step4b_event}
+    
+                            # Phase 5: Master Data Matching
+                            resolved_payable = matcher.resolve_payable(grounded_payable, text_context=seg_text)
+                            
+                            supp_id = resolved_payable.get("supplier", {}).get("supplier_id", "")
+                            comp_code = resolved_payable.get("buyer", {}).get("company_code", "")
+                            print(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", flush=True)
+    
+                            master_summary = {
+                                "supplier_id": supp_id,
+                                "company_code": comp_code,
+                                "business_unit_code": resolved_payable.get("buyer", {}).get("business_unit_code", ""),
+                                "location_code": resolved_payable.get("buyer", {}).get("location_code", ""),
+                                "po_id": resolved_payable.get("po_id", ""),
+                                "payment_term_id": resolved_payable.get("payment_term_id", "")
+                            }
+                            
+                            step5_event = {
+                                "step": 5,
+                                "subdoc_idx": s_idx,
+                                "title": f"Phase 5: Master Data Resolution [{sub_label}]",
+                                "master_matched": master_summary,
+                                "resolved_json": resolved_payable
+                            }
+                            trace.append(step5_event)
+                            st.session_state.doc_traces[filename].append(step5_event)
+                            yield {"type": "STEP_5", "filename": filename, "data": step5_event}
+    
+                            # Phase 6: Pre-ERP Payload Assembly
+                            payables.append(resolved_payable)
+                            step6_event = {
+                                "step": 6,
+                                "subdoc_idx": s_idx,
+                                "title": f"Phase 6: Pre-ERP Payload Assembly [{sub_label}]",
+                                "payload": resolved_payable
+                            }
+                            trace.append(step6_event)
+                            st.session_state.doc_traces[filename].append(step6_event)
+                            yield {"type": "STEP_6", "filename": filename, "data": step6_event}
+    
+                            # Phase 7: ERP Oracle Booking Check
+                            erp_res = erp_book(resolved_payable)
+                            booked_gross = erp_res.get("will_book_gross", 0.0)
+                            printed_gross_str = str(resolved_payable.get("gross_total") or "").strip()
+                            try:
+                                target_gross = float(printed_gross_str) if printed_gross_str else 0.0
+                            except ValueError:
+                                target_gross = 0.0
+    
+                            is_match = abs(booked_gross - target_gross) < 0.05
+                            erp_status = "PASS" if is_match else "FAIL"
+                            print(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", flush=True)
+    
+                            step7_event = {
+                                "step": 7,
+                                "subdoc_idx": s_idx,
+                                "title": f"Phase 7: ERP Oracle Booking Verification [{sub_label}]",
+                                "target_gross": f"{target_gross:.2f}",
+                                "booked_gross": f"{booked_gross:.2f}",
+                                "status": erp_status,
+                                "erp_details": erp_res
+                            }
+                            trace.append(step7_event)
+                            st.session_state.doc_traces[filename].append(step7_event)
+                            yield {"type": "STEP_7", "filename": filename, "data": step7_event}
+    
+                        except QuotaExhaustedError as qe:
+                            print(f"[QUOTA EXHAUSTED]: {qe}", flush=True)
+                            st.session_state.doc_status[filename] = "FAIL"
+                            return
+                        except Exception as e:
+                            print(f"  [EXTRACTION FAILED]: {e}", flush=True)
+                            declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction exception: {e}"})
+                    else:
+                        print(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", flush=True)
+                        declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
+    
+                # Save final payload to output/<pdf_stem>.json
+                file_payload = {
+                    "file": filename,
+                    "payables": payables,
+                    "declined": declined
+                }
+                out_json_path = out_dir / f"{pdf.stem}.json"
+                out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding="utf-8")
+                print(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", flush=True)
+    
+                # Determine overall document status (100% consistent with ERP booking check)
+                if payables:
+                    has_erp_fail = any(
+                        ev.get("step") == 7 and ev.get("status") == "FAIL"
+                        for ev in st.session_state.doc_traces[filename]
+                    )
+                    if has_erp_fail:
+                        final_status = "FAIL"
+                        st.session_state.stats["failed"] += 1
+                    else:
+                        final_status = "PASS"
+                        st.session_state.stats["first_try_pass"] += len(payables)
                 else:
-                    print(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", flush=True)
-                    declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
-
-            # Save final payload to output/<pdf_stem>.json
-            file_payload = {
-                "file": filename,
-                "payables": payables,
-                "declined": declined
-            }
-            out_json_path = out_dir / f"{pdf.stem}.json"
-            out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding="utf-8")
-            print(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", flush=True)
-
-            # Determine overall document status (100% consistent with ERP booking check)
-            if payables:
-                has_erp_fail = any(
-                    ev.get("step") == 7 and ev.get("status") == "FAIL"
-                    for ev in st.session_state.doc_traces[filename]
-                )
-                if has_erp_fail:
-                    final_status = "FAIL"
-                    st.session_state.stats["failed"] += 1
-                else:
-                    final_status = "PASS"
-                    st.session_state.stats["first_try_pass"] += len(payables)
-            else:
-                final_status = "DECLINED"
-
-            st.session_state.doc_status[filename] = final_status
-            st.session_state.stats["total"] += 1
-            st.session_state.stats["payables"] += len(payables)
-            st.session_state.stats["declined"] += len(declined)
-
+                    final_status = "DECLINED"
+    
+                st.session_state.doc_status[filename] = final_status
+                st.session_state.stats["total"] += 1
+                st.session_state.stats["payables"] += len(payables)
+                st.session_state.stats["declined"] += len(declined)
+    
+            except Exception as e:
+                import traceback
+                import shutil
+                dlq_dir = Path("output/dlq")
+                dlq_dir.mkdir(parents=True, exist_ok=True)
+                error_msg = f"Fatal Document Error: {e}\n{traceback.format_exc()}"
+                print(error_msg, flush=True)
+                try:
+                    shutil.copy(pdf, dlq_dir / pdf.name)
+                    dlq_meta = {
+                        "filename": filename,
+                        "error": str(e),
+                        "traceback": traceback.format_exc(),
+                        "partial_trace": st.session_state.doc_traces.get(filename, [])
+                    }
+                    import json
+                    (dlq_dir / f"{pdf.stem}_error.json").write_text(json.dumps(dlq_meta, indent=2), encoding="utf-8")
+                except Exception as dlq_e:
+                    print(f"Failed to write DLQ: {dlq_e}")
+                
+                st.session_state.doc_status[filename] = "FAIL"
+                st.session_state.stats["failed"] += 1
+                
+                st.session_state.doc_traces[filename].append({
+                    "step": "DLQ",
+                    "title": "System Crash — Routed to Dead Letter Queue",
+                    "error": str(e)
+                })
             yield {
                 "type": "DOC_END",
                 "filename": filename,
-                "status": final_status
+                "status": st.session_state.doc_status.get(filename, "FAIL")
             }
     finally:
         sys.stdout = original_stdout
