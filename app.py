@@ -664,28 +664,10 @@ with st.sidebar:
     else:
         st.info("📦 **Autodrafts Pending**", icon="⏳")
 
-    status_container = st.container()
-    with status_container:
+    with st.expander("📄 View Queue Status", expanded=False):
         display_list = pdf_names if processing_mode.startswith("All") else ([single_file_selected] if single_file_selected else pdf_names)
-        for name in display_list:
-            status = st.session_state.doc_status.get(name, "QUEUED")
-            if status == "PASS":
-                icon = "✅"
-                st_class = "status-pass"
-            elif status == "DECLINED":
-                icon = "⛔"
-                st_class = "status-declined"
-            elif status == "FAIL":
-                icon = "❌"
-                st_class = "status-fail"
-            elif status == "PROCESSING":
-                icon = "⚙️"
-                st_class = "status-processing"
-            else:
-                icon = "⏳"
-                st_class = "status-queued"
-
-            st.markdown(f"{icon} **`{name}`** — <span class='{st_class}'>{status}</span>", unsafe_allow_html=True)
+        queue_data = [{"Document": name, "Status": st.session_state.doc_status.get(name, "QUEUED")} for name in display_list]
+        st.dataframe(queue_data, use_container_width=True, hide_index=True)
 
 
 # ---------------------------------------------------------------------------
@@ -1258,17 +1240,27 @@ def render_rerun_erp_section():
 # Main Region: UI Layout & Placeholders
 # ---------------------------------------------------------------------------
 
-status_dashboard_placeholder = st.empty()
-metrics_placeholder = st.empty()
-st.divider()
-flowchart_placeholder = st.empty()
-erp_playground_placeholder = st.empty()
-st.divider()
-rerun_erp_placeholder = st.empty()
-st.divider()
-trace_header_placeholder = st.empty()
-trace_placeholder = st.container()
-log_expander_placeholder = st.empty()
+tab_dash, tab_inspect, tab_tools = st.tabs(["📊 Operations Dashboard", "🔍 Document Inspector", "🧮 ERP Tools & Logs"])
+
+with tab_dash:
+    status_dashboard_placeholder = st.empty()
+    metrics_placeholder = st.empty()
+    st.markdown("### 📋 Batch Queue Status")
+    queue_placeholder = st.empty()
+
+with tab_inspect:
+    st.info("Select a document from the sidebar 'Review Processed Trace' dropdown to inspect it.")
+    flowchart_placeholder = st.empty()
+    st.divider()
+    trace_header_placeholder = st.empty()
+    trace_placeholder = st.container()
+
+with tab_tools:
+    erp_playground_placeholder = st.empty()
+    st.divider()
+    rerun_erp_placeholder = st.empty()
+    st.divider()
+    log_expander_placeholder = st.empty()
 
 
 def refresh_live_ui():
@@ -1277,6 +1269,9 @@ def refresh_live_ui():
         render_process_status_dashboard(pdf_names)
     with metrics_placeholder.container():
         render_metrics()
+    with queue_placeholder.container():
+        queue_data = [{"Document": name, "Status": st.session_state.doc_status.get(name, "QUEUED")} for name in pdf_names]
+        st.dataframe(queue_data, use_container_width=True, hide_index=True)
     with flowchart_placeholder.container():
         render_flowchart_stepper(st.session_state.selected_doc)
     with erp_playground_placeholder.container():
