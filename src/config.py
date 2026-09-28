@@ -3,6 +3,8 @@ from pydantic import Field, AliasChoices
 from functools import lru_cache
 
 class AppSettings(BaseSettings):
+    primary_provider: str = Field(default="OpenRouter", exclude=True)
+    
     # Model configs
     groq_api_key: str = Field(default="", validation_alias="GROQ_API_KEY")
     groq_model: str = Field(default="llama-3.3-70b-versatile", validation_alias="GROQ_MODEL")

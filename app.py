@@ -690,19 +690,26 @@ with st.sidebar:
     st.title("⚙️ invoice2ERP Control Panel")
     st.caption("Intelligent Financial Document Ingestion & ERP Booking Engine")
 
-    # Optional Bring Your Own Key (BYOK) Input Section
+    # Bring Your Own Key (BYOK) Input Section
     with st.expander("🔑 Custom API Keys (BYOK)", expanded=False):
-        st.caption("Optionally input your custom API keys for testing:")
-        custom_groq = st.text_input("Groq API Key:", type="password", help="Overrides default GROQ_API_KEY")
-        custom_openrouter = st.text_input("OpenRouter API Key:", type="password", help="Overrides default OPEN_ROUTER_API")
-        custom_gemini = st.text_input("Gemini API Key:", type="password", help="Overrides default GEMINI_API_KEY")
+        st.caption("Provide your own API key to force routing to a specific provider:")
+        selected_provider = st.selectbox(
+            "Select AI Provider", 
+            ["OpenRouter", "Groq", "Gemini", "Cloudflare"]
+        )
+        custom_api_key = st.text_input(f"{selected_provider} API Key:", type="password", help="Overrides defaults and forces this provider.")
         
-        if custom_groq.strip():
-            settings.groq_api_key = custom_groq.strip()
-        if custom_openrouter.strip():
-            settings.open_router_api_key = custom_openrouter.strip()
-        if custom_gemini.strip():
-            settings.gemini_api_key = custom_gemini.strip()
+        if custom_api_key.strip():
+            settings.primary_provider = selected_provider
+            
+            if selected_provider == "Groq":
+                settings.groq_api_key = custom_api_key.strip()
+            elif selected_provider == "OpenRouter":
+                settings.open_router_api_key = custom_api_key.strip()
+            elif selected_provider == "Gemini":
+                settings.gemini_api_key = custom_api_key.strip()
+            elif selected_provider == "Cloudflare":
+                settings.cloudflare_workers_ai_key = custom_api_key.strip()
 
     st.divider()
 

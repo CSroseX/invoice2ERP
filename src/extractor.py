@@ -856,44 +856,70 @@ cloudflare_breaker = CircuitBreaker("Cloudflare", failure_threshold=2, cooldown_
 gemini_breaker = CircuitBreaker("Gemini", failure_threshold=2, cooldown_seconds=60)
 
 def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
-    """Route LLM extraction call to available API provider (OpenRouter -> Groq -> Cloudflare -> Gemini)."""
+    """Route LLM extraction call dynamically prioritizing settings.primary_provider, then falling back to others."""
     
-    if settings.open_router_api_key and "<" not in settings.open_router_api_key and openrouter_breaker.can_execute():
-        try:
-            result = call_openrouter_api(ocr_text, filename=filename)
-            openrouter_breaker.record_success()
+    # Define provider execution blocks
+    def run_openrouter():
+        if settings.open_router_api_key and "<" not in settings.open_router_api_key and openrouter_breaker.can_execute():
+            try:
+                res = call_openrouter_api(ocr_text, filename=filename)
+                openrouter_breaker.record_success()
+                return res
+            except Exception as e:
+                openrouter_breaker.record_failure()
+                print(f"OpenRouter API failed ({e}), trying fallback providers...", file=sys.stderr)
+        return None
+
+    def run_groq():
+        if settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key and groq_breaker.can_execute():
+            try:
+                res = call_groq_api(ocr_text, filename=filename)
+                groq_breaker.record_success()
+                return res
+            except Exception as e:
+                groq_breaker.record_failure()
+                print(f"Groq API failed ({e}), trying fallback providers...", file=sys.stderr)
+        return None
+
+    def run_cloudflare():
+        if settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key and cloudflare_breaker.can_execute():
+            try:
+                res = call_cloudflare_workers_ai_api(ocr_text, filename=filename)
+                cloudflare_breaker.record_success()
+                return res
+            except Exception as e:
+                cloudflare_breaker.record_failure()
+                print(f"Cloudflare Workers AI API failed ({e}), trying fallback providers...", file=sys.stderr)
+        return None
+
+    def run_gemini():
+        if gemini_breaker.can_execute():
+            try:
+                res = get_raw_gemini_response(ocr_text, filename=filename)
+                gemini_breaker.record_success()
+                return res
+            except Exception as e:
+                gemini_breaker.record_failure()
+                print(f"Gemini API failed ({e}), trying fallback providers...", file=sys.stderr)
+        return None
+
+    # Priority mapping
+    providers = {
+        "OpenRouter": run_openrouter,
+        "Groq": run_groq,
+        "Gemini": run_gemini,
+        "Cloudflare": run_cloudflare
+    }
+
+    # Order providers: put primary_provider first
+    primary = getattr(settings, "primary_provider", "OpenRouter")
+    execution_order = [primary] + [p for p in providers.keys() if p != primary]
+
+    for p_name in execution_order:
+        result = providers[p_name]()
+        if result is not None:
             return result
-        except Exception as e:
-            openrouter_breaker.record_failure()
-            print(f"OpenRouter API failed ({e}), trying fallback providers...", file=sys.stderr)
-            
-    if settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key and groq_breaker.can_execute():
-        try:
-            result = call_groq_api(ocr_text, filename=filename)
-            groq_breaker.record_success()
-            return result
-        except Exception as e:
-            groq_breaker.record_failure()
-            print(f"Groq API failed ({e}), trying fallback providers...", file=sys.stderr)
-            
-    if settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key and cloudflare_breaker.can_execute():
-        try:
-            result = call_cloudflare_workers_ai_api(ocr_text, filename=filename)
-            cloudflare_breaker.record_success()
-            return result
-        except Exception as e:
-            cloudflare_breaker.record_failure()
-            print(f"Cloudflare Workers AI API failed ({e}), trying fallback providers...", file=sys.stderr)
-            
-    if gemini_breaker.can_execute():
-        try:
-            result = get_raw_gemini_response(ocr_text, filename=filename)
-            gemini_breaker.record_success()
-            return result
-        except Exception as e:
-            gemini_breaker.record_failure()
-            raise RuntimeError(f"All LLM providers failed. Last error from Gemini: {e}")
-            
+
     raise RuntimeError("All LLM providers are offline or circuits are OPEN. Cannot extract document.")
 
 
