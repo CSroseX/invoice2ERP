@@ -5,7 +5,7 @@ Extracts structured header fields, line items, and taxes from OCR layout text
 into autodraft JSON format complying strictly with AUTODRAFT_SCHEMA.md.
 
 Includes:
-- Dual LLM Client Support: Groq API (GROQ_API_KEY) & Gemini API (GEMINI_API_KEY).
+- Dual LLM Client Support: Groq API (settings.groq_api_key) & Gemini API (settings.gemini_api_key).
 - Rule 1 Grounding Verifier (src/grounding.py) to eliminate hallucinations.
 - Rule 8 Prompt Constraint (unprinted unit_price remains blank "").
 - Structural Audit Verifier (tax placement & component decomposition).
@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+from src.config import settings
 import re
 import sys
 import urllib.error
@@ -36,27 +37,14 @@ from src.ocr_engine import extract_text
 load_dotenv(override=True)
 
 # 1. Groq API Configuration
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
-
 # 2. OpenRouter API Configuration
-OPEN_ROUTER_API_KEY = (os.getenv("OPEN_ROUTER_API") or os.getenv("OPENROUTER_API_KEY") or "").strip()
-OPEN_ROUTER_MODEL = (os.getenv("OPEN_ROUTER_MODEL") or os.getenv("OPENROUTER_MODEL") or "meta-llama/llama-3.2-3b-instruct").strip()
-
 # 3. Gemini API Configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash").strip()
-MODEL_NAME = GEMINI_MODEL
-
 # 4. Cloudflare Workers AI Configuration
-CLOUDFLARE_WORKERS_AI_KEY = (os.getenv("CLOUDFLARE_WORKERS_AI") or os.getenv("CLOUDFLARE_API_KEY") or "").strip()
-CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
-CLOUDFLARE_MODEL = os.getenv("CLOUDFLARE_MODEL", "@cf/meta/llama-3.1-8b-instruct").strip()
 
-if not GEMINI_API_KEY or "lang-client" in GEMINI_API_KEY or "<" in GEMINI_API_KEY:
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if not settings.gemini_api_key or "lang-client" in settings.gemini_api_key or "<" in settings.gemini_api_key:
+    settings.gemini_api_key = os.environ.get("settings.gemini_api_key", "")
 
-client = genai.Client(api_key=GEMINI_API_KEY) if genai and GEMINI_API_KEY and "<" not in GEMINI_API_KEY else None
+client = genai.Client(api_key=settings.gemini_api_key) if genai and settings.gemini_api_key and "<" not in settings.gemini_api_key else None
 
 SYSTEM_PROMPT = """
 You are an expert financial invoice parsing system. Convert the provided document OCR layout text into a single JSON object conforming strictly to AUTODRAFT_SCHEMA.md.
@@ -615,23 +603,23 @@ class QuotaExhaustedError(RuntimeError):
 
 
 @with_retries(max_retries=2, base_delay=2.0)
-def call_groq_api(ocr_text: str, filename: str = "") -> str:
+def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Groq API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
-    if not GROQ_API_KEY or "gsk_" not in GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY is missing or invalid.")
+    if not settings.groq_api_key or "gsk_" not in settings.groq_api_key:
+        raise ValueError("settings.groq_api_key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
     print("\n" + "=" * 80, flush=True)
     print(f"=== EXACT AI INPUT PAYLOAD FED TO GROQ FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {GROQ_MODEL} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
+    print(f"Model Name: {settings.groq_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
     print("=" * 80, flush=True)
     print(full_prompt_input, flush=True)
     print("=" * 80 + "\n", flush=True)
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     payload = {
-        "model": GROQ_MODEL,
+        "model": settings.groq_model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"DOCUMENT TEXT:\n{ocr_text}"}
@@ -644,7 +632,7 @@ def call_groq_api(ocr_text: str, filename: str = "") -> str:
         url,
         data=json.dumps(payload).encode("utf-8"),
         headers={
-            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Authorization": f"Bearer {settings.groq_api_key}",
             "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         },
@@ -655,11 +643,11 @@ def call_groq_api(ocr_text: str, filename: str = "") -> str:
         with urllib.request.urlopen(req) as resp:
             resp_data = json.loads(resp.read().decode("utf-8"))
             content = resp_data["choices"][0]["message"]["content"]
-            return content.strip()
+            return content.strip(), resp_data.get("usage", {})
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="ignore")
         if e.code == 429 or "rate_limit_exceeded" in err_body.lower() or "quota" in err_body.lower():
-            raise QuotaExhaustedError(f"Groq API Quota Exhausted ({GROQ_MODEL}): HTTP {e.code} - {err_body}") from e
+            raise QuotaExhaustedError(f"Groq API Quota Exhausted ({settings.groq_model}): HTTP {e.code} - {err_body}") from e
         if e.code == 400 and ("json_validate_failed" in err_body.lower() or "validate json" in err_body.lower()):
             # Retry without response_format constraint
             payload_retry = dict(payload)
@@ -668,7 +656,7 @@ def call_groq_api(ocr_text: str, filename: str = "") -> str:
                 url,
                 data=json.dumps(payload_retry).encode("utf-8"),
                 headers={
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Authorization": f"Bearer {settings.groq_api_key}",
                     "Content-Type": "application/json",
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
                 },
@@ -697,21 +685,21 @@ def call_groq_api(ocr_text: str, filename: str = "") -> str:
 
 
 @with_retries(max_retries=2, base_delay=2.0)
-def call_openrouter_api(ocr_text: str, filename: str = "") -> str:
+def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call OpenRouter API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
-    if not OPEN_ROUTER_API_KEY or "<" in OPEN_ROUTER_API_KEY:
+    if not settings.open_router_api_key or "<" in settings.open_router_api_key:
         raise ValueError("OPEN_ROUTER_API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
     print("\n" + "=" * 80, flush=True)
     print(f"=== EXACT AI INPUT PAYLOAD FED TO OPENROUTER FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {OPEN_ROUTER_MODEL} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
+    print(f"Model Name: {settings.open_router_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
     print("=" * 80, flush=True)
 
     url = "https://openrouter.ai/api/v1/chat/completions"
     payload = {
-        "model": OPEN_ROUTER_MODEL,
+        "model": settings.open_router_model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"DOCUMENT TEXT:\n{ocr_text}"}
@@ -725,7 +713,7 @@ def call_openrouter_api(ocr_text: str, filename: str = "") -> str:
         url,
         data=json.dumps(payload).encode("utf-8"),
         headers={
-            "Authorization": f"Bearer {OPEN_ROUTER_API_KEY}",
+            "Authorization": f"Bearer {settings.open_router_api_key}",
             "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         },
@@ -744,34 +732,34 @@ def call_openrouter_api(ocr_text: str, filename: str = "") -> str:
             end_idx = content.rfind("}")
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 content = content[start_idx:end_idx+1]
-            return content
+            return content, resp_data.get("usage", {})
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="ignore")
         if e.code == 429 or "rate_limit" in err_body.lower() or "quota" in err_body.lower():
-            raise QuotaExhaustedError(f"OpenRouter API Quota Exhausted ({OPEN_ROUTER_MODEL}): HTTP {e.code} - {err_body}") from e
+            raise QuotaExhaustedError(f"OpenRouter API Quota Exhausted ({settings.open_router_model}): HTTP {e.code} - {err_body}") from e
         raise RuntimeError(f"OpenRouter API Call Failed: HTTP {e.code} - {err_body}") from e
     except Exception as e:
         raise RuntimeError(f"OpenRouter API Error: {e}") from e
 
 
 @with_retries(max_retries=2, base_delay=2.0)
-def get_raw_gemini_response(ocr_text: str, filename: str = "") -> str:
+def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Gemini API directly and return the raw unparsed JSON string response."""
-    if not (client and GEMINI_API_KEY and "<" not in GEMINI_API_KEY and "lang-client" not in GEMINI_API_KEY):
+    if not (client and settings.gemini_api_key and "<" not in settings.gemini_api_key and "lang-client" not in settings.gemini_api_key):
         raise ValueError("Gemini API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
     print("\n" + "=" * 80, flush=True)
     print(f"=== EXACT AI INPUT PAYLOAD FED TO GEMINI FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {GEMINI_MODEL} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
+    print(f"Model Name: {settings.gemini_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
     print("=" * 80, flush=True)
     print(full_prompt_input, flush=True)
     print("=" * 80 + "\n", flush=True)
 
     try:
         response = client.models.generate_content(
-            model=GEMINI_MODEL,
+            model=settings.gemini_model,
             contents=[SYSTEM_PROMPT, f"DOCUMENT TEXT:\n{ocr_text}"],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -782,29 +770,29 @@ def get_raw_gemini_response(ocr_text: str, filename: str = "") -> str:
     except Exception as e:
         err_msg = str(e)
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg or "quota" in err_msg.lower():
-            raise QuotaExhaustedError(f"Gemini API Quota Exhausted ({GEMINI_MODEL}): {e}") from e
+            raise QuotaExhaustedError(f"Gemini API Quota Exhausted ({settings.gemini_model}): {e}") from e
         raise e
 
 
 @with_retries(max_retries=2, base_delay=2.0)
-def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> str:
+def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Cloudflare Workers AI API via stdlib urllib.request."""
-    if not CLOUDFLARE_WORKERS_AI_KEY or "<" in CLOUDFLARE_WORKERS_AI_KEY:
+    if not settings.cloudflare_workers_ai_key or "<" in settings.cloudflare_workers_ai_key:
         raise ValueError("CLOUDFLARE_WORKERS_AI key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
     print("\n" + "=" * 80, flush=True)
     print(f"=== EXACT AI INPUT PAYLOAD FED TO CLOUDFLARE WORKERS AI FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {CLOUDFLARE_MODEL} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
+    print(f"Model Name: {settings.cloudflare_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
     print("=" * 80, flush=True)
     print(full_prompt_input, flush=True)
     print("=" * 80 + "\n", flush=True)
 
-    if CLOUDFLARE_ACCOUNT_ID:
-        url = f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/v1/chat/completions"
+    if settings.cloudflare_account_id:
+        url = f"https://api.cloudflare.com/client/v4/accounts/{settings.cloudflare_account_id}/ai/v1/chat/completions"
         payload = {
-            "model": CLOUDFLARE_MODEL,
+            "model": settings.cloudflare_model,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"DOCUMENT TEXT:\n{ocr_text}"}
@@ -815,7 +803,7 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> str:
         # Fallback to general AI gateway / direct worker format if account_id is not specified
         url = f"https://api.cloudflare.com/client/v4/ai/v1/chat/completions"
         payload = {
-            "model": CLOUDFLARE_MODEL,
+            "model": settings.cloudflare_model,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"DOCUMENT TEXT:\n{ocr_text}"}
@@ -827,7 +815,7 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> str:
         url,
         data=json.dumps(payload).encode("utf-8"),
         headers={
-            "Authorization": f"Bearer {CLOUDFLARE_WORKERS_AI_KEY}",
+            "Authorization": f"Bearer {settings.cloudflare_workers_ai_key}",
             "Content-Type": "application/json",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         },
@@ -852,11 +840,11 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> str:
             end_idx = content.rfind("}")
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 content = content[start_idx:end_idx+1]
-            return content
+            return content, resp_data.get("usage", {})
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="ignore")
         if e.code == 429 or "rate_limit" in err_body.lower() or "quota" in err_body.lower():
-            raise QuotaExhaustedError(f"Cloudflare Workers AI Quota Exhausted ({CLOUDFLARE_MODEL}): HTTP {e.code} - {err_body}") from e
+            raise QuotaExhaustedError(f"Cloudflare Workers AI Quota Exhausted ({settings.cloudflare_model}): HTTP {e.code} - {err_body}") from e
         raise RuntimeError(f"Cloudflare Workers AI Call Failed: HTTP {e.code} - {err_body}") from e
     except Exception as e:
         raise RuntimeError(f"Cloudflare Workers AI Error: {e}") from e
@@ -867,10 +855,10 @@ groq_breaker = CircuitBreaker("Groq", failure_threshold=2, cooldown_seconds=60)
 cloudflare_breaker = CircuitBreaker("Cloudflare", failure_threshold=2, cooldown_seconds=60)
 gemini_breaker = CircuitBreaker("Gemini", failure_threshold=2, cooldown_seconds=60)
 
-def get_raw_llm_response(ocr_text: str, filename: str = "") -> str:
+def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Route LLM extraction call to available API provider (OpenRouter -> Groq -> Cloudflare -> Gemini)."""
     
-    if OPEN_ROUTER_API_KEY and "<" not in OPEN_ROUTER_API_KEY and openrouter_breaker.can_execute():
+    if settings.open_router_api_key and "<" not in settings.open_router_api_key and openrouter_breaker.can_execute():
         try:
             result = call_openrouter_api(ocr_text, filename=filename)
             openrouter_breaker.record_success()
@@ -879,7 +867,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> str:
             openrouter_breaker.record_failure()
             print(f"OpenRouter API failed ({e}), trying fallback providers...", file=sys.stderr)
             
-    if GROQ_API_KEY and "gsk_" in GROQ_API_KEY and "<" not in GROQ_API_KEY and groq_breaker.can_execute():
+    if settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key and groq_breaker.can_execute():
         try:
             result = call_groq_api(ocr_text, filename=filename)
             groq_breaker.record_success()
@@ -888,7 +876,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> str:
             groq_breaker.record_failure()
             print(f"Groq API failed ({e}), trying fallback providers...", file=sys.stderr)
             
-    if CLOUDFLARE_WORKERS_AI_KEY and "<" not in CLOUDFLARE_WORKERS_AI_KEY and cloudflare_breaker.can_execute():
+    if settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key and cloudflare_breaker.can_execute():
         try:
             result = call_cloudflare_workers_ai_api(ocr_text, filename=filename)
             cloudflare_breaker.record_success()
@@ -959,10 +947,10 @@ def repair_json_string(s: str) -> str:
 
 def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback: bool = False) -> dict:
     """Extract structured autodraft JSON from OCR layout text using OpenRouter, Groq, Cloudflare, or Gemini API."""
-    has_openrouter = bool(OPEN_ROUTER_API_KEY and "<" not in OPEN_ROUTER_API_KEY)
-    has_groq = bool(GROQ_API_KEY and "gsk_" in GROQ_API_KEY and "<" not in GROQ_API_KEY)
-    has_cloudflare = bool(CLOUDFLARE_WORKERS_AI_KEY and "<" not in CLOUDFLARE_WORKERS_AI_KEY)
-    has_gemini = bool(client and GEMINI_API_KEY and "<" not in GEMINI_API_KEY and "lang-client" not in GEMINI_API_KEY)
+    has_openrouter = bool(settings.open_router_api_key and "<" not in settings.open_router_api_key)
+    has_groq = bool(settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key)
+    has_cloudflare = bool(settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key)
+    has_gemini = bool(client and settings.gemini_api_key and "<" not in settings.gemini_api_key and "lang-client" not in settings.gemini_api_key)
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
@@ -989,7 +977,7 @@ def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback:
         grounded_payable, _ = verify_payable_grounding(payable_data, ocr_text)
         return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
 
-    raise ValueError("No valid OPEN_ROUTER_API, GROQ_API_KEY, CLOUDFLARE_WORKERS_AI or GEMINI_API_KEY configured and allow_fallback=False.")
+    raise ValueError("No valid OPEN_ROUTER_API, settings.groq_api_key, CLOUDFLARE_WORKERS_AI or settings.gemini_api_key configured and allow_fallback=False.")
 
 
 from src.classifier import classify_document_text, classify_file

@@ -2,101 +2,19 @@
   "file": "DU-06.pdf",
   "payables": [
     {
-      "invoice_number": "FN 05/80906935",
-      "invoice_date": "2026-06-15",
-      "due_date": "2026-07-16",
-      "invoice_type": "INVOICE",
-      "currency": "EUR",
+      "gross_total": "6.00",
       "supplier": {
-        "name": "Blackpine Supply S.A",
-        "supplier_id": "",
-        "address": "Qta da Mendanha, OTAPARK, Fracao AN, 2580-490 Carregado",
-        "vat_id": "785255159"
+        "supplier_id": ""
       },
       "buyer": {
         "company_code": "BOLTGROUP",
         "business_unit_code": "EE001",
         "location_code": "LOC_EE_001"
       },
-      "payment_term_id": "",
-      "po_number": "REF-841468",
       "po_id": "",
-      "gross_total": "153.58",
-      "subtotal": "138.20",
-      "total_tax_amount": "15.38",
-      "discount_amount": "0.00",
-      "freight_charges": "0.00",
-      "insurance_charges": "0.00",
-      "extra_charges": "0.00",
-      "excise_duties": "0.00",
+      "payment_term_id": "",
       "taxes": [],
-      "line_items": [
-        {
-          "description": "Empanadilha Atum Cozida (S0u)",
-          "item_type": "GOODS",
-          "uom": "",
-          "quantity": "1.00",
-          "unit_price": "41.68",
-          "total": "41.68",
-          "discount": "0.00",
-          "discount_percentage": "0.00",
-          "tax_rate": "23.00",
-          "tax_amount": "9.59",
-          "taxes": []
-        },
-        {
-          "description": "Pao Burger Brioch LeBrio14px4u",
-          "item_type": "GOODS",
-          "uom": "",
-          "quantity": "1.00",
-          "unit_price": "28.43",
-          "total": "28.43",
-          "discount": "0.00",
-          "discount_percentage": "0.00",
-          "tax_rate": "6.00",
-          "tax_amount": "1.71",
-          "taxes": []
-        },
-        {
-          "description": "Chapata Cristallino 28px2u",
-          "item_type": "GOODS",
-          "uom": "",
-          "quantity": "1.00",
-          "unit_price": "25.94",
-          "total": "25.94",
-          "discount": "0.00",
-          "discount_percentage": "0.00",
-          "tax_rate": "6.00",
-          "tax_amount": "1.56",
-          "taxes": []
-        },
-        {
-          "description": "Pao Maestra Classica 7u",
-          "item_type": "GOODS",
-          "uom": "",
-          "quantity": "2.00",
-          "unit_price": "13.43",
-          "total": "26.86",
-          "discount": "0.00",
-          "discount_percentage": "0.00",
-          "tax_rate": "6.00",
-          "tax_amount": "1.61",
-          "taxes": []
-        },
-        {
-          "description": "Pao Maestra Cereais 7u",
-          "item_type": "GOODS",
-          "uom": "",
-          "quantity": "1.00",
-          "unit_price": "15.29",
-          "total": "15.29",
-          "discount": "0.00",
-          "discount_percentage": "0.00",
-          "tax_rate": "6.00",
-          "tax_amount": "0.92",
-          "taxes": []
-        }
-      ]
+      "line_items": []
     }
   ],
   "declined": []

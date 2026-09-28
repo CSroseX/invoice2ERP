@@ -1,0 +1,958 @@
+{
+  "filename": "DU-03.pdf",
+  "error": "cannot access local variable 'json' where it is not associated with a value",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\app.py\", line 540, in _process_single_pdf\n    out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding=\"utf-8\")\n                             ^^^^\nUnboundLocalError: cannot access local variable 'json' where it is not associated with a value\n",
+  "partial_trace": [
+    {
+      "step": 1,
+      "title": "Phase 1: OCR & Spatial Layout Extraction",
+      "path_used": "Cached OCR Text (300 DPI Spatial Layout)",
+      "char_count": 45425,
+      "page_count": 1,
+      "raw_text": "Blueharbor\nLogistics & Services\nOriqinal\nTAX\nCadence PIE LIU Invaice     (4 Mov 0534\n08-08 18 TAI                                                                                          Due                                     16.Jan.2026\nParnu tint 18\n539775\nPayment terms:              60 Days Net\nCredit Party Cadence PTE LTD\n08-08 18 TAI\nParnu mnt 18\n539775\nCustomer No\nTotal Amount Due\nCondition                                                                       Rate                                    Base                                Total( USD)\nValue\nNet value                                                                                                                                                                                1,040.06\nQ% GST on sales                                                         0.0Q %                           1.040.06                                                  0.0Q\nAmount Due                                                                                                                                                                    1040.06\nHAWB\nSold to Cacence PTE LTD\nPOL: Hamburg                       Place 0f Receipt: Hamburg\nPOD: Singapore                     Place of Delivery: Singapore                       SHPR: Polvex DISTRIBUTION GMBH & COKG\nETD: 92-Nov-&OIEIA 19 Nov-/991       Cadence PTE LID\nof                                   Qty     UoM      Curr  Unit Price               ROE       Total(USD)\n1      International Freight                     567.000          KG       USD                1.28        1.00000                   725.76\n2      Origin Terminal Handling             567.000          KG       USD                0.10        1.00000                      56.70\n3                            Documentation              1.000           EA        USD             45.00        1.00000                      45.00\nFee\n4      Delivery                                            567.000          KG       USD                0.04        1.00000                      22.68\n5     Pick-up                                              567.000          KG       USD                0.18        1.00000                    102.06\n6      Customs DEJTWOXDDWJ                              1.000           EA       USD                7.50        1.00000                        7.50\nExport\nReg: No.                           GST Reg: No. M2-0029161-1\nPage 1 of  2\n\n--- PAGE BREAK ---\n\nBlueharbor\nLogistics & Services\n0107892268\nItem                                                                     YY      UOM       Lurr   Unit Price               KUc         LOalL4PU)\n7      Origin Documentation                        1.000           EA        USD              15.00        1.00000                      15.00\n8      Customs DEJTWOXDBWJ                              1.000           EA        USD             15.00        1.00000                      15.00\nImport\n9      Carrier Manifest Filing                        1.000           EA        USD                5.00        1.00000                         5.00\n10   DEHVZCKRPYE    Terminal                     567.000          KG       USD                0.08        1.00000                      45.36\nHandling\n1040.06\nTotal Amount Que\nCondition                                                                           Rate                            Base Value                     Total(USD)\nNet value                                                                                                                                                                                1,040.06\n0% GST on sales                                                                 0.00 %                           1.040.06                                          0.00\nAmount Due                                                                                                                                                                   1040.06\nConversion to SGD for Tax purpose only\nCondition                                                                       Rate                                    Base                                Total( SGD)\nValue\n(SGD)\nNet value                                                                                                                                                                                1,350.55\n0% GST on sales                                                         0.00 %                           1350.55                                                  0.0Q\nIotal Amount Que (SGDS                                                                                                                                         4350.55\nPayment in USD: The                  And                Banking                                               Account no:\nPayment Ref: By Payn                trans              ie inclu\nJhle to Buuebarbor Logistics & Services Singapore Pte_ ViuOJ2200\nCLCT- CL4A L^                      Ten A                                                                                                                                                     Ltd_\nBlueharhor Logistics & Services Singapurgi\n15-01                    Duallci 3\"7JY945N271 C U0jJJ\nTelenhauz iJo: \"61 80180856\n1-1\ncara silva@blueharbor com\nLiuar This is an elecuLee\"] Ylililll 7uuic33:                                   uullnnt and authorised                is not required.\nBlueharbor Logistics & Services Singapore Pte. Ltd.\nBrightside Trading Pte. Ltd\nChangi Airfreight Centre\nGartenweg 7\nCargo Agents Building E\n819834 Singapore\nTelephone:                                                    3388, Fax:\nReg. No.                           GST Reg: No. M2-0029161-1\nPage 2 of   2\n\n--- PAGE BREAK ---\n\n'\nMAERSK\nShipment Cartage Advice\nPage 1 of 1\nJob\nRrinhtside Print PTF  TD\nCo  \"5'                               Telephone No\nCARGO\n918116                                                                              Fax No\nDate                           13-Nov-25 12.04\nCONSIGNEE\nPolvex DISIRIBUTION  GMBH & CO KG\nParnu mnt 35\nLuuuy                                                                                                 Juni D J0jiJ\nGermany                                                                                            REP , OF\nTO\nDlueharbor | ogistics & Services Singapore Pte Ltd                                                       Cadence PTE LID\n119               CARGO ROAD              CARGO                                  CIO Yusen Logistics (Singapore) Pte Ltd\n#03-01/02                   819454 SGSIN                                               30 Tuas Avenue 13                                   PA   I5 pm\nSingapore 638996\nCFS Rerererice:                                                                                 Cartier Booking Reference:\nMarco                                                                                               Marco\nAvailbble Dater                                                                                  Estimaated Delivery:             17-Nov-25 15.00\nLovi Frae Doy 6l Bforape:                                                                           Delivery Required By;         17-Nov-25 15.00\nHAWB\nWeIGHT\nER), 0 CTN (INNER)                                                         567.0 KG                    3.360 M3                    567.0 KG\nCc\nTYPE                                                                                     WIDTH                           UNDsS    STACKABILITY\nPLT                      567.0 KG            3.360 M3           100           120           140 CM\nGOods DERKXOCAVMU\nPZH-AT\nNOT RESTRICTED-\nRouting\nMode        Flight Date                                 Cartier                                         Load        Discharge Bio                   ETA\nAIR           KL841O / 12-Nov                           CASS KLM ROYAL DUTCH            DEHAM    NLAMS     12-Nov-25 22.59 13-Nov-25 07.59\nAIR           KL835 / 13-Nov                             CASS KLM ROYAL DUTCH            NLAMS     SGSIN       13-Nov-25 20.40 14-Nov-25 16.15\nNotes\nON 17/11/25                            To THE                ADDRESS\nYours Sincerely,\nluis haas@blueharbor com\nBlueharbor Loqistics & Services Singapore Pte. Ltd\nLncensuasse\nFluI             Quarter\n408533\nFax;\n\n--- PAGE BREAK ---\n\nCARGO                                                    PG  ;  1 OF      2\nTYPE                   IN-NON-PAYMENT\nTYPE                                            SES /\nCadence PTE. LTD. 81/79/652J\nTOTAL GROSS WT /UNIT                                567 . 000 /KGM\nTOTAL OUTER PACK / UNIT:                                        2 /PKG\nEXPORTER:                                                                     TOT                  DUT                           S$                             0 00\nTOT                     DUT PAYABLE :   SS                             0 . 00\nTOT OTHER TAX                              SS                             0 00\nTOTAL GST AMT                              SS                        722.76\nAGENT :                                                       TOTAL                                                  SS                             0 00\nCARGO                     TYPE: OTHER NON-CONTA INERIZED\nIN                          IDENTIFIER:\nNO: KL835\nPORT OF LOADING / NEXT PORT OF CALL :       OBL/MAWB NO\nPORT OF DISCHARGE / FINAL PORT OF CALL                     DATE                           14/11/2025\nOU                          IDENTIFIER:\nOF FINAL\nNO:\nPTE. LTD\nDATE\nAGENT :                                                                   NO :\nPLACE OF RELEASE :                                                 PLACE OF RECEIPT:\nFTZ                                                                  MAJOR\nCz                                                                                      ME\nNO:                                                                                                             CODE  (CPC)\nREF :                             20251112 1178\n\n--- PAGE BREAK ---\n\nCARGO                                                    PG  :    2 OF    2\nNO                                                                     2\n(CONTINUATION PAGE)\nS/NO           HS CODE                                  LOT NO                                           LOT NO\nCTY OF                          BRAND NAME                MODEL\nIN HAWB / HUCR HBL                                                                       OUT HAWB / HUCR / HBL\nPACKING /GOODS DERKXOCAVMU                                                           HS                        6  UNIT\nCIF /FOB VALUE  (SS)\nGST                   (SS)\nMANUFACTURER S NAME\n01    39033090\nDE      NA\nP2H-AT RED                                                                                                                                 0.5500 TNE\n8030 70\n722 76\nTRADER S\nINV NO: 2279433-82704896\nAnja          Costu\nNO UNAUTHORISED ADDITION / AMENDMENT TO THIS                   MAY BE MADE AFTER\nNAME OF                        Blueharoor                                       PTE LTD;\nNAME  Anja                               Vidal\nCODE\nTEL NO                           65769148\n201                                BY                          CUSTOMS\nGA                                  BY                                                                  TO THE IMPORTER ,\nAGENT OR / AND THE                                                   WITH THE\nFOR THE                   TO BE VALID_                       TO                  WITH                                  IS AN OFFENCE\nTX            THE GOODS                        IN THIS                  ARE IMPORTED /EXPORTED BY A\nMA            THE GOODS AND THIS                  WITH INVOICES , BL / AWB ,  ETC MUST BE\nFOR                                              AT A  FREE TRADE ZONE    OUT'  GATE ,\nTRA IN / WOODLANDS / TUAS                                              It IS                        TO THE    GREEN LANE    AT\nTHE TIME OF  CLEARANCE ,  OR A                                                                  OR                     AS INSTRUCTED\nA6            IF THE                   IS NOT USED ,  It MUST BE                          OR RE-VALIDATED NOT LATER\nTHAN 24 HOURS AFTER ITS EXP IRY\nEEE         END OF CARGO                          PERMIT\nREF :                             20251112 1178\n\n--- PAGE BREAK ---\n\nShr~\nHouse Air    aybill\nPOLVEX DISTRIBUTION\nGMBH & CO.KG        by Aldwin INTERNATIONAL               GMBH\nLindenstrasse 35                                                                                                       Avenida Cenbal 7\n20095, HAMBURG,\nHH 20539 DE\nTE                                                                                                     Copies 1, 2 and 3 of Ihis Air Waybill are orginals and have Ihe same valldity.\nConsignee $ Name and Address                             Consignee 5 Account Number            Mfis agreed thal tha nnnrle          herein are accepted in apparent good order and condition (except as\nnoted) for carriage           To THE               OF             ONTHE                       ALL\nCadence PTE LTD                                                                                      GOODS MaY BE           BY ANY OTHER MEANS             ROAD OR ANY Other\nINSTRUCTIONS ARE GIVEN          BY THE Shipper; AND\nTHAT THE             May BE           VIA\nRua do Ouro 18                                                                                        WHICH THE           deEMS APPROPRIATE. THE SHIPPERS              IS DRAWN TO THE\nOF LIABILITY . Shipper mav increase such limitation 0l\nliability by            higher value Ior carriage and paying a supplemental        if requlred\n539775 SG\nTE\nIssulng Carrier $ Agent Name and Clty                                                                   Accounling Inlcrmallon\nAgent's IATA Code                                Account No;\n23-4 7534/2015\n~Airport 01 Departure (Addr . 0f First Carrier) and Requested Routing                                               Reterence Number             Optional Shipping Intormation\nTERMS: FCA\nTo        By First Carrier       Routing and Destinaion   t0         DY                 DV                    [CrGS  WNAL     Other                Value for Carriage                 Valuo for Cusioms\nPpd             colL\nAMS                      KL                        SIN   KL                         EURICPI      IX X                    NVD                           NCV\nAirpon 0i DEHVICKRPYE                              Requcstcd FlightDate                Amount af insuranca                           II Carner oliers Insurance and such Insurance is\nrequcsted in accordance wilh Ine conditions Increol, indicatc amouni lo bC\nSI                                               KL8410/12   KL835/13                      XXX            Iinsured in ligures in box marked amouni ol insurance\nHandling Information   1.11.2025 16.20 | SPX BY XRY DEIRA0O 169-02                  BY DEIRA/00095-06\nNOT                                                                                                                                                                 MRN:\nSCI\nX\nGross            Rate Class                                       Rate\nNo;Oi       Weight                                          wcignt                                                     Total                                    Nature and Quantity 0f Goods\nPieces                                  Commcdily                                             Charge                                                               ~(incl. Dimensions or Volume)\nRCP                                    KemNo\n2                 567.Okl                                   567.0                                               As Agreed]   NOVODUR PZH-AT\nNOT RESTRICTED-\nMarks:                                                                                                                                             HS Codes: 39033000\nORDER NO                                                                                                                    DIMS 100x120x140 CMx 2\n03153934                                                                                                                    VOL 3.360 M3\nPART NO\nTA 440162      82704896\n2        567.0\nPregaid          Weight                     Collect            [Oiner\nValuation Charge\nTax\nToaloher Charges Duc Agent                          [Shipper certitles that Ihe particulars an Inc Iacc hercol arc carreci and Inal Insofar Js any part 0l Ihe consignment\ncontains danaerous aoods such part is properly           by name and is in proper condition for carriage by air according to the\nRegulations_\nTotal Other        Due Carrier                                                                                  AS AGENT                                       Uitcoc\n0i Shipper or his Aqent\nTotal Prepaia                          Total Collect\nINTERNATIONAL AS AGENT                                        utcue\nConversion Rales         CC:                               11-Nov-25\nNorthwind Distribution GMBH\nExecuted on (date)                                   ai (place)                                           of Issuing Carer or its Agent\nCharges a1 Destination                 Tolal Collec Charges                                                 HAWB No:\nFor Carriers use only\nOriginal 2  (for Consignee)\n\n--- PAGE BREAK ---\n\nCARRIERS'                         OF\nIf the carriage involves an ultimate DEHVZCKRPYE or stop in a country other than the country of departure, the Montreal Convention or the Warsaw\nConvention may be applicable to the liability of the Carrier in respeci of loss of, damage or delav to cargo. Carrier's limitation of liability in accordance\nwith those Conventions shall be as set forth in subparagraph 4 unless a higher value is\nOF\nIn this contract and the Notices appearing hereon:                                                    6./6.1 For cargo accepted for carriage. Ine Warsaw Convention and the Montreal Convention\npermit shipper I0 increase Ihe limitalion 0f liability by            a higher value for carriage and\nincluces the air carrier issuing thls air waybill and all carriers that carry Or undertake      paying a supplemental         requlred.\nt0 carry the cargo or pertorm any other services related t0 such carriage:\n6.2 In carriage to which nelther the Warsaw Convention nor the Montreal Convention applies\nRIGHT (SDR) is & Special Drawing Righl as delined by Ire International      Carrier shall, in accordance wilh Ilie procedures set forth in its 4 Habxey eral condilions of carriage and\nMonelary Fund:                                                                                             applicable Iarifs, permit shipper l0 increase Ine          ol        Dy             higher value ior\ncarriage and paying a supplemental        it so required:\nmeans whichever of Ihe following instruments is applcable to Ihe\ncontract of camage:                                                                                         7.77.1 In cases ol loss ol, damage or delay to part of the cargo. the weighi to be laken into account\nin determining Carrier $ limit of Iiability shall Le only the weight of the package Or packages\nthe Convention for the Unification of Certain Rules Relating t0 Internaticnal Carriage by Air,     concerned;\nsigned al Warsaw, 12 October 1929;\n7.2 Notwithstanding any other provisions, lor \"ioreign air transportation\" as defined by Ihe U.S:\nthat Convention as amended at The Hague on 28 September 1955;                                    Transportation Code:\nthat Convenlion as arended at The Hague 1955 and by Montreal Prolocol No. 1, 2. or 4      7.2.1 in Ihe case 0f loss 0l, damage or delay t0 a shipment; the weight to be used in delermining\n(1975) as the case may be                                                                                 Carrier'$ limit ol liability shall be the weight which Is used (0 determine the        for carriage 0f\nsuch shipment; and\nmeans Ihe Convention for tho Unification ol Certain Rules lor\nInternational Carriage by Air, done at Montreal on 28 May 1999                                         7.2.2 in Ihe case ol loss 0l, damage or delay (0 a part ol a shipment; Ihe shipment weight In 72.1\nshall be prorated t0 the packages covered by the same air waybill whose value is atfecled by the\n2/2.1 Carriage is subjoct to the rules relalting to liability established by the Warsaw Convention      loss, damage or delay. The woight applicable in the case of loss or damage to one or more articles\nor the Montreal Convention unless such carriage is not \"international carriage as defined by      in a package shall be the weight of the entire package.\nIhe applicable Conventions.\n8 Any exclusion or Iimitation of Iiability  applicable lo Carrier   shall apply t0 Carrier's agents_\n2 2 To Ihe extent  not in conflict wilh Ihe  foregoing; carriage and olher relaled services      employees, and representatives and (0 any person whose aircralt or equipment is used by Carrier\npertormed by each Carrier are subject to:                                                                 Ior carnage and such person'$ agents, employees and representalives.\n2.2.1 applicable laws and government regulations:                                                       9. Carrier underlakes lo complete the carriage with reasonable dispalch Where  permitted by\napplicable laws , tarilis and government regulations, Carrier may use altemative carriers, aircraft or\n2.2.2 provisions contained in the air waybill, Carrier' $ conditions of carriage and rolated rulos      modes of Iransport withoul notice but with due regard t0 Ihe interests ol the shipper. Carrer is\nregulatians, and Iimetables (but not the Ilmes of departure ana arnval staled therein) and      authorised by the sh pper to select the routing and all intermediate stopping places that it deems\napplicable tariffs of such Carrier, which are made part hereof. and which may be inspected al     appropriate or t0 cnange or deviale irom Ihe routing shown on Ihe Iace hereof.\nany airports Or other cargo sales offices from which it operates regular services. When carriage\nis to/from the USA Ihe shipper and Ihe consignoe are entitled, upon requosi, t0 recoive & Iree      10. Receipt by Ihe person entitled t0 delivery of Ihe cargo wlthout complaint shall be prima Iacie\ncopy of the Carrier $ conditions 0l carriage. The Carrier $ conditions of carriage Include , but are      evidence thal Ihe cargo has been dellvered in good condition and in accordance with Ihe contract\nnot limited t0:                                                                                                ol carriage.\n22.2.1 limits on the Carrier' s liability for loss, damage Or delay of goods, Including fragile or      10 1 In Ihe case ol loss of, damage or delay t0 cargo a written complaint must be made t0 Carrier\nperishable goods;                                                                                           by Ihe person entitled i0 delivery. Such complaint must be made:\n2.2.2.2 claims restrictions, ircluding time periods within which shippers or consignees must Iile      10.1.1 in Ihe case ol damage l0 Ihe cargo, immedialely alter discovery 0l the damage and at Ihe\na claim Or bring an action against Ihe Carrier for its acls Or omissions, Or Ihose of its agents;         Iatest within 14 days from Ihe dale of receipl of the cargo:\n2.2.2.3 rights if any, of Ihe Carrier t0 change Ihe terms of Ihe contracl;                                 10.1.2 In the case of delay, within 21 days Irom Ihe date on which the cargo was placed at Ihe\ndisposal ol Ihe person entitled l0 delivery.\n2.2.2.4 rules about Carrier $ right t0 refuse t0 carry;\n10.1.3 in the case of non-cellvery of the cargo, within 120 days from the date of issue of the air\n22.2.5 rights of Ihe Carrier and limitations concerning delay or Iallure to perform service ,      waybill; or il an air waybill has not been issued , within 120 days from the date of receipt of Ihe\nincluding schedule          subslitution of allernate Carrier or alrcralt and rerouting:                 cargo Ior transportalion by Ihe Carrier .\n3 . The agreed stopping places (which may be allered Dy Carrier In case ol necessity) are those      10 2 Such complaint may be made t0 the Carrier whose air waybill was used, Or Io the first Carrler\nplaces; except the place of departure and place ol DEHVZCKRPYE sel Iorth on the face hereof or      or to the last Carrier or to Ihe Carrier, which performed the carriage during which the loss, damage\nshown in Carrier'$ limetables as scheduled slopping places lor Ihe roule. Carriage I0 be      or delay took place.\nperformed hereunder by several successive Carriers i5 regarded as a Single operation.\n10.3 Unless a written complaint is made wlthin the time limits specified in 10.1 no action may be\nFor carriage t0 which Ihe Montreal Corivention does not apply, Carrier s liabillty Ilmitalion Ior      brought against Carrier.\ncargo Iost, damaged or delayed shall be 26 SDRs per kilogram unless & greater per kilogram\nmonetary limit iS provided in any applicable Convention or in Carrier $ taritis 0r general      10 4 Any rights to damages against Carrier shall be extinguished unless an action is brought within\nconditions of carriage:                                                                                       two years Irom Ihe date of arrival at the DEHVZCKRPYEOr Irom the date on which the aircraft ought to\nhave arrived , or Iromn (he date on which Ine carriage stopped.\n5 /5.1 Except when the Carrier has extended credit t0 Ihe consiqnee withoul the  written\nconsent of Ihe shipper, Ihe shipper guarantees payment of all         for Ine carriage due in      11 Shipper shall comply with all applicable laws and government regulations of any country t0 %\naccordance with Carrier $ tariff , conditions of carriage and relaiea reguiations, applicable laws     from which the cargo may be carried, including those relating t0 Ihe packing, carriage or delivery of\n(including national laws implementing Ihe Warsaw Convention and Ihe Montreal Convention) ,      the cargo, and shall furnish such iniormation and altach such documents t0 the air waybill as may\ngovernment regulations, orders and requirements:                                                       be necessary t0 comply with such laws and regulalions. Carrier is not liable to shipper and shipper\nshall indemnify Carrier for loss ar expense due Io shipper $ Iailure to comply wilh this provision.\n5 2 When no part of the consignment is delivered a claim wlth respect to such consignment wlll\nbe considered even Inough transponalion         thereon are unpald:                                 12 No agent , employee or representative of Carrier has authority t0 alter. modify or waive any\nprovisions of this contract:\n\n--- PAGE BREAK ---\n\nShr~\nHouse Air    aybill\nPOLVEX DISTRIBUTION\nGMBH & CO.KG           Aldwin INTERNATIONAL               GMBH\nLindenstrasse 35                                                                                                       Avenida Cenbal 7\n20095, HAMBURG,\nHH 20539 DE\nTE                                                                                                     Copies 1, 2 and 3 of Ihis Air Waybill are orginals and have Ihe same valldity.\nConsignee $ Name and Address                             Consignee 5 Account Number            Received in Good Order and Condition\nCadence PTE LTD                 aan\nat (piacei                                                     on (qate tIme)\nRua do Ouro 18\nSignature of Consignee or his Agent\n539775 SG\nTE\nIssulng Carrier $ Agent Name and Clty                                                                   Accounling Inlcrmallon\nAgent's IATA Code                                Account No;\n23-4 7534/2015\n~Airport 01 Departure (Addr . 0f First Carrier) and Requested Routing                                               Reterence Number             Optional Shipping Intormation\nTERMS: FCA\nTo        By First Carrier       Routing and Destinaion   t0         DY                 DV                    [CrGS  WNAL     Other                Value for Carriage                 Valuo for Cusioms\nPpd             colL\nAMS                       KL                        SIN   KL                         EURICPI      IX X                    NVD                           NCV\nAirpon 0i DEHVICKRPYE                              Requcstcd FlightDate                Amount af insuranca                           II Carner oliers Insurance and such Insurance is\nrequcsted in accordance wilh Ine conditions Increol, indicatc amouni lo bC\nKL8410/12   KL835/13                      XXX            Iinsured in ligures in box marked amouni ol insurance\nHandling Information   1.11.2025 16.20 | SPX BY XRY DEIRA0O 169-02                  BY DEIRA/00095-06\nNOT                                                                                                                                                                 MRN:\nSCI\nX\nGross            Rate Class                                       Rate\nNo;Oi       Weight                                          wcignt                                                     Total                                    Nature and Quantity 0f Goods\nPieces                                  Commcdily                                             Charge                                                               ~(incl. Dimensions or Volume)\nRCP                                    KemNo\n2                 567.Okl                                   567.0                                               As Agreed]   NOVODUR PZH-AT\nNOT RESTRICTED-\nMarks:                                                                                                                                             HS Codes: 39033000\nORDER NO                                                                                                                    DIMS 100x120x140 CMx 2\n03153934                                                                                                                    VOL 3.360 M3\nPART NO\nTA 440162      82704896\n2        567.0\nPregaid          Weight                     Collect            [Oiner\nValuation Charge\nTax\nToaloher Charges Duc Agent                          [Shipper certitles that Ihe particulars an Inc Iacc hercol arc carreci and Inal Insofar Js any part 0l Ihe consignment\ncontains dangerous goods; such part is properly           by name and is in proper condition for carriage by air according to the\napplicable Dangerous Goods Regulations\nTol Other Charges Due Carror                                               INTERNATIONAL AS AGENT                                       Uitcoc\n0i Shipper Ohig Agent\nTotal Prepaia                          Total Collect\nINTERNATIONAL AS AGENT                                        Tcu\nConversion Rales Brightside Distribution CC       11-Nov-25\n:Northwind Distribution GMBH\nExecuted on (date)                                    ai (place)                                           of Issuing Carer or its Agent\nCharges al Destinalon                 Toll Colled Charges_                                                 HAWB No: HAM00092526\nFor Carriars use anly\nCopy 4 - (Delivery Receipt)\n\n--- PAGE BREAK ---\n\nShr~\nHouse Air    aybill\nPOLVEX DISTRIBUTION\nGMBH & CO.KG           Aldwin INTERNATIONAL               GMBH\nLindenstrasse 35                                                                                                       Avenida Cenbal 7\n20095, HAMBURG,\nHH 20539 DE\nTE                                                                                                     Copies 1, 2 and 3 of Ihis Air Waybill are orginals and have Ihe same valldity.\nConsignee $ Name and Address                             Consignee 5 Account Number\nCadence PTE LTD\nRua do Ouro 18\n539775 SG\nTE\nIssulng Carrier $ Agent Name and Clty                                                                   Accounling Inlcrmallon\nAgent's IATA Code                                Account No;\n23-4 7534/2015\n~Airport 01 Departure (Addr . 0f First Carrier) and Requested Routing                                               Reterence Number             Optional Shipping Intormation\nTERMS: FCA\nTo        By First Carrier       Routing and Destinaion   t0         DY                 DV                    [CrGS  WNAL     Other                Value for Carriage                 Valuo for Cusioms\nPpd             colL\nAMS                       KL                        SIN   KL                         EURICPI      IX X                    NVD                           NCV\nAirpon 0i DEHVICKRPYE                              Requcstcd FlightDate                Amount af insuranca                           II Carner oliers Insurance and such Insurance is\nrequcsted in accordance wilh Ine conditions Increol, indicatc amouni lo bC\nKL8410/12   KL835/13                      XXX            Iinsured in ligures in box marked amouni ol insurance\nHandling Information   1.11.2025 16.20 | SPX BY XRY DEIRA0O 169-02                  BY DEIRA/00095-06\nNOT                                                                                                                                                                 MRN:\nSCI\nX\nGross            Rate Class                                       Rate\nNo;Oi       Weight                                          wcignt                                                     Total                                    Nature and Quantity 0f Goods\nPieces                                  Commcdily                                             Charge                                                               ~(incl. Dimensions or Volume)\nRCP                                    KemNo\n2                 567.Okl                                   567.0                                               As Agreed]   NOVODUR PZH-AT\nNOT RESTRICTED-\nMarks:                                                                                                                                             HS Codes: 39033000\nORDER NO                                                                                                                    DIMS 100x120x140 CMx 2\n03153934                                                                                                                    VOL 3.360 M3\nPART NO\nTA 440162      82704896\n2        567.0\nPregaid          Weight                     Collect            [Oiner\nValuation Charge\nTax\nToaloher Charges Duc Agent                          [Shipper certitles that Ihe particulars an Inc Iacc hercol arc carreci and Inal Insofar Js any part 0l Ihe consignment\ncontains dangerous goods; such part is properly           by name and is in proper condition for carriage by air according to the\nJus Goods Regulations_\nTol Other Charges Due Carror                ALDWINF                       AS AGENT\nUitcoc\n0i Shipper or his Aqent\nTotal Prepaia                          Total Collect\nINTERNATIONAL AS AGENT                                        utcue\nConversion Rales         CC:                               11-Nov-25\nNorthwind Distribution GMBH\nExecuted on (date)                                   ai (place)                                           of Issuing Carer or its Agent\nCharges a1 Destination                 Tolal Collec Charges                                                 HAWB No:\nFor Carriers use only\nCopy 5  (Extra Copy)\n\n--- PAGE BREAK ---\n\nShr~\nHouse Air    aybill\nPOLVEX DISTRIBUTION\nGMBH & CO.KG           Aldwin INTERNATIONAL               GMBH\nLindenstrasse 35                                                                                                       Avenida Cenbal 7\n20095, HAMBURG,\nHH 20539 DE\nTE                                                                                                     Copies 1, 2 and 3 of Ihis Air Waybill are orginals and have Ihe same valldity.\nConsignee $ Name and Address                             Consignee 5 Account Number\nCadence PTE LTD\nRua do Ouro 18\n539775 SG\nTE\nIssulng Carrier $ Agent Name and Clty                                                                   Accounling Inlcrmallon\nAgent's IATA Code                                Account No;\n23-4 7534/2015\n~Airport 01 Departure (Addr . 0f First Carrier) and Requested Routing                                               Reterence Number             Optional Shipping Intormation\nTERMS: FCA\nTo        By First Carrier       Routing and Destinaion   t0         DY                 DV                    [CrGS  WNAL     Other                Value for Carriage                 Valuo for Cusioms\nPpd             colL\nAMS                       KL                        SIN   KL                         EURICPI      IX X                    NVD                           NCV\nAirpon 0i DEHVICKRPYE                              Requcstcd FlightDate                Amount af insuranca                           II Carner oliers Insurance and such Insurance is\nrequcsted in accordance wilh Ine conditions Increol, indicatc amouni lo bC\nKL8410/12   KL835/13                      XXX            Iinsured in ligures in box marked amouni ol insurance\nHandling Information   1.11.2025 16.20 | SPX BY XRY DEIRA0O 169-02                  BY DEIRA/00095-06\nNOT                                                                                                                                                                 MRN:\nSCI\nX\nGross            Rate Class                                       Rate\nNo;Oi       Weight                                          wcignt                                                     Total                                    Nature and Quantity 0f Goods\nPieces                                  Commcdily                                             Charge                                                               ~(incl. Dimensions or Volume)\nRCP                                    KemNo\n2                 567.Okl                                   567.0                                               As Agreed]   NOVODUR PZH-AT\nNOT RESTRICTED-\nMarks:                                                                                                                                             HS Codes: 39033000\nORDER NO                                                                                                                    DIMS 100x120x140 CMx 2\n03153934                                                                                                                    VOL 3.360 M3\nPART NO\nTA 440162      82704896\n2        567.0\nPregaid          Weight                     Collect            [Oiner\nValuation Charge\nTax\nToaloher Charges Duc Agent                          [Shipper certitles that Ihe particulars an Inc Iacc hercol arc carreci and Inal Insofar Js any part 0l Ihe consignment\ncontains dangerous goods; such part is properly           by name and is in proper condition for carriage by air according to the\nJus Goods Regulations_\nTol Other Charges Due Carror                ALDWINF                       AS AGENT\nUitcoc\n0i Shipper or his Aqent\nTotal Prepaia                          Total Collect\nINTERNATIONAL AS AGENT                                        utcue\nConversion Rales         CC:                               11-Nov-25\nNorthwind Distribution GMBH\nExecuted on (date)                                   ai (place)                                           of Issuing Carer or its Agent\nCharges a1 Destination                 Tolal Collec Charges                                                 HAWB No:\nFor Carriers use only\nCopy 6  (Extra Copy)\n\n--- PAGE BREAK ---\n\nShr~\nHouse Air    aybill\nPOLVEX DISTRIBUTION\nGMBH & CO.KG           Aldwin INTERNATIONAL               GMBH\nLindenstrasse 35                                                                                                       Avenida Cenbal 7\n20095, HAMBURG,\nHH 20539 DE\nTE                                                                                                     Copies 1, 2 and 3 of Ihis Air Waybill are orginals and have Ihe same valldity.\nConsignee $ Name and Address                             Consignee 5 Account Number            IiIS agreed thal the aoods          herein are accepted in apparent good order and condition (except as\nnoted) for carrage           To THE               OF             ONTHE                       ALL\nCadence PTE LTD                                                                                      GOODS MaY BE           BY ANY OTHER MEANS             ROAD OR ANY Other\nINSTRUCTIONS ARE GIVEN          BY THE Shipper; AND\nTHAT THE             May BE           Via INTERMEDIATE\nRua do Ouro 18                                                                                        WHICH THE           deEMS APPROPRIATE. THE                           IS DRAWN TO THE\nOF LIABILITY . Shipper mav increase such limitation 0l\nliability by            higher value Ior carriage and paying a supplemental       if requlred\n539775 SG\nTE\nIssulng Carrier $ Agent Name and Clty                                                                   Accounling Inlcrmallon\nAgent's IATA Code                                Account No;\n23-4 7534/2015\n~Airport 01 Departure (Addr . of First Carrier) ana           Routing                                               Reterence Number             Optional Shipping Intormation\nTERMS: FCA\nTo        By First Carrier       Routing and Destinaion   t0         DY                 DV                    [CrGS  WNAL     Other                Value for Carriage                 Valuo for Cusioms\nPpd             colL\nAMS                       KL                        SIN   KL                         EURICPI      IX X                    NVD                           NCV\nAirpon 0i DEHVICKRPYE                              Requcstcd FlightDate                Amount af insuranca                           II Carner oliers Insurance and such Insurance is\nrequcsted in accordance wilh Ine conditions Increol, indicatc amouni lo bC\nKL8410/12   KL835/13                      XXX            Iinsured in ligures in box marked amouni ol insurance\nHandling Information   1.11.2025 16.20 | SPX BY XRY DEIRA0O 169-02                  BY DEIRA/00095-06\nNOT                                                                                                                                                                 MRN:\nSCI\nX\nGross            Rate Class                                       Rate\nNo;Oi       Weight                                          wcignt                                                     Total                                    Nature and Quantity 0f Goods\nPieces                                  Commcdily                                             Charge                                                               ~(incl. Dimensions or Volume)\nRCP                                    KemNo\n2                 567.Okl                                   567.0                                               As Agreed]   NOVODUR PZH-AT\nNOT RESTRICTED-\nMarks:                                                                                                                                             HS Codes: 39033000\nORDER NO                                                                                                                    DIMS 100x120x140 CMx 2\n03153934                                                                                                                    VOL 3.360 M3\nPART NO\nTA 440162      82704896\n2        567.0\nPregaid          Weight (                    Collect            [Oiner\nValuation Charge\nTax\nToaloher Charges Duc Agent                          [Shipper certitles that Ihe particulars an Inc Iacc hercol arc carreci and Inal Insofar Js any part 0l Ihe consignment\ncontains dangerous goods; such part is properly           by name and is in proper condition for carriage by air according to the\napplicable Dangerous Goods Regulations\nTol Other Charges Due Carror                          Aldwin           INTERNATIONAL AS AGENT                                       Uitcoc\n0i Shipper Ohig Agent\nTotal Prepaia                          Total Collect\nINTERNATIONAL AS AGENT                                        utcue\nConversion Rales         CC:       in                     1-Nov-25\nNorthwind Distribution GMBH\nExecuted on (date)                                   ai (place)                                           of Issuing Carer or its Agent\nCharges a1 Destination                 Tolal Collec Charges                                                 HAWB No:\nFor Carriers use only\nCopy 7  (Extra Copy)\n\n\n--- PAGE BREAK ---\n\nDate  10/28/2025\nOrder no.\nCadence PTE LTD\nHigh Street 18\n#08-08, 539775 Singapore\nAttn:                   Tan\nEmail: clara lind@cadence com\nUNIT PRICE    TOTAL\nPZH-AT                                                                                     EUR 8. 18            EUR 4.499.00\nPolvex               (FAR EAST) LTD\n80\nEhuetiti\nKoxo\nKoso"
+    },
+    {
+      "step": 2,
+      "title": "Phase 2: Multi-Document Pre-Segmentation",
+      "subdoc_count": 2,
+      "status_msg": "Detected 2 distinct sub-document segment(s)."
+    },
+    {
+      "step": 3,
+      "subdoc_idx": 1,
+      "title": "Phase 3: Classification [DU-03.pdf#subdoc1]",
+      "is_payable": true,
+      "doc_type": "INVOICE",
+      "score": 0.85,
+      "reasons": [
+        "TableStructure(+25)",
+        "TaxID(+15)",
+        "EntityParties(+10)",
+        "FinancialTotal(+10)"
+      ]
+    },
+    {
+      "step": 4,
+      "subdoc_idx": 1,
+      "title": "Phase 4: AI Model Extraction (Groq) [DU-03.pdf#subdoc1]",
+      "raw_json": {
+        "invoice_number": "0534",
+        "invoice_date": "2024-08-08",
+        "due_date": "2026-01-16",
+        "invoice_type": "INVOICE",
+        "currency": "USD",
+        "supplier": {
+          "name": "Blueharbor Logistics & Services",
+          "supplier_id": "",
+          "address": "Changi Airfreight Centre, Cargo Agents Building E, 819834 Singapore",
+          "vat_id": "M2-0029161-1"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_60",
+        "po_number": "",
+        "po_id": "",
+        "gross_total": "1040.06",
+        "subtotal": "1040.06",
+        "total_tax_amount": "0.00",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "International Freight",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "1.28",
+            "total": "725.76",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.10",
+            "total": "56.70",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Documentation Fee",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "45.00",
+            "total": "45.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Delivery",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.04",
+            "total": "22.68",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Pick-up",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.18",
+            "total": "102.06",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Export",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "7.50",
+            "total": "7.50",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Documentation",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Import",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Carrier Manifest Filing",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "5.00",
+            "total": "5.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.08",
+            "total": "45.36",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": "4b",
+      "subdoc_idx": 1,
+      "title": "Phase 4b: Grounding & Anti-Hallucination Verification [DU-03.pdf#subdoc1]",
+      "warnings": [],
+      "sanitized_json": {
+        "invoice_number": "0534",
+        "invoice_date": "2024-08-08",
+        "due_date": "2026-01-16",
+        "invoice_type": "INVOICE",
+        "currency": "USD",
+        "supplier": {
+          "name": "Blueharbor Logistics & Services",
+          "supplier_id": "",
+          "address": "Changi Airfreight Centre, Cargo Agents Building E, 819834 Singapore",
+          "vat_id": "M2-0029161-1"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_60",
+        "po_number": "",
+        "po_id": "",
+        "gross_total": "1040.06",
+        "subtotal": "1040.06",
+        "total_tax_amount": "0.00",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "International Freight",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "1.28",
+            "total": "725.76",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.10",
+            "total": "56.70",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Documentation Fee",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "45.00",
+            "total": "45.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Delivery",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.04",
+            "total": "22.68",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Pick-up",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.18",
+            "total": "102.06",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Export",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "7.50",
+            "total": "7.50",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Documentation",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Import",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Carrier Manifest Filing",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "5.00",
+            "total": "5.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.08",
+            "total": "45.36",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "subdoc_idx": 1,
+      "title": "Phase 5: Master Data Resolution [DU-03.pdf#subdoc1]",
+      "master_matched": {
+        "supplier_id": "",
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "EE001",
+        "location_code": "LOC_EE_001",
+        "po_id": "",
+        "payment_term_id": "Net_60"
+      },
+      "resolved_json": {
+        "invoice_number": "0534",
+        "invoice_date": "2024-08-08",
+        "due_date": "2026-01-16",
+        "invoice_type": "INVOICE",
+        "currency": "USD",
+        "supplier": {
+          "name": "Blueharbor Logistics & Services",
+          "supplier_id": "",
+          "address": "Changi Airfreight Centre, Cargo Agents Building E, 819834 Singapore",
+          "vat_id": "M2-0029161-1"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_60",
+        "po_number": "",
+        "po_id": "",
+        "gross_total": "1040.06",
+        "subtotal": "1040.06",
+        "total_tax_amount": "0.00",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "International Freight",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "1.28",
+            "total": "725.76",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.10",
+            "total": "56.70",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Documentation Fee",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "45.00",
+            "total": "45.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Delivery",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.04",
+            "total": "22.68",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Pick-up",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.18",
+            "total": "102.06",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Export",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "7.50",
+            "total": "7.50",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Documentation",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Import",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Carrier Manifest Filing",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "5.00",
+            "total": "5.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.08",
+            "total": "45.36",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "subdoc_idx": 1,
+      "title": "Phase 6: Pre-ERP Payload Assembly [DU-03.pdf#subdoc1]",
+      "payload": {
+        "invoice_number": "0534",
+        "invoice_date": "2024-08-08",
+        "due_date": "2026-01-16",
+        "invoice_type": "INVOICE",
+        "currency": "USD",
+        "supplier": {
+          "name": "Blueharbor Logistics & Services",
+          "supplier_id": "",
+          "address": "Changi Airfreight Centre, Cargo Agents Building E, 819834 Singapore",
+          "vat_id": "M2-0029161-1"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_60",
+        "po_number": "",
+        "po_id": "",
+        "gross_total": "1040.06",
+        "subtotal": "1040.06",
+        "total_tax_amount": "0.00",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "International Freight",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "1.28",
+            "total": "725.76",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.10",
+            "total": "56.70",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Documentation Fee",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "45.00",
+            "total": "45.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Delivery",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.04",
+            "total": "22.68",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Pick-up",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.18",
+            "total": "102.06",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Export",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "7.50",
+            "total": "7.50",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Origin Documentation",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Customs Import",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "15.00",
+            "total": "15.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Carrier Manifest Filing",
+            "item_type": "SERVICE",
+            "uom": "EA",
+            "quantity": "1.00",
+            "unit_price": "5.00",
+            "total": "5.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          },
+          {
+            "description": "Terminal Handling",
+            "item_type": "FREIGHT",
+            "uom": "KG",
+            "quantity": "567.00",
+            "unit_price": "0.08",
+            "total": "45.36",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "subdoc_idx": 1,
+      "title": "Phase 7: ERP Oracle Booking Verification [DU-03.pdf#subdoc1]",
+      "target_gross": "1040.06",
+      "booked_gross": "1040.06",
+      "status": "PASS",
+      "erp_details": {
+        "will_book_gross": 1040.06,
+        "currency": "USD"
+      }
+    },
+    {
+      "step": 3,
+      "subdoc_idx": 2,
+      "title": "Phase 3: Classification [DU-03.pdf#subdoc2]",
+      "is_payable": true,
+      "doc_type": "INVOICE",
+      "score": 0.85,
+      "reasons": [
+        "TableStructure(+25)",
+        "TaxID(+15)",
+        "FinancialTotal(+10)"
+      ]
+    },
+    {
+      "step": 4,
+      "subdoc_idx": 2,
+      "title": "Phase 4: AI Model Extraction (Groq) [DU-03.pdf#subdoc2]",
+      "raw_json": {
+        "invoice_number": "2279433-82704896",
+        "invoice_date": "2025-11-13",
+        "due_date": "",
+        "invoice_type": "INVOICE",
+        "currency": "EUR",
+        "supplier": {
+          "name": "Polvex Distribution GmbH & Co. KG",
+          "supplier_id": "",
+          "address": "Lindenstrasse 35, 20095 Hamburg, Germany",
+          "vat_id": ""
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_14",
+        "po_number": "03153934",
+        "po_id": "",
+        "gross_total": "4499.00",
+        "subtotal": "4499.00",
+        "total_tax_amount": "722.76",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "NOVODUR PZH-AT",
+            "item_type": "GOODS",
+            "uom": "",
+            "quantity": "567.00",
+            "unit_price": "8.18",
+            "total": "4499.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": "4b",
+      "subdoc_idx": 2,
+      "title": "Phase 4b: Grounding & Anti-Hallucination Verification [DU-03.pdf#subdoc2]",
+      "warnings": [],
+      "sanitized_json": {
+        "invoice_number": "2279433-82704896",
+        "invoice_date": "2025-11-13",
+        "due_date": "",
+        "invoice_type": "INVOICE",
+        "currency": "EUR",
+        "supplier": {
+          "name": "Polvex Distribution GmbH & Co. KG",
+          "supplier_id": "",
+          "address": "Lindenstrasse 35, 20095 Hamburg, Germany",
+          "vat_id": ""
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_14",
+        "po_number": "03153934",
+        "po_id": "",
+        "gross_total": "4499.00",
+        "subtotal": "4499.00",
+        "total_tax_amount": "722.76",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "NOVODUR PZH-AT",
+            "item_type": "GOODS",
+            "uom": "",
+            "quantity": "567.00",
+            "unit_price": "8.18",
+            "total": "4499.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "subdoc_idx": 2,
+      "title": "Phase 5: Master Data Resolution [DU-03.pdf#subdoc2]",
+      "master_matched": {
+        "supplier_id": "",
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "EE001",
+        "location_code": "LOC_EE_001",
+        "po_id": "",
+        "payment_term_id": "Net_14"
+      },
+      "resolved_json": {
+        "invoice_number": "2279433-82704896",
+        "invoice_date": "2025-11-13",
+        "due_date": "",
+        "invoice_type": "INVOICE",
+        "currency": "EUR",
+        "supplier": {
+          "name": "Polvex Distribution GmbH & Co. KG",
+          "supplier_id": "",
+          "address": "Lindenstrasse 35, 20095 Hamburg, Germany",
+          "vat_id": ""
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_14",
+        "po_number": "03153934",
+        "po_id": "",
+        "gross_total": "4499.00",
+        "subtotal": "4499.00",
+        "total_tax_amount": "722.76",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "NOVODUR PZH-AT",
+            "item_type": "GOODS",
+            "uom": "",
+            "quantity": "567.00",
+            "unit_price": "8.18",
+            "total": "4499.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "subdoc_idx": 2,
+      "title": "Phase 6: Pre-ERP Payload Assembly [DU-03.pdf#subdoc2]",
+      "payload": {
+        "invoice_number": "2279433-82704896",
+        "invoice_date": "2025-11-13",
+        "due_date": "",
+        "invoice_type": "INVOICE",
+        "currency": "EUR",
+        "supplier": {
+          "name": "Polvex Distribution GmbH & Co. KG",
+          "supplier_id": "",
+          "address": "Lindenstrasse 35, 20095 Hamburg, Germany",
+          "vat_id": ""
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "EE001",
+          "location_code": "LOC_EE_001"
+        },
+        "payment_term_id": "Net_14",
+        "po_number": "03153934",
+        "po_id": "",
+        "gross_total": "4499.00",
+        "subtotal": "4499.00",
+        "total_tax_amount": "722.76",
+        "discount_amount": "",
+        "freight_charges": "",
+        "insurance_charges": "",
+        "extra_charges": "",
+        "excise_duties": "",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "NOVODUR PZH-AT",
+            "item_type": "GOODS",
+            "uom": "",
+            "quantity": "567.00",
+            "unit_price": "8.18",
+            "total": "4499.00",
+            "discount": "",
+            "discount_percentage": "",
+            "tax_rate": "",
+            "tax_amount": "",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "subdoc_idx": 2,
+      "title": "Phase 7: ERP Oracle Booking Verification [DU-03.pdf#subdoc2]",
+      "target_gross": "4499.00",
+      "booked_gross": "4638.06",
+      "status": "FAIL",
+      "erp_details": {
+        "will_book_gross": 4638.06,
+        "currency": "EUR"
+      }
+    }
+  ]
+}

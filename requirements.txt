@@ -13,3 +13,6 @@ rapidfuzz>=3.0.0
 
 # Gemini API (Phase 4)
 google-generativeai>=0.8.0
+
+# Config management
+pydantic-settings>=2.0.0

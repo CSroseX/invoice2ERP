@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+from src.config import settings
 import sys
 import time
 import textwrap
@@ -334,8 +335,258 @@ if not st.session_state.selected_doc and pdf_names:
 # ---------------------------------------------------------------------------
 # Pipeline Generator Function
 # ---------------------------------------------------------------------------
+import queue
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from streamlit.runtime.scriptrunner import add_script_run_ctx
+
+def _process_single_pdf(idx, pdf, target_files_len, q, matcher, out_dir):
+    """Worker thread function to process a single PDF asynchronously."""
+    try:
+        filename = pdf.name
+        # Note: In Streamlit, modifying st.session_state from a background thread can be problematic 
+        # if the main thread triggers a rerun while the worker is writing.
+        # We push all events to the queue and let the main thread update the state!
+        
+        trace = []
+        
+        print(f"\n" + "=" * 80, flush=True)
+        audit_logger.info(f"DOCUMENT [{idx:02d}/{target_files_len}]: {filename}", extra={"doc_filename": filename, "status": "START"})
+        print("=" * 80, flush=True)
+
+        q.put({
+            "type": "DOC_START",
+            "filename": filename,
+            "idx": idx,
+            "total": target_files_len
+        })
+
+        try:
+            txt_cache = Path("parsed_files") / f"{pdf.stem}.txt"
+            path_used = "PyMuPDF Native Vector Text"
+            page_count = 1
+
+            # Phase 1: OCR Extraction & Layout
+            if txt_cache.exists():
+                full_ocr_text = txt_cache.read_text(encoding="utf-8", errors="ignore")
+                path_used = "Cached OCR Text (300 DPI Spatial Layout)"
+                audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", extra={"doc_filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text)})
+            else:
+                doc = fitz.open(str(pdf))
+                page_count = len(doc)
+                is_dig = any(is_digital_vector_page(doc[i]) for i in range(len(doc)))
+                doc.close()
+                
+                text_pages = extract_text(str(pdf))
+                full_ocr_text = "\n\n--- PAGE BREAK ---\n\n".join(text_pages)
+                path_used = "PyMuPDF Direct Text Extraction" if is_dig else "PyMuPDF Render (300 DPI) + EasyOCR"
+                audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", extra={"doc_filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text), "page_count": page_count})
+
+            step1_event = {
+                "step": 1,
+                "title": "Phase 1: OCR & Spatial Layout Extraction",
+                "path_used": path_used,
+                "char_count": len(full_ocr_text),
+                "page_count": page_count,
+                "raw_text": full_ocr_text
+            }
+            trace.append(step1_event)
+            q.put({"type": "STEP_1", "filename": filename, "data": step1_event})
+
+            # Phase 2: Multi-Document Pre-Segmentation
+            subdoc_texts = segment_document_text(full_ocr_text)
+            audit_logger.info(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", extra={"doc_filename": filename, "step": 2, "subdoc_count": len(subdoc_texts)})
+
+            step2_event = {
+                "step": 2,
+                "title": "Phase 2: Multi-Document Pre-Segmentation",
+                "subdoc_count": len(subdoc_texts),
+                "status_msg": f"Detected {len(subdoc_texts)} distinct sub-document segment(s)."
+            }
+            trace.append(step2_event)
+            q.put({"type": "STEP_2", "filename": filename, "data": step2_event})
+
+            payables = []
+            declined = []
+
+            for s_idx, seg_text in enumerate(subdoc_texts, 1):
+                sub_label = f"{filename}#subdoc{s_idx}" if len(subdoc_texts) > 1 else filename
+                
+                # Phase 3: Classification
+                class_res = classify_document_text(seg_text, filename=sub_label)
+                confidence_score = getattr(class_res, 'confidence', getattr(class_res, 'score', 1.0))
+                audit_logger.info(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", extra={"doc_filename": filename, "sub_label": sub_label, "step": 3, "is_payable": class_res.is_payable, "doc_type": class_res.doc_type, "confidence": confidence_score})
+
+                step3_event = {
+                    "step": 3,
+                    "subdoc_idx": s_idx,
+                    "title": f"Phase 3: Classification [{sub_label}]",
+                    "is_payable": class_res.is_payable,
+                    "doc_type": class_res.doc_type,
+                    "score": confidence_score,
+                    "reasons": class_res.reasons
+                }
+                trace.append(step3_event)
+                q.put({"type": "STEP_3", "filename": filename, "data": step3_event})
+
+                if class_res.is_payable:
+                    try:
+                        # Phase 4: AI Model Extraction (Groq)
+                        audit_logger.info(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", extra={"doc_filename": filename, "sub_label": sub_label, "step": 4})
+                        raw_payable = extract_payable_from_text(seg_text, filename=sub_label, allow_fallback=False)
+                        token_usage = raw_payable.pop("__tokens__", {})
+                        st.session_state.stats["prompt_tokens"] += token_usage.get("prompt_tokens", token_usage.get("prompt_token_count", 0))
+                        st.session_state.stats["completion_tokens"] += token_usage.get("completion_tokens", token_usage.get("candidates_token_count", 0))
+                        if class_res.doc_type == "CREDIT_MEMO":
+                            raw_payable["invoice_type"] = "CREDIT_MEMO"
+
+                        step4_event = {
+                            "step": 4,
+                            "subdoc_idx": s_idx,
+                            "title": f"Phase 4: AI Model Extraction (Groq) [{sub_label}]",
+                            "raw_json": raw_payable,
+                            "token_usage": token_usage
+                        }
+                        trace.append(step4_event)
+                        q.put({"type": "STEP_4", "filename": filename, "data": step4_event})
+
+                        # Phase 4b: Grounding Verification
+                        grounded_payable, g_warns = verify_payable_grounding(raw_payable, seg_text)
+                        step4b_event = {
+                            "step": "4b",
+                            "subdoc_idx": s_idx,
+                            "title": f"Phase 4b: Grounding & Anti-Hallucination Verification [{sub_label}]",
+                            "warnings": g_warns,
+                            "sanitized_json": grounded_payable
+                        }
+                        trace.append(step4b_event)
+                        q.put({"type": "STEP_4B", "filename": filename, "data": step4b_event})
+
+                        # Phase 5: Master Data Matching
+                        resolved_payable = matcher.resolve_payable(grounded_payable, text_context=seg_text)
+                        
+                        supp_id = resolved_payable.get("supplier", {}).get("supplier_id", "")
+                        comp_code = resolved_payable.get("buyer", {}).get("company_code", "")
+                        audit_logger.info(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", extra={"doc_filename": filename, "sub_label": sub_label, "step": 5, "supplier_id": supp_id, "company_code": comp_code})
+
+                        master_summary = {
+                            "supplier_id": supp_id,
+                            "company_code": comp_code,
+                            "business_unit_code": resolved_payable.get("buyer", {}).get("business_unit_code", ""),
+                            "location_code": resolved_payable.get("buyer", {}).get("location_code", ""),
+                            "po_id": resolved_payable.get("po_id", ""),
+                            "payment_term_id": resolved_payable.get("payment_term_id", "")
+                        }
+                        
+                        step5_event = {
+                            "step": 5,
+                            "subdoc_idx": s_idx,
+                            "title": f"Phase 5: Master Data Resolution [{sub_label}]",
+                            "master_matched": master_summary,
+                            "resolved_json": resolved_payable
+                        }
+                        trace.append(step5_event)
+                        q.put({"type": "STEP_5", "filename": filename, "data": step5_event})
+
+                        # Phase 6: Pre-ERP Payload Assembly
+                        payables.append(resolved_payable)
+                        step6_event = {
+                            "step": 6,
+                            "subdoc_idx": s_idx,
+                            "title": f"Phase 6: Pre-ERP Payload Assembly [{sub_label}]",
+                            "payload": resolved_payable
+                        }
+                        trace.append(step6_event)
+                        q.put({"type": "STEP_6", "filename": filename, "data": step6_event})
+
+                        # Phase 7: ERP Oracle Booking Check
+                        erp_res = erp_book(resolved_payable)
+                        booked_gross = erp_res.get("will_book_gross", 0.0)
+                        printed_gross_str = str(resolved_payable.get("gross_total") or "").strip()
+                        try:
+                            target_gross = float(printed_gross_str) if printed_gross_str else 0.0
+                        except ValueError:
+                            target_gross = 0.0
+
+                        is_match = abs(booked_gross - target_gross) < 0.05
+                        erp_status = "PASS" if is_match else "FAIL"
+                        audit_logger.info(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", extra={"doc_filename": filename, "sub_label": sub_label, "step": 7, "erp_status": erp_status, "gross": printed_gross_str, "currency": resolved_payable.get("currency")})
+
+                        step7_event = {
+                            "step": 7,
+                            "subdoc_idx": s_idx,
+                            "title": f"Phase 7: ERP Oracle Booking Verification [{sub_label}]",
+                            "target_gross": f"{target_gross:.2f}",
+                            "booked_gross": f"{booked_gross:.2f}",
+                            "status": erp_status,
+                            "erp_details": erp_res
+                        }
+                        trace.append(step7_event)
+                        q.put({"type": "STEP_7", "filename": filename, "data": step7_event})
+
+                    except QuotaExhaustedError as qe:
+                        audit_logger.error(f"[QUOTA EXHAUSTED]: {qe}", extra={"doc_filename": filename, "sub_label": sub_label, "error": str(qe)})
+                        q.put({"type": "QUOTA_ERROR", "filename": filename, "error": str(qe)})
+                        return
+                    except Exception as e:
+                        audit_logger.error(f"  [EXTRACTION FAILED]: {e}", extra={"doc_filename": filename, "sub_label": sub_label, "error": str(e)})
+                        declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction exception: {e}"})
+                else:
+                    audit_logger.warning(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", extra={"doc_filename": filename, "sub_label": sub_label, "reasons": class_res.reasons})
+                    declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
+
+            # Save final payload to output/<pdf_stem>.json
+            file_payload = {
+                "file": filename,
+                "payables": payables,
+                "declined": declined
+            }
+            out_json_path = out_dir / f"{pdf.stem}.json"
+            out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding="utf-8")
+            audit_logger.info(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", extra={"doc_filename": filename, "step": "SAVE_JSON", "payload_path": str(out_json_path)})
+
+            q.put({
+                "type": "DOC_END", 
+                "filename": filename, 
+                "payables_count": len(payables),
+                "declined_count": len(declined),
+                "has_erp_fail": any(ev.get("step") == 7 and ev.get("status") == "FAIL" for ev in trace) if payables else False
+            })
+
+        except Exception as e:
+            import traceback
+            import shutil
+            dlq_dir = Path("output/dlq")
+            dlq_dir.mkdir(parents=True, exist_ok=True)
+            error_msg = f"Fatal Document Error: {e}\n{traceback.format_exc()}"
+            audit_logger.critical(f"Fatal Document Error: {e}", extra={"doc_filename": filename, "dlq": True, "traceback": traceback.format_exc()})
+            print(error_msg, flush=True)
+            try:
+                shutil.copy(pdf, dlq_dir / pdf.name)
+                dlq_meta = {
+                    "filename": filename,
+                    "error": str(e),
+                    "traceback": traceback.format_exc(),
+                    "partial_trace": trace
+                }
+                (dlq_dir / f"{pdf.stem}_error.json").write_text(json.dumps(dlq_meta, indent=2), encoding="utf-8")
+            except Exception as dlq_e:
+                print(f"Failed to write DLQ: {dlq_e}")
+            
+            q.put({
+                "type": "DOC_FATAL", 
+                "filename": filename, 
+                "error": str(e)
+            })
+
+    except Exception as e:
+        q.put({"type": "DOC_FATAL", "filename": pdf.name, "error": str(e)})
+
+# ---------------------------------------------------------------------------
+# Pipeline Generator Function (Async/Queue based)
+# ---------------------------------------------------------------------------
 def run_pipeline_generator(target_files: list[Path]):
-    """Generator yielding live step events per document with safe stdout redirection."""
+    """Generator yielding live step events per document using Async/Queue."""
     matcher = MasterDataMatcher()
     out_dir = Path("output")
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -343,279 +594,94 @@ def run_pipeline_generator(target_files: list[Path]):
     original_stdout = sys.stdout
     sys.stdout = StreamTee(original_stdout, st.session_state.raw_logs)
 
+    q = queue.Queue()
+    target_files_len = len(target_files)
+
     try:
-        for idx, pdf in enumerate(target_files, 1):
-            if st.session_state.stop_requested:
-                st.session_state.raw_logs.append("[SYSTEM]: Processing stopped by user request.")
-                break
-
+        # Initialize UI state for all files before starting threads
+        for pdf in target_files:
             filename = pdf.name
-            st.session_state.doc_status[filename] = "PROCESSING"
-            st.session_state.selected_doc = filename
+            st.session_state.doc_status[filename] = "PENDING"
             st.session_state.doc_traces[filename] = []
+        
+        if target_files:
+            st.session_state.selected_doc = target_files[0].name
 
-            trace = []
-            
-            print(f"\n" + "=" * 80, flush=True)
-            audit_logger.info(f"DOCUMENT [{idx:02d}/{len(target_files)}]: {filename}", extra={"filename": filename, "status": "START"})
-            print("=" * 80, flush=True)
+        active_workers = 0
+        with ThreadPoolExecutor(max_workers=min(4, target_files_len)) as executor:
+            for idx, pdf in enumerate(target_files, 1):
+                if st.session_state.stop_requested:
+                    st.session_state.raw_logs.append("[SYSTEM]: Processing stopped by user request.")
+                    break
+                
+                # Submit worker
+                future = executor.submit(
+                    _process_single_pdf, idx, pdf, target_files_len, q, matcher, out_dir
+                )
+                add_script_run_ctx(future)
+                active_workers += 1
 
-            yield {
-                "type": "DOC_START",
-                "filename": filename,
-                "idx": idx,
-                "total": len(target_files)
-            }
-
-            try:
-                txt_cache = Path("parsed_files") / f"{pdf.stem}.txt"
-                path_used = "PyMuPDF Native Vector Text"
-                page_count = 1
-    
-                # Phase 1: OCR Extraction & Layout
-                if txt_cache.exists():
-                    full_ocr_text = txt_cache.read_text(encoding="utf-8", errors="ignore")
-                    path_used = "Cached OCR Text (300 DPI Spatial Layout)"
-                    audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Loaded cached text ({len(full_ocr_text)} chars)", extra={"filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text)})
-                else:
-                    doc = fitz.open(str(pdf))
-                    page_count = len(doc)
-                    is_dig = any(is_digital_vector_page(doc[i]) for i in range(len(doc)))
-                    doc.close()
-                    
-                    text_pages = extract_text(str(pdf))
-                    full_ocr_text = "\n\n--- PAGE BREAK ---\n\n".join(text_pages)
-                    path_used = "PyMuPDF Direct Text Extraction" if is_dig else "PyMuPDF Render (300 DPI) + EasyOCR"
-                    audit_logger.info(f"[STEP 1: OCR & LAYOUT EXTRACTION] -> Extracted {page_count} page(s) via {path_used} ({len(full_ocr_text)} chars)", extra={"filename": filename, "step": 1, "path_used": path_used, "char_count": len(full_ocr_text), "page_count": page_count})
-    
-                step1_event = {
-                    "step": 1,
-                    "title": "Phase 1: OCR & Spatial Layout Extraction",
-                    "path_used": path_used,
-                    "char_count": len(full_ocr_text),
-                    "page_count": page_count,
-                    "raw_text": full_ocr_text
-                }
-                trace.append(step1_event)
-                st.session_state.doc_traces[filename].append(step1_event)
-                yield {"type": "STEP_1", "filename": filename, "data": step1_event}
-    
-                # Phase 2: Multi-Document Pre-Segmentation
-                subdoc_texts = segment_document_text(full_ocr_text)
-                audit_logger.info(f"[STEP 2: PRE-SEGMENTATION]       -> Segmented into {len(subdoc_texts)} sub-document(s)", extra={"filename": filename, "step": 2, "subdoc_count": len(subdoc_texts)})
-    
-                step2_event = {
-                    "step": 2,
-                    "title": "Phase 2: Multi-Document Pre-Segmentation",
-                    "subdoc_count": len(subdoc_texts),
-                    "status_msg": f"Detected {len(subdoc_texts)} distinct sub-document segment(s)."
-                }
-                trace.append(step2_event)
-                st.session_state.doc_traces[filename].append(step2_event)
-                yield {"type": "STEP_2", "filename": filename, "data": step2_event}
-    
-                payables = []
-                declined = []
-                doc_has_payable = False
-    
-                for s_idx, seg_text in enumerate(subdoc_texts, 1):
-                    if st.session_state.stop_requested:
-                        break
-    
-                    sub_label = f"{filename}#subdoc{s_idx}" if len(subdoc_texts) > 1 else filename
-                    
-                    # Phase 3: Classification
-                    class_res = classify_document_text(seg_text, filename=sub_label)
-                    confidence_score = getattr(class_res, 'confidence', getattr(class_res, 'score', 1.0))
-                    audit_logger.info(f"  [STEP 3: CLASSIFICATION]         -> Payable: {class_res.is_payable} | Type: {class_res.doc_type} (Confidence: {confidence_score})", extra={"filename": filename, "sub_label": sub_label, "step": 3, "is_payable": class_res.is_payable, "doc_type": class_res.doc_type, "confidence": confidence_score})
-    
-                    step3_event = {
-                        "step": 3,
-                        "subdoc_idx": s_idx,
-                        "title": f"Phase 3: Classification [{sub_label}]",
-                        "is_payable": class_res.is_payable,
-                        "doc_type": class_res.doc_type,
-                        "score": confidence_score,
-                        "reasons": class_res.reasons
-                    }
-                    trace.append(step3_event)
-                    st.session_state.doc_traces[filename].append(step3_event)
-                    yield {"type": "STEP_3", "filename": filename, "data": step3_event}
-    
-                    if class_res.is_payable:
-                        doc_has_payable = True
-                        try:
-                            # Phase 4: AI Model Extraction (Groq)
-                            audit_logger.info(f"  [STEP 4: AI EXTRACTION & GROUNDING] -> Sending OCR text to Groq API...", extra={"filename": filename, "sub_label": sub_label, "step": 4})
-                            raw_payable = extract_payable_from_text(seg_text, filename=sub_label, allow_fallback=False)
-                            if class_res.doc_type == "CREDIT_MEMO":
-                                raw_payable["invoice_type"] = "CREDIT_MEMO"
-    
-                            step4_event = {
-                                "step": 4,
-                                "subdoc_idx": s_idx,
-                                "title": f"Phase 4: AI Model Extraction (Groq) [{sub_label}]",
-                                "raw_json": raw_payable
-                            }
-                            trace.append(step4_event)
-                            st.session_state.doc_traces[filename].append(step4_event)
-                            yield {"type": "STEP_4", "filename": filename, "data": step4_event}
-    
-                            # Phase 4b: Grounding Verification
-                            grounded_payable, g_warns = verify_payable_grounding(raw_payable, seg_text)
-                            step4b_event = {
-                                "step": "4b",
-                                "subdoc_idx": s_idx,
-                                "title": f"Phase 4b: Grounding & Anti-Hallucination Verification [{sub_label}]",
-                                "warnings": g_warns,
-                                "sanitized_json": grounded_payable
-                            }
-                            trace.append(step4b_event)
-                            st.session_state.doc_traces[filename].append(step4b_event)
-                            yield {"type": "STEP_4B", "filename": filename, "data": step4b_event}
-    
-                            # Phase 5: Master Data Matching
-                            resolved_payable = matcher.resolve_payable(grounded_payable, text_context=seg_text)
-                            
-                            supp_id = resolved_payable.get("supplier", {}).get("supplier_id", "")
-                            comp_code = resolved_payable.get("buyer", {}).get("company_code", "")
-                            audit_logger.info(f"  [STEP 5: MASTER DATA MATCHING]   -> Supplier ID: '{supp_id}' | Company Code: '{comp_code}'", extra={"filename": filename, "sub_label": sub_label, "step": 5, "supplier_id": supp_id, "company_code": comp_code})
-    
-                            master_summary = {
-                                "supplier_id": supp_id,
-                                "company_code": comp_code,
-                                "business_unit_code": resolved_payable.get("buyer", {}).get("business_unit_code", ""),
-                                "location_code": resolved_payable.get("buyer", {}).get("location_code", ""),
-                                "po_id": resolved_payable.get("po_id", ""),
-                                "payment_term_id": resolved_payable.get("payment_term_id", "")
-                            }
-                            
-                            step5_event = {
-                                "step": 5,
-                                "subdoc_idx": s_idx,
-                                "title": f"Phase 5: Master Data Resolution [{sub_label}]",
-                                "master_matched": master_summary,
-                                "resolved_json": resolved_payable
-                            }
-                            trace.append(step5_event)
-                            st.session_state.doc_traces[filename].append(step5_event)
-                            yield {"type": "STEP_5", "filename": filename, "data": step5_event}
-    
-                            # Phase 6: Pre-ERP Payload Assembly
-                            payables.append(resolved_payable)
-                            step6_event = {
-                                "step": 6,
-                                "subdoc_idx": s_idx,
-                                "title": f"Phase 6: Pre-ERP Payload Assembly [{sub_label}]",
-                                "payload": resolved_payable
-                            }
-                            trace.append(step6_event)
-                            st.session_state.doc_traces[filename].append(step6_event)
-                            yield {"type": "STEP_6", "filename": filename, "data": step6_event}
-    
-                            # Phase 7: ERP Oracle Booking Check
-                            erp_res = erp_book(resolved_payable)
-                            booked_gross = erp_res.get("will_book_gross", 0.0)
-                            printed_gross_str = str(resolved_payable.get("gross_total") or "").strip()
-                            try:
-                                target_gross = float(printed_gross_str) if printed_gross_str else 0.0
-                            except ValueError:
-                                target_gross = 0.0
-    
-                            is_match = abs(booked_gross - target_gross) < 0.05
-                            erp_status = "PASS" if is_match else "FAIL"
-                            audit_logger.info(f"  [STATUS]: BOOKABLE PAYABLE ({erp_status}) -> Gross Total: {printed_gross_str} {resolved_payable.get('currency')}", extra={"filename": filename, "sub_label": sub_label, "step": 7, "erp_status": erp_status, "gross": printed_gross_str, "currency": resolved_payable.get("currency")})
-    
-                            step7_event = {
-                                "step": 7,
-                                "subdoc_idx": s_idx,
-                                "title": f"Phase 7: ERP Oracle Booking Verification [{sub_label}]",
-                                "target_gross": f"{target_gross:.2f}",
-                                "booked_gross": f"{booked_gross:.2f}",
-                                "status": erp_status,
-                                "erp_details": erp_res
-                            }
-                            trace.append(step7_event)
-                            st.session_state.doc_traces[filename].append(step7_event)
-                            yield {"type": "STEP_7", "filename": filename, "data": step7_event}
-    
-                        except QuotaExhaustedError as qe:
-                            audit_logger.error(f"[QUOTA EXHAUSTED]: {qe}", extra={"filename": filename, "sub_label": sub_label, "error": str(qe)})
-                            st.session_state.doc_status[filename] = "FAIL"
-                            return
-                        except Exception as e:
-                            audit_logger.error(f"  [EXTRACTION FAILED]: {e}", extra={"filename": filename, "sub_label": sub_label, "error": str(e)})
-                            declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction exception: {e}"})
-                    else:
-                        audit_logger.warning(f"  [STATUS]: DECLINED              -> Reasons: {'; '.join(class_res.reasons)}", extra={"filename": filename, "sub_label": sub_label, "reasons": class_res.reasons})
-                        declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
-    
-                # Save final payload to output/<pdf_stem>.json
-                file_payload = {
-                    "file": filename,
-                    "payables": payables,
-                    "declined": declined
-                }
-                out_json_path = out_dir / f"{pdf.stem}.json"
-                out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding="utf-8")
-                audit_logger.info(f"LAST [STEP 6: JSON SAVED]               -> Saved JSON to '{out_json_path}'", extra={"filename": filename, "step": "SAVE_JSON", "payload_path": str(out_json_path)})
-    
-                # Determine overall document status (100% consistent with ERP booking check)
-                if payables:
-                    has_erp_fail = any(
-                        ev.get("step") == 7 and ev.get("status") == "FAIL"
-                        for ev in st.session_state.doc_traces[filename]
-                    )
-                    if has_erp_fail:
-                        final_status = "FAIL"
-                        st.session_state.stats["failed"] += 1
-                    else:
-                        final_status = "PASS"
-                        st.session_state.stats["first_try_pass"] += len(payables)
-                else:
-                    final_status = "DECLINED"
-    
-                st.session_state.doc_status[filename] = final_status
-                st.session_state.stats["total"] += 1
-                st.session_state.stats["payables"] += len(payables)
-                st.session_state.stats["declined"] += len(declined)
-    
-            except Exception as e:
-                import traceback
-                import shutil
-                dlq_dir = Path("output/dlq")
-                dlq_dir.mkdir(parents=True, exist_ok=True)
-                error_msg = f"Fatal Document Error: {e}\n{traceback.format_exc()}"
-                audit_logger.critical(f"Fatal Document Error: {e}", extra={"filename": filename, "dlq": True, "traceback": traceback.format_exc()}); audit_logger.critical(f"Fatal Document Error: {e}", extra={"doc_filename": filename, "dlq": True, "traceback": traceback.format_exc()}); print(error_msg, flush=True)
+            # Poll the queue and yield to Streamlit
+            completed = 0
+            while completed < active_workers:
                 try:
-                    shutil.copy(pdf, dlq_dir / pdf.name)
-                    dlq_meta = {
-                        "filename": filename,
-                        "error": str(e),
-                        "traceback": traceback.format_exc(),
-                        "partial_trace": st.session_state.doc_traces.get(filename, [])
-                    }
-                    import json
-                    (dlq_dir / f"{pdf.stem}_error.json").write_text(json.dumps(dlq_meta, indent=2), encoding="utf-8")
-                except Exception as dlq_e:
-                    print(f"Failed to write DLQ: {dlq_e}")
-                
-                st.session_state.doc_status[filename] = "FAIL"
-                st.session_state.stats["failed"] += 1
-                
-                st.session_state.doc_traces[filename].append({
-                    "step": "DLQ",
-                    "title": "System Crash — Routed to Dead Letter Queue",
-                    "error": str(e)
-                })
-            yield {
-                "type": "DOC_END",
-                "filename": filename,
-                "status": st.session_state.doc_status.get(filename, "FAIL")
-            }
+                    # Timeout prevents deadlocks if a worker silently crashes
+                    event = q.get(timeout=1.0)
+                    
+                    filename = event["filename"]
+                    
+                    if event["type"] == "DOC_START":
+                        st.session_state.doc_status[filename] = "PROCESSING"
+                        yield event
+                    
+                    elif event["type"].startswith("STEP_"):
+                        st.session_state.doc_traces[filename].append(event["data"])
+                        yield event
+                        
+                    elif event["type"] == "QUOTA_ERROR":
+                        st.session_state.doc_status[filename] = "FAIL"
+                        completed += 1
+                        yield event
+                        
+                    elif event["type"] == "DOC_END":
+                        # Update stats based on results
+                        if event["payables_count"] > 0:
+                            if event["has_erp_fail"]:
+                                final_status = "FAIL"
+                                st.session_state.stats["failed"] += 1
+                            else:
+                                final_status = "PASS"
+                                st.session_state.stats["first_try_pass"] += event["payables_count"]
+                        else:
+                            final_status = "DECLINED"
+                            
+                        st.session_state.doc_status[filename] = final_status
+                        st.session_state.stats["total"] += 1
+                        st.session_state.stats["payables"] += event["payables_count"]
+                        st.session_state.stats["declined"] += event["declined_count"]
+                        
+                        completed += 1
+                        yield event
+                        
+                    elif event["type"] == "DOC_FATAL":
+                        st.session_state.doc_status[filename] = "FAIL"
+                        st.session_state.stats["failed"] += 1
+                        st.session_state.doc_traces[filename].append({
+                            "step": "DLQ",
+                            "title": "System Crash — Routed to Dead Letter Queue",
+                            "error": event["error"]
+                        })
+                        completed += 1
+                        yield event
+                        
+                except queue.Empty:
+                    # Allow Streamlit to handle stop requests while waiting
+                    if st.session_state.stop_requested:
+                        st.session_state.raw_logs.append("[SYSTEM]: Aborting queued tasks...")
+                        break
+                    
     finally:
         sys.stdout = original_stdout
-
 
 # ---------------------------------------------------------------------------
 # Sidebar UI: Controls & Scope Selection
@@ -632,11 +698,11 @@ with st.sidebar:
         custom_gemini = st.text_input("Gemini API Key:", type="password", help="Overrides default GEMINI_API_KEY")
         
         if custom_groq.strip():
-            os.environ["GROQ_API_KEY"] = custom_groq.strip()
+            settings.groq_api_key = custom_groq.strip()
         if custom_openrouter.strip():
-            os.environ["OPEN_ROUTER_API"] = custom_openrouter.strip()
+            settings.open_router_api_key = custom_openrouter.strip()
         if custom_gemini.strip():
-            os.environ["GEMINI_API_KEY"] = custom_gemini.strip()
+            settings.gemini_api_key = custom_gemini.strip()
 
     st.divider()
 
@@ -1422,7 +1488,7 @@ if start_btn:
     st.session_state.is_processing = True
     st.session_state.processing_complete = False
     st.session_state.stop_requested = False
-    st.session_state.stats = {"total": 0, "payables": 0, "declined": 0, "first_try_pass": 0, "failed": 0}
+    st.session_state.stats = {"total": 0, "payables": 0, "declined": 0, "first_try_pass": 0, "failed": 0, "prompt_tokens": 0, "completion_tokens": 0}
     st.session_state.raw_logs = []
 
     # Determine target list based on mode
@@ -1466,4 +1532,3 @@ else:
                 st.code("\n".join(st.session_state.raw_logs[-100:]), language="text")
             else:
                 st.code("No stdout logs recorded yet. Start processing to view terminal logs live.", language="text")
-

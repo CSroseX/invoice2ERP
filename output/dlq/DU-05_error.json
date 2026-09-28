@@ -1,0 +1,257 @@
+{
+  "filename": "DU-05.pdf",
+  "error": "cannot access local variable 'json' where it is not associated with a value",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\app.py\", line 540, in _process_single_pdf\n    out_json_path.write_text(json.dumps(file_payload, indent=2, ensure_ascii=False), encoding=\"utf-8\")\n                             ^^^^\nUnboundLocalError: cannot access local variable 'json' where it is not associated with a value\n",
+  "partial_trace": [
+    {
+      "step": 1,
+      "title": "Phase 1: OCR & Spatial Layout Extraction",
+      "path_used": "Cached OCR Text (300 DPI Spatial Layout)",
+      "char_count": 2185,
+      "page_count": 1,
+      "raw_text": "Vantek Asia Pte Ltd                            Phone   +43 0546 01 68\nHigh Street 7                                    Fax       +65 6546 65 76\n#03-66/67/68/69                                  vantekcom\nWww\nSingapore 737664                        clara kask@vantek com\nSingapore\nTax Invoice\n(Number                                     Date                        Page\nCadence Pte . Ltd Standard                                                                    7363916                                  30.06.2026        1 /1\nJalan Ampang 08\nSingapore 539775                                                                            Customer nr:                                our / VAT-no\n12192                                   207490313H\nYour Ust-ID no                              our Ust-ID no\n207490313H\nyour EORI no                                our EORI no\nContact\nPhone                                        Fax\nConsignee Ship-to party                                                                                Customer reference\nFairmont Technologies Inc                                                                       693100096\nGartenweg 24\nLaguna Technopark, Building C\nOrder number                               Currency\n4024 BINAN-SPECIAL ECONOMIC ZONE                                3057199                              SGD\nPHILIPPINES\nPos.  Product number / Description                                                                              Amount     Un    List price per unit     PU     VAT     Total\n80 4108044                                                                                                       100  PC              771.66   100                          771.66\nF:WSA89424080   HSS (N) H2940 DKC\nCust. mat-no: 89424080\nCountry of origin: Indonesia\nCustoms tariff nr:: 3926.9000\nDelivery note: 8358769 from 30.06.2026\nTotal amount in SGD\nIncoterms: EXW BATAM\nTerms of payment: 90 days net\nDue date:        Up to 28.09.2026 without deduction\nBank account       Larkspur Bank                                                SINGAPORE BRANCH\nUSD-acc. 267-621698-425 . Swift Code: TFFKBCCO\nSGD-acc  143-022260-749 . Swift Code: TFFKBCCO"
+    },
+    {
+      "step": 2,
+      "title": "Phase 2: Multi-Document Pre-Segmentation",
+      "subdoc_count": 1,
+      "status_msg": "Detected 1 distinct sub-document segment(s)."
+    },
+    {
+      "step": 3,
+      "subdoc_idx": 1,
+      "title": "Phase 3: Classification [DU-05.pdf]",
+      "is_payable": true,
+      "doc_type": "INVOICE",
+      "score": 0.95,
+      "reasons": [
+        "PayableTitle(+40)",
+        "TableStructure(+25)",
+        "TaxID(+15)",
+        "EntityParties(+10)",
+        "FinancialTotal(+10)"
+      ]
+    },
+    {
+      "step": 4,
+      "subdoc_idx": 1,
+      "title": "Phase 4: AI Model Extraction (Groq) [DU-05.pdf]",
+      "raw_json": {
+        "invoice_number": "7363916",
+        "invoice_date": "2026-06-30",
+        "due_date": "2026-09-28",
+        "invoice_type": "INVOICE",
+        "currency": "SGD",
+        "supplier": {
+          "name": "Vantek Asia Pte Ltd",
+          "supplier_id": "",
+          "address": "High Street 7 #03-66/67/68/69 Singapore 737664",
+          "vat_id": "207490313H"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "MY001",
+          "location_code": "LOC_MY_001"
+        },
+        "payment_term_id": "Net_90",
+        "po_number": "3057199",
+        "po_id": "",
+        "gross_total": "771.66",
+        "subtotal": "771.66",
+        "total_tax_amount": "0.00",
+        "discount_amount": "0.00",
+        "freight_charges": "0.00",
+        "insurance_charges": "0.00",
+        "extra_charges": "0.00",
+        "excise_duties": "0.00",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "F:WSA89424080 HSS (N) H2940 DKC",
+            "item_type": "GOODS",
+            "uom": "PC",
+            "quantity": "100.00",
+            "unit_price": "771.66",
+            "total": "771.66",
+            "discount": "0.00",
+            "discount_percentage": "0.00",
+            "tax_rate": "0.00",
+            "tax_amount": "0.00",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": "4b",
+      "subdoc_idx": 1,
+      "title": "Phase 4b: Grounding & Anti-Hallucination Verification [DU-05.pdf]",
+      "warnings": [],
+      "sanitized_json": {
+        "invoice_number": "7363916",
+        "invoice_date": "2026-06-30",
+        "due_date": "2026-09-28",
+        "invoice_type": "INVOICE",
+        "currency": "SGD",
+        "supplier": {
+          "name": "Vantek Asia Pte Ltd",
+          "supplier_id": "",
+          "address": "High Street 7 #03-66/67/68/69 Singapore 737664",
+          "vat_id": "207490313H"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "MY001",
+          "location_code": "LOC_MY_001"
+        },
+        "payment_term_id": "Net_90",
+        "po_number": "3057199",
+        "po_id": "",
+        "gross_total": "771.66",
+        "subtotal": "771.66",
+        "total_tax_amount": "0.00",
+        "discount_amount": "0.00",
+        "freight_charges": "0.00",
+        "insurance_charges": "0.00",
+        "extra_charges": "0.00",
+        "excise_duties": "0.00",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "F:WSA89424080 HSS (N) H2940 DKC",
+            "item_type": "GOODS",
+            "uom": "PC",
+            "quantity": "100.00",
+            "unit_price": "771.66",
+            "total": "771.66",
+            "discount": "0.00",
+            "discount_percentage": "0.00",
+            "tax_rate": "0.00",
+            "tax_amount": "0.00",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "subdoc_idx": 1,
+      "title": "Phase 5: Master Data Resolution [DU-05.pdf]",
+      "master_matched": {
+        "supplier_id": "",
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "MY001",
+        "location_code": "LOC_MY_001",
+        "po_id": "",
+        "payment_term_id": "Net_90"
+      },
+      "resolved_json": {
+        "invoice_number": "7363916",
+        "invoice_date": "2026-06-30",
+        "due_date": "2026-09-28",
+        "invoice_type": "INVOICE",
+        "currency": "SGD",
+        "supplier": {
+          "name": "Vantek Asia Pte Ltd",
+          "supplier_id": "",
+          "address": "High Street 7 #03-66/67/68/69 Singapore 737664",
+          "vat_id": "207490313H"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "MY001",
+          "location_code": "LOC_MY_001"
+        },
+        "payment_term_id": "Net_90",
+        "po_number": "3057199",
+        "po_id": "",
+        "gross_total": "771.66",
+        "subtotal": "771.66",
+        "total_tax_amount": "0.00",
+        "discount_amount": "0.00",
+        "freight_charges": "0.00",
+        "insurance_charges": "0.00",
+        "extra_charges": "0.00",
+        "excise_duties": "0.00",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "F:WSA89424080 HSS (N) H2940 DKC",
+            "item_type": "GOODS",
+            "uom": "PC",
+            "quantity": "100.00",
+            "unit_price": "771.66",
+            "total": "771.66",
+            "discount": "0.00",
+            "discount_percentage": "0.00",
+            "tax_rate": "0.00",
+            "tax_amount": "0.00",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "subdoc_idx": 1,
+      "title": "Phase 6: Pre-ERP Payload Assembly [DU-05.pdf]",
+      "payload": {
+        "invoice_number": "7363916",
+        "invoice_date": "2026-06-30",
+        "due_date": "2026-09-28",
+        "invoice_type": "INVOICE",
+        "currency": "SGD",
+        "supplier": {
+          "name": "Vantek Asia Pte Ltd",
+          "supplier_id": "",
+          "address": "High Street 7 #03-66/67/68/69 Singapore 737664",
+          "vat_id": "207490313H"
+        },
+        "buyer": {
+          "company_code": "BOLTGROUP",
+          "business_unit_code": "MY001",
+          "location_code": "LOC_MY_001"
+        },
+        "payment_term_id": "Net_90",
+        "po_number": "3057199",
+        "po_id": "",
+        "gross_total": "771.66",
+        "subtotal": "771.66",
+        "total_tax_amount": "0.00",
+        "discount_amount": "0.00",
+        "freight_charges": "0.00",
+        "insurance_charges": "0.00",
+        "extra_charges": "0.00",
+        "excise_duties": "0.00",
+        "taxes": [],
+        "line_items": [
+          {
+            "description": "F:WSA89424080 HSS (N) H2940 DKC",
+            "item_type": "GOODS",
+            "uom": "PC",
+            "quantity": "100.00",
+            "unit_price": "771.66",
+            "total": "771.66",
+            "discount": "0.00",
+            "discount_percentage": "0.00",
+            "tax_rate": "0.00",
+            "tax_amount": "0.00",
+            "taxes": []
+          }
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "subdoc_idx": 1,
+      "title": "Phase 7: ERP Oracle Booking Verification [DU-05.pdf]",
+      "target_gross": "771.66",
+      "booked_gross": "77166.00",
+      "status": "FAIL",
+      "erp_details": {
+        "will_book_gross": 77166.0,
+        "currency": "SGD"
+      }
+    }
+  ]
+}
