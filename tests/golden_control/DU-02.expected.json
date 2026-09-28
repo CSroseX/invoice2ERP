@@ -1,0 +1,1063 @@
+{
+  "file": "DU-02.pdf",
+  "payables": [
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "EUR",
+      "supplier": {
+        "name": "Novatek US LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "EE001",
+        "location_code": "LOC_EE_001"
+      },
+      "payment_term_id": "",
+      "po_number": "",
+      "po_id": "",
+      "gross_total": "37534.94",
+      "subtotal": "",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "REA DIAG POLY CHAIN",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "2.00",
+          "unit_price": "10.61",
+          "total": "21.22",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "REA DIAG, POLY CHAIN",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "87.19",
+          "total": "87.19",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PLSTS GSKTS, WASHERS,",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "3.00",
+          "unit_price": "30.47",
+          "total": "91.40",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "pTHPLSTIC MAT,OTH;",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "8.00",
+          "unit_price": "1.46",
+          "total": "11.67",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "KLASSWARE LABHYG.",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "8.00",
+          "unit_price": "1.35",
+          "total": "10.83",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "FILTPURIF MACH PARTS,",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "762.94",
+          "total": "762.94",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "FLOUR MILL AND GRAIN",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "2.00",
+          "unit_price": "",
+          "total": "6216.19",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "pTH PRTSMMECH APPS,WI",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "1.00",
+          "unit_price": "115.97",
+          "total": "115.97",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PTH PRTSMMECH APPS,WI",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "261.28",
+          "total": "261.28",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "TUNGSTEN HALGN",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "2.00",
+          "unit_price": "53.77",
+          "total": "107.53",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "ULTRAVIOLET LAMP",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "327.79",
+          "total": "327.79",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "ULTRAVIOLET LAMP",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "264.89",
+          "total": "264.89",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "ELNDLEEBBN",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "1.00",
+          "unit_price": "20850.22",
+          "total": "20850.22",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "ELNDLEEBBN",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "1.00",
+          "unit_price": "4359.50",
+          "total": "4359.50",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PRT ELEC",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "2.00",
+          "unit_price": "",
+          "total": "465.45",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PRT ELEC",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "2.00",
+          "unit_price": "",
+          "total": "434.37",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PRT ELEC",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "8.00",
+          "unit_price": "1.23",
+          "total": "9.84",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PRT ELEC",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "2.00",
+          "unit_price": "",
+          "total": "412.44",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PT ELC INST ,",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "8.00",
+          "unit_price": "78.88",
+          "total": "630.10",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PT ELC INST ,",
+          "item_type": "GOODS",
+          "uom": "EA",
+          "quantity": "6.00",
+          "unit_price": "",
+          "total": "2287.88",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PT ELC INST ,",
+          "item_type": "GOODS",
+          "uom": "PC",
+          "quantity": "2.00",
+          "unit_price": "",
+          "total": "456.24",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419603/66691406",
+      "po_id": "",
+      "gross_total": "1.872.11",
+      "subtotal": "1.872.11",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "Ref. sample Glutomatic",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "1.00",
+          "unit_price": "1.872.11",
+          "total": "1.872.11",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "EE001",
+        "location_code": "LOC_EE_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419505/5229132",
+      "po_id": "",
+      "gross_total": "1628.16",
+      "subtotal": "1628.16",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "Vial Diffuser Molding",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "8.00",
+          "unit_price": "61.92",
+          "total": "495.36",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "713 mm Black Plastic Screw Cap",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "8.00",
+          "unit_price": "73.46",
+          "total": "587.68",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "4 mL Clr Scr Vial 15 x 45 13-425 PER PC:",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "8.00",
+          "unit_price": "68.14",
+          "total": "545.12",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419825/5222652",
+      "po_id": "",
+      "gross_total": "92366.96",
+      "subtotal": "92366.96",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "PFA-ST Nebulizer for prepFAST",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "2.00",
+          "unit_price": "46183.48",
+          "total": "92366.96",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419739/5229131",
+      "po_id": "",
+      "gross_total": "54.52",
+      "subtotal": "54.52",
+      "total_tax_amount": "0.00",
+      "discount_amount": "0.00",
+      "freight_charges": "0.00",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
+      "taxes": [
+        {
+          "tax_type": "",
+          "tax_name": "",
+          "tax_rate": "",
+          "tax_amount": "0.00",
+          "tax_type_code": ""
+        }
+      ],
+      "line_items": [
+        {
+          "description": "Nickel Skimmer Cone for NexION",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "12.00",
+          "unit_price": "4.90",
+          "total": "19.59",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "HyperSkimmer Cone for NexION",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "2.00",
+          "unit_price": "3.03",
+          "total": "72.13",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "Nickel Sampler Cone for NexION",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "",
+          "unit_price": "5.70",
+          "total": "22.80",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505416600/66690602",
+      "po_id": "",
+      "gross_total": "16.50",
+      "subtotal": "16.50",
+      "total_tax_amount": "0.00",
+      "discount_amount": "0.00",
+      "freight_charges": "0.00",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "OEM- Deuterium lamp",
+          "item_type": "GOODS",
+          "uom": "TRY",
+          "quantity": "1.00",
+          "unit_price": "16.50",
+          "total": "16.50",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "0.00",
+          "tax_amount": "0.00",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-06-01",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419906/5229766",
+      "po_id": "",
+      "gross_total": "8.20",
+      "subtotal": "8.20",
+      "total_tax_amount": "0.00",
+      "discount_amount": "0.00",
+      "freight_charges": "0.00",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "MPLC Concept Holder, 10 cm",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "1.00",
+          "unit_price": "8.20",
+          "total": "8.20",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "0.00",
+          "tax_amount": "0.00",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419741/5229612",
+      "po_id": "",
+      "gross_total": "34982.89",
+      "subtotal": "",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "Titanium 1,000 ug/mL HZOfTr HF ICP 125mL",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "360.80",
+          "total": "360.80",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "Hybrid XLT 3-Slot Organics Torch Avio",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "2.00",
+          "unit_price": "710.38",
+          "total": "",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "PFA-ST MicroFiow Nebullzer for Optima",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "713.15",
+          "total": "713.15",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "STD PHOSPHORUS 1000 HGMML 125ML",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "707.46",
+          "total": "707.46",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505418938/66691189",
+      "po_id": "",
+      "gross_total": "22966.44",
+      "subtotal": "22966.44",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "KIT SQ8 HEADAMP",
+          "item_type": "GOODS",
+          "uom": "TRY",
+          "quantity": "2.00",
+          "unit_price": "11483.22",
+          "total": "22966.44",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505420114/66691592",
+      "po_id": "",
+      "gross_total": "28.031.70",
+      "subtotal": "28.031.70",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "GASKET",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "3.00",
+          "unit_price": "1533.74",
+          "total": "4601.22",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "HS-40 SS Needle",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "2.00",
+          "unit_price": "11715.24",
+          "total": "23430.48",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505420246/66691631",
+      "po_id": "",
+      "gross_total": "21865.82",
+      "subtotal": "21865.82",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "BRAZE ASSY ASXL CHARCOAL TRAP",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "2.00",
+          "unit_price": "10932.91",
+          "total": "21865.82",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505417511/5228031",
+      "po_id": "",
+      "gross_total": "",
+      "subtotal": "",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "extra_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "Avio 220 Max Base Instrument",
+          "item_type": "GOODS",
+          "uom": "KG",
+          "quantity": "1.00",
+          "unit_price": "",
+          "total": "",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "",
+      "gross_total": "5838.05",
+      "supplier": {
+        "supplier_id": ""
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "po_id": "",
+      "payment_term_id": "",
+      "taxes": [],
+      "line_items": []
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505419742/5229609",
+      "po_id": "",
+      "gross_total": "18746.97",
+      "subtotal": "18746.97",
+      "total_tax_amount": "",
+      "discount_amount": "",
+      "freight_charges": "",
+      "insurance_charges": "",
+      "excise_duties": "",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "ELP UV Lamp Complete",
+          "item_type": "GOODS",
+          "uom": "TRY",
+          "quantity": "1.00",
+          "unit_price": "13334.17",
+          "total": "13334.17",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        },
+        {
+          "description": "Tungsten Halogen Lamp Assembly",
+          "item_type": "GOODS",
+          "uom": "TRY",
+          "quantity": "2.00",
+          "unit_price": "2706.40",
+          "total": "5412.80",
+          "discount": "",
+          "discount_percentage": "",
+          "tax_rate": "",
+          "tax_amount": "",
+          "taxes": []
+        }
+      ]
+    },
+    {
+      "invoice_number": "554701215",
+      "invoice_date": "2026-01-06",
+      "due_date": "",
+      "invoice_type": "INVOICE",
+      "currency": "TRY",
+      "supplier": {
+        "name": "Novatek US: LLC",
+        "supplier_id": "",
+        "address": "Avenida Central 455, 1950 KRAAINEM, BELGIUM",
+        "vat_id": "BE2480635349"
+      },
+      "buyer": {
+        "company_code": "BOLTGROUP",
+        "business_unit_code": "GH001",
+        "location_code": "LOC_GH_001"
+      },
+      "payment_term_id": "",
+      "po_number": "5505420084",
+      "po_id": "",
+      "gross_total": "532.37",
+      "subtotal": "532.37",
+      "total_tax_amount": "0.00",
+      "discount_amount": "0.00",
+      "freight_charges": "0.00",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
+      "taxes": [],
+      "line_items": [
+        {
+          "description": "GLUTOMATIC 2000 100-240V 50-60Hz",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "239.83",
+          "total": "239.83",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "0.00",
+          "taxes": []
+        },
+        {
+          "description": "CENTRIFUG 2010 100-240V 50-60HZ",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "73.08",
+          "total": "73.08",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "0.00",
+          "taxes": []
+        },
+        {
+          "description": "LactoScope 300",
+          "item_type": "GOODS",
+          "uom": "",
+          "quantity": "1.00",
+          "unit_price": "219.45",
+          "total": "219.45",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
+          "tax_rate": "",
+          "tax_amount": "0.00",
+          "taxes": []
+        }
+      ]
+    }
+  ],
+  "declined": []
+}

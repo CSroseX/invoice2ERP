@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  invoice2erp:
+    build: .
+    container_name: invoice2erp-app
+    ports:
+      - "8501:8501"
+    volumes:
+      # Mount application data for persistence
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./master_data:/app/master_data
+      - ./documents:/app/documents
+    env_file:
+      - .env
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Overrides can go here, e.g., 
+      # - PRIMARY_PROVIDER=OpenRouter
