@@ -1,0 +1,76 @@
+--- PAGE 1 ---
+[0.99] Vantek Asia Pte Ltd.
+[1.00] Phone
+[1.00] +43 0546 01 68
+[1.00] High Street 7
+[1.00] Fax
+[1.00] +65 6546 65 76
+[1.00] #03-66/67/68/69
+[1.00] www.vantek.com
+[1.00] Singapore 737664
+[1.00] clara.kask@vantek.com
+[1.00] Singapore
+[1.00] Tax Invoice
+[1.00] Number
+[1.00] Date
+[1.00] Page
+[1.00] Cadence Pte. Ltd - Standard
+[1.00] 7363916
+[1.00] 30.06.2026
+[1.00] 1/1
+[0.97] Jalan Ampang 08
+[1.00] Singapore 539775
+[0.99] Customer nr.
+[0.98] our / VAT-no
+[1.00] 12192
+[1.00] 207490313H
+[1.00] Your Ust-ID no
+[1.00] our Ust-ID no
+[1.00] 207490313H
+[1.00] your EORI no
+[0.99] our EORI no
+[1.00] Contact
+[1.00] Phone
+[1.00] Fax
+[1.00] Consignee / Ship-to party
+[1.00] Customer reference
+[1.00] Fairmont Technologies Inc
+[1.00] 693100096
+[1.00] Gartenweg 24
+[1.00] Laguna Technopark, Building C
+[1.00] Order number
+[1.00] Currency
+[1.00] 4024 BINAN-SPECIAL ECONOMIC ZONE
+[1.00] 3057199
+[1.00] SGD
+[1.00] PHILIPPINES
+[1.00] Pos.
+[0.99] Product number / Description
+[1.00] Amount
+[1.00] Un
+[1.00] List price per unit
+[1.00] PU
+[1.00] VAT
+[1.00] Total
+[1.00] 80
+[1.00] 4108044
+[1.00] 100
+[1.00] PC
+[1.00] 771.66
+[1.00] 100
+[1.00] 771.66
+[0.97] F:WSA_89424080 _HSS (N) H2940 DKC
+[1.00] Cust. mat-no: 89424080
+[0.98] Country of origin: Indonesia
+[0.98] Customs tariff nr.: 3926.9000
+[1.00] Delivery note: 8358769 from 30.06.2026
+[1.00] Total amount in SGD
+[0.99] Incoterms: EXW BATAM
+[0.99] Terms of payment: 90 days net
+[1.00] Due date:
+[1.00] Up to 28.09.2026 without deduction
+[1.00] Bank account
+[1.00] Larkspur Bank
+[1.00] SINGAPORE BRANCH
+[0.98] USD-acc. 267-621698-425. Swift Code: TFFKBCCQ
+[0.99] SGD-acc. 143-022260-749. Swift Code: TFFKBCCQ

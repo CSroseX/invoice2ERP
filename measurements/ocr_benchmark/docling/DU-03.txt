@@ -1,0 +1,408 @@
+## Blueharbor
+
+## TAX
+
+## Oriainal
+
+| 539775      |                   | Due 16.Jan-2026           |
+|-------------|-------------------|---------------------------|
+|             | 08-08 18 TAI Pamu | Payment tens: 60 Days Net |
+| Customer No | 539775            |                           |
+
+| Condition   | Rate   | Base Value   | Total(USD)   |
+|-------------|--------|--------------|--------------|
+| Net value   |        |              | 1,040.06     |
+|             |        |              | 00Q          |
+| Amount Due  |        |              | 4040.06      |
+
+## HAWB
+
+POL: Hamburg
+
+POD: Singapore Place of Dellvery: Singapore
+
+ETD;
+
+|    | of  <!-- image -->       |     QtY | UoM   | Curr   |   Unit Price |     ROE |   Total(USD) |
+|----|--------------------------|---------|-------|--------|--------------|---------|--------------|
+|  1 | Intemational Freight     | 567.000 | KG    | USD    |         1.28 | 1.00000 |       725.76 |
+|  2 | Oriqin Terminal Handling | 567.000 | KG    | USD    |         0.10 | 1.00000 |        56.70 |
+|  3 | Documentation Fee        |   1,000 | EA    | USD    |        45.00 |         |        45.00 |
+|    | Delivery                 | 567.000 | KG    | USD    |         0.04 | 1.00000 |        22.68 |
+|  5 | Pick-up                  | 567.000 | KG    | USD    |         0.18 | 1.00000 |       102.06 |
+|  6 | Export                   |   1.000 | EA    | USD    |         7.50 | 1.00000 |         7.50 |
+
+## Blueharbor
+
+|   Item |                         |         | Uur   |     |   Unit Price | RUc     |       |
+|--------|-------------------------|---------|-------|-----|--------------|---------|-------|
+|      7 | Ongin Documentation     |   1.000 | EA    | USD |        15.00 | 1.00000 | 15.00 |
+|      8 | Import                  |   1.000 | EA    | USD |        15.00 | 1.00000 | 15.00 |
+|      9 | Currier Manifest Filing |   1.000 | EA    | USD |         5.00 | 1.00000 |  5.00 |
+|     10 | Terminal Handling       | 567.000 | KG    | USD |         0.08 | 1,00000 | 45.36 |
+
+1,040.06
+
+| Condition              | Rate   | Base Value       | Total(USD)   |
+|------------------------|--------|------------------|--------------|
+| Net value              |        |                  | 1,040.06     |
+|                        |        | 1,040.06         | 0.0Q         |
+| Amount Due             |        |                  | 4040.06      |
+| Condition              | Rate   | Base Value (SGD) | Total( SGD)  |
+| Net value              |        |                  | 1,350.55     |
+|                        |        | 1350.55          |              |
+| Total Amount Que (SGDL |        |                  |              |
+
+FL
+
+tran:
+
+1- Blueharbor Logistics &amp; Services Singapore Pte. Ltd.
+
+<!-- image -->
+
+Is not requlred;
+
+Tclephonc:
+
+Changi Airfrcight Centrc
+
+Cargo Agents Building E 819834 Singapore
+
+No. Reg.
+
+GST No: 2-0029161-1 Reg:
+
+3388, Fax:
+
+## 0107892268
+
+<!-- image -->
+
+## Shipment Cartage Advice
+
+Pagc
+
+Job
+
+Marco
+
+Routing
+
+Modc CARGO
+
+918116
+
+Telephone Ko
+
+Fax No
+
+CARCO ROAD;
+
+TD
+
+CARGO
+
+PLT
+
+CONSIGNEB
+
+RFP QF
+
+30 Tuas Avenua 13
+
+567.0KG
+
+420
+
+Lond ETA
+
+AIR
+
+KL84 10 /12
+
+NLNS
+
+AIR
+
+NLAVS
+
+Yours Sircerely,
+
+## luis haas@blueharbor com
+
+Date PA
+
+TYPE
+
+TYPE
+
+SES /
+
+IN FON
+
+EXPORTER:
+
+TOTAL GROSS
+
+567 .000/KGM
+
+TOTAL QUTER PACK/UNIT:
+
+2 /PKG
+
+TCT
+
+DUT
+
+0.00
+
+AGENT ;
+
+TCT OTIER TAX
+
+SS
+
+0.00
+
+5S
+
+TCTAL
+
+GST
+
+AMT
+
+TOTAL
+
+SS
+
+722.76
+
+0.00
+
+PORT LOADING / NEXT PORT CF CALL:
+
+PORT OF DISCHARGE /FINAL PORT 0F CALL
+
+CARGO
+
+IN
+
+IDENTIFIER ;
+
+DATE
+
+14/11/2025
+
+Qu IDENTIFTER :
+
+CATE
+
+07 FINAL
+
+PLACE OF RELEASE:
+
+PLACZ OF RECZIPT:
+
+FTZ
+
+MAJOR
+
+CZ
+
+## PTE, LTD
+
+CODE
+
+## (CONTINUATION PAGE}
+
+GA
+
+CODE
+
+LOT
+
+NO
+
+CTX OF
+
+BRAND
+
+MCDEL
+
+IN HAWB / HUCR / HBL PACKING / GOODS
+
+## MANUFACTURER 5 NAHE
+
+01 39033090
+
+DE NA
+
+TRADER
+
+INV
+
+NO UNAUTHORISED ADDITION / AKENDKENT T0 THIS
+
+OUT
+
+HS
+
+UNIT
+
+GST
+
+(55)
+
+BE MADE AFTER
+
+OF
+
+NO
+
+NAMZ
+
+CODE
+
+65769148
+
+BX
+
+CUSTONS
+
+BY
+
+FOR THE
+
+VALID \_
+
+TO
+
+NITH THE
+
+15 AN CFFENCE
+
+TX
+
+MA
+
+FOR
+
+AND THIS
+
+PY
+
+WITE INVOICES, ETC MuST BE
+
+A FREE  TRADE ZONE OUT" GATE ,
+
+THE TIKE 0F CLEARANCE, OR A
+
+INSTRUCTED
+
+IS
+
+NOT LATER
+
+HOURS AFTER EXPIRY
+
+END CARGO
+
+PERMIT, IS
+
+To THE
+
+0.5500
+
+722 ,76
+
+<!-- image -->
+
+a
+
+<!-- image -->
+
+<!-- image -->
+
+<!-- image -->
+
+579775 SG
+
+TC
+
+23-4 7534/2015
+
+AMS
+
+KL
+
+SIN KL
+
+## House Air aybill
+
+EUR CP
+
+TERMS: FCA
+
+NVD
+
+Hanping Inlornaton
+
+2
+
+0
+
+567.01
+
+As Agroec
+
+FART
+
+440162
+
+02704096
+
+2
+
+567,0
+
+NOVODUR PZH-AT NOT RESTRICTEDHS Codes: 390330C0
+
+INTERNATIONAL AS AGENT
+
+INTERNATIONAL AS AGENT
+
+XXX
+
+HAWB No:
+
+X
+
+<!-- image -->
+
+<!-- image -->
+
+High Slreel 18
+
+#08-08, 539775 Singapore
+
+Attn:
+
+Tan
+
+Email: cara lind@cadence com
+
+PZH-AT
+
+Dale ; 1028/2025
+
+Order no.
+
+UNIT PRICE
+
+TOTAL
+
+EUR 4.499,00
+
+<!-- image -->

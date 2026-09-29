@@ -400,6 +400,18 @@ def apply_fix3_and_fix4_postprocessing(payable: dict, ocr_text: str = "") -> dic
             if tax_amt and tot_amt and tax_amt == tot_amt and not tax_rate and not taxes:
                 li["tax_amount"] = ""
                 
+            # 3. Backfill unit_price if missing but quantity and total exist
+            u_price = str(li.get("unit_price") or "").strip()
+            tot = str(li.get("total") or "").strip()
+            if not u_price and li.get("quantity") and tot:
+                try:
+                    q_val = float(li["quantity"])
+                    t_val = float(tot)
+                    if q_val != 0:
+                        li["unit_price"] = f"{(t_val / q_val):.2f}"
+                except ValueError:
+                    pass
+
             san_lines.append(li)
         cleaned["line_items"] = san_lines
 

@@ -1,0 +1,232 @@
+--- PAGE 1 ---
+[0.98] 1120 VERMONT AVENUE ASSOCIATES, LLP
+[1.00] UTILITIES REIMBURSEMENT
+[1.00] Amerihealth - 2nd Floor
+[0.98] Attention:
+[1.00] Accountspayable@amerihealthcaritas.com
+[0.60] A
+[1.00] Invoice Date:
+[1.00] 6/12/2018
+[1.00] Billing Address:
+[1.00] AmeriHealth
+[1.00] Invoice:
+[1.00] 5568
+[1.00] 200 Stevens Drive
+[1.00] Purchase Order:
+[1.00] 17816
+[1.00] Philadelphia, PA 19113
+[1.00] Service Period:
+[0.98] April 30, 2018 to May 29, 2018 (30 Days)
+[1.00] ELECTRIC USAGE
+[1.00] Meter Reading
+[1.00] Meter Number
+[1.00] Read Type
+[1.00] Present
+[1.00] Previous
+[1.00] Multiplier
+[1.00] KWH Used
+[1.00] Blended $/KWH
+[1.00] Amount
+[1.00] SM #0201
+[1.00] Actual
+[1.00] 497649
+[1.00] 497625
+[0.76] =
+[1.00] 24
+[0.99] xxxxxx
+[0.95] 1
+[0.83] 1 11 11 11 1 11
+[0.81] 1
+[1.00] 24
+[0.97] X
+[1.00] 0.097958122
+[0.82] =
+[1.00] $2.35
+[1.00] at 2nd fl North Mech Room
+[0.97] Demand
+[1.00] 1
+[0.96] 1
+[0.93] 1
+[0.87] X
+[1.00] 11.470001
+[1.00] $11.47
+[1.00] 3
+[1.00] SM #0202
+[1.00] Actual
+[1.00] 434313
+[1.00] 434122
+[0.85] =
+[1.00] 191
+[0.97] 1
+[1.00] 191
+[0.71] X
+[1.00] 0.097958122
+[0.96] =
+[1.00] $18.71
+[0.98] at 2nd fl North Mech Room
+[1.00] Demand
+[1.00] 0.7
+[0.96] 1
+[1.00] 0.7
+[0.99] X
+[1.00] 11.470001
+[0.91] =
+[0.99] $8.03
+[1.00] 4
+[1.00] SM #0206
+[1.00] Actual
+[1.00] 703329
+[1.00] 687513
+[0.82] =
+[1.00] 15816
+[0.95] 1
+[1.00] 15816
+[0.94] X
+[1.00] 0.097958122
+[0.77] =
+[1.00] $1,549.31
+[1.00] at
+[1.00] Demand
+[1.00] 21.5
+[0.96] 1
+[0.94] 21.5
+[0.86] X
+[1.00] 11.470001
+[1.00] $246.61
+[1.00] Total KWH Billed:
+[1.00] 16,031
+[0.99] Non-Residential-GT:
+[1.00] $1,570.37
+[0.99] Total Distribution Charged:
+[1.00] 23.200
+[1.00] Maximum Demand:
+[1.00] $266.10
+[0.98] Sales tax at 0.0575 on utility bills:
+[1.00] $105.60
+[1.00] SUB-TOTAL FOR ELECTRICAL COSTS:
+[1.00] $1,942.07
+[1.00] EMERGENCY GENERATOR FUEL USAGE
+[1.00] Meter Reading
+[1.00] Meter Number
+[1.00] Present
+[1.00] Previous
+[1.00] Gallons
+[1.00] Multiplier
+[1.00] Consumption
+[1.00] Rate
+[1.00] Amount
+[0.98] 1
+[1.00] #4369148
+[1.00] 815
+[1.00] 815
+[1.00] 0
+[1.00] X
+[0.95] 1
+[0.87] =
+[1.00] 0
+[0.99] X
+[1.00] $2.76
+[0.69] =
+[1.00] $0.00
+[1.00] Sales tax at 0.0575 on utility bills:
+[1.00] $0.00
+[1.00] SUB-TOTAL FOR EMERGENCY GENERATOR FUEL COSTS:
+[1.00] $0.00
+[1.00] COOLING SYSTEM CONDENSER WATER USAGE
+[1.00] Per lease annual fee of
+[0.97] CSCW x connected ton
+[1.00] Unit Number
+[1.00] Model Number
+[1.00] Install Date
+[1.00] Usage Type
+[1.00] Unit BTU's
+[1.00] BTU Tonnage
+[1.00] Connected Ton
+[0.93] 12 months*
+[1.00] Amount
+[0.99] 1
+[1.00] 2.1
+[1.00] CCH-042
+[1.00] 07/23/03
+[1.00] Standby
+[1.00] 42,000
+[1.00] 12,000
+[1.00] 3.500
+[0.97] X
+[1.00] $63.93
+[1.00] $61.73
+[1.00] 2
+[1.00] 2.5
+[1.00] WCMS.1.024
+[1.00] 07/23/03
+[1.00] 24 Hour
+[1.00] 24,000
+[1.00] 12,000
+[1.00] 2.000
+[0.92] X
+[1.00] $63.93
+[1.00] $35.27
+[1.00] 4
+[1.00] 2.9
+[1.00] CCH-024
+[1.00] 01/01/14
+[1.00] 24 Hour
+[1.00] 60,000
+[1.00] 12,000
+[1.00] 5.000
+[0.93] X
+[1.00] $63.93
+[0.56] 二
+[0.98] $319.65
+[1.00] *24 Hour unit utility costs: $740.71, Lease Hour unit utility costs: $194.7, $26.49 for maintenance and repairs to the 24-hour central plant system; per connected ton
+[0.98] Total Connected Tonnage:
+[1.00] 10.500
+[1.00] Total Energy Costs:
+[1.00] $393.47
+[1.00] Cost Per Ton, Common Equipment PM:
+[1.00] 2.208
+[1.00] Total C.E. PM Costs:
+[0.92] $23.18
+[1.00] SUB-TOTAL FOR CONDENSER WATER COSTS:
+[0.99] $416.65
+[0.99] BUILDING SERVICE FEES
+[0.97] (4-12000.00 ::: 152.19375)
+[1.00] $122.00
+[0.76] ()
+[0.99] Sales tax at 0.0575 on building services:
+[1.00] $7.02
+[1.00] NET CURRENT REIMBURSEMENT:
+[1.00] $2,487.73
+[1.00] Usage History
+[1.00] 40000
+[1.00] 20000
+[0.98] 6
+[0.99] 5
+[0.58] 3050
+[0.73] 52
+[0.55] 4.1
+[0.74] 0ctobr r 14508
+[0.31] 590
+[0.98] 20619
+[0.85] 78
+[0.74] 405
+[1.00] 2
+[0.92] April1964
+[0.85] 60
+[0.78] $aanury582
+[0.66] 9ar89
+[1.00] 0
+[0.88] May 1
+[0.82] Junell
+[0.79] July l
+[0.96] August
+[0.95] Septemb
+[0.87] Novemb
+[0.95] Decembe
+[0.89] ebrary
+[0.99] May
+[0.81] et
+[0.97] et
+[0.94] r
+[0.93] page 1 of 1
+[1.00] 4-02 Amerihealth Utility Reimbursement.xls

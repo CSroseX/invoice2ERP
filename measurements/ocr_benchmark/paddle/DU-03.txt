@@ -1,0 +1,1334 @@
+--- PAGE 1 ---
+[1.00] Blueharbor
+[1.00] Logistics & Services
+[1.00] Original
+[1.00] TAX
+[1.00] Cadence PTE. LTD. Invoice
+[1.00] 74.Nov.0534
+[1.00] 08-08 18 TAI
+[1.00] Due
+[1.00] 16.Jan.2026
+[0.99] Parnu mnt 18
+[1.00] 539775
+[1.00] Payment terms:
+[1.00] 60 Days Net
+[0.98] Credit Party Cadence PTE. LTD.
+[1.00] 08-08 18 TAI
+[1.00] Parnu mnt 18
+[1.00] 539775
+[1.00] Customer No
+[0.99] Total Amount Due
+[1.00] Condition
+[1.00] Rate
+[1.00] Base
+[1.00] Total(USD)
+[1.00] Value
+[1.00] Net value
+[1.00] 1,040.06
+[1.00] 0% GST on sales
+[0.96] 0.00 %
+[1.00] 1,040.06
+[1.00] 0.00
+[1.00] Amount Due
+[1.00] 1,040.06
+[1.00] HAWB
+[1.00] Sold toCadence PTE. LTD.
+[0.99] POL: Hamburg
+[1.00] Place of Receipt: Hamburg
+[0.99] POD: Singapore
+[1.00] Place of Delivery: Singapore
+[0.98] SHPR: Polvex DISTRIBUTION GMBH & CO.KG
+[0.99] ETD: 92-Nov-9004 ETA: 19-Nov-7991
+[1.00] Cadence PTE. LTD
+[1.00] of
+[1.00] Qty
+[1.00] UoM
+[1.00] Curr Unit Price
+[1.00] ROE
+[1.00] Total(USD)
+[1.00] 1
+[1.00] International Freight
+[1.00] 567.000
+[1.00] KG
+[1.00] USD
+[1.00] 1.28
+[1.00] 1.00000
+[1.00] 725.76
+[1.00] 2
+[1.00] Origin Terminal Handling
+[1.00] 567.000
+[1.00] KG
+[1.00] USD
+[1.00] 0.10
+[1.00] 1.00000
+[1.00] 56.70
+[1.00] 3
+[1.00] Documentation
+[1.00] 1.000
+[1.00] EA
+[1.00] USD
+[1.00] 45.00
+[1.00] 1.00000
+[1.00] 45.00
+[1.00] Fee
+[1.00] 4
+[1.00] Delivery
+[1.00] 567.000
+[1.00] KG
+[1.00] USD
+[1.00] 0.04
+[1.00] 1.00000
+[1.00] 22.68
+[1.00] 5
+[1.00] Pick-up
+[1.00] 567.000
+[1.00] KG
+[1.00] USD
+[1.00] 0.18
+[1.00] 1.00000
+[1.00] 102.06
+[1.00] 6
+[1.00] CustomsDEJTWOXDBWJ
+[1.00] 1.000
+[1.00] EA
+[1.00] USD
+[1.00] 7.50
+[1.00] 1.00000
+[1.00] 7.50
+[1.00] Export
+[0.97] Reg. No.
+[1.00] , GST Reg. No. M2-0029161-1
+[1.00] Page 1 of 2
+
+--- PAGE BREAK ---
+
+--- PAGE 2 ---
+[1.00] Blueharbor
+[1.00] Logistics & Services
+[1.00] 0107892268
+[1.00] Item
+[0.96] Qty
+[0.98] UOM
+[0.98] curr
+[1.00] Unit Price
+[0.88] KUE
+[0.74] TOtai(USD)
+[1.00] 7
+[1.00] Origin Documentation
+[1.00] 1.000
+[1.00] EA
+[1.00] USD
+[1.00] 15.00
+[1.00] 1.00000
+[1.00] 15.00
+[1.00] 8
+[1.00] CustomsDEJTWOXDBWJ
+[1.00] 1.000
+[1.00] EA
+[1.00] USD
+[1.00] 15.00
+[1.00] 1.00000
+[1.00] 15.00
+[1.00] Import
+[1.00] 9
+[1.00] Carrier Manifest Filing
+[1.00] 1.000
+[1.00] EA
+[1.00] USD
+[1.00] 5.00
+[1.00] 1.00000
+[1.00] 5.00
+[1.00] 10
+[1.00] DEHVZCKRPYE
+[1.00] Terminal
+[1.00] 567.000
+[1.00] KG
+[1.00] USD
+[1.00] 0.08
+[1.00] 1.00000
+[1.00] 45.36
+[1.00] Handling
+[1.00] 1,040.06
+[0.99] Total Amount Due
+[1.00] Condition
+[1.00] Rate
+[1.00] Base Value
+[1.00] Total(USD)
+[1.00] Net value
+[1.00] 1,040.06
+[0.97] 0% GST on sales
+[0.98] 0.00 %
+[1.00] 1,040.06
+[1.00] 0.00
+[1.00] Amount Due
+[1.00] 1,040.06
+[1.00] Conversion to SGD for Tax purpose only
+[1.00] Condition
+[1.00] Rate
+[1.00] Base
+[1.00] Total(SGD)
+[1.00] Value
+[1.00] (SGD)
+[1.00] Net value
+[1.00] 1,350.55
+[0.97] 0% GST on sales
+[0.99] 0.00 %
+[1.00] 1,350.55
+[1.00] 0.00
+[0.99] Total Amount Due (SGD)
+[1.00] 1,350.55
+[1.00] ****1
+[0.99] Payment in USD: The
+[1.00] And
+[1.00] Banking
+[0.97] Account no:
+[0.95] trans
+[0.98] e inclu
+[0.98] hle to
+[0.50] 0101010
+[0.87] Telenhuue No: +61 80180856
+[0.98] Fax No:
+[1.00] 1-1
+[0.85] La uuie.uara.silva@blueharbor.com
+[0.90] This is an elecuocuy
+[0.97] unt and authorised
+[1.00] is not required.
+[1.00] Blueharbor Logistics & Services Singapore Pte. Ltd.
+[1.00] Brightside Trading Pte. Ltd
+[0.99] Changi Airfreight Centre
+[1.00] Gartenweg 7
+[0.99] Cargo Agents Building E
+[1.00] 819834 Singapore
+[1.00] Telephone:
+[0.48] 1
+[0.96] 3388, Fax:
+[0.72] m
+[1.00] Reg. No.
+[0.98] , GST Reg. No. M2-0029161-1
+[1.00] Page 2 of 2
+
+--- PAGE BREAK ---
+
+--- PAGE 3 ---
+[0.74] '"/11
+[1.00] MAERSK
+[1.00] Shipment Cartage Advice
+[1.00] Page 1 of 1
+[1.00] Job
+[0.95] Brightside Print PTF I TD
+[1.00] CARGO
+[1.00] D
+[1.00] Telephone No
+[1.00] 918116
+[1.00] Fax No
+[1.00] Date
+[1.00] 13-Nov-25 12:04
+[1.00] CONSIGNEE
+[0.99] Polvex DISTRIBUTION GMBH & CO.KG
+[0.99] D.
+[1.00] Parnu mnt 35
+[1.00] Germany
+[0.95] REP. OF
+[0.61] ONLJOOTTO
+[1.00] TO
+[0.99] Blueharbor Logistics & Services Singapore Pte. Ltd.
+[0.98] Cadence PTE. LTD.
+[1.00] 119
+[0.99] CARGO ROAD.
+[1.00] CARGO
+[1.00] C/O Yusen Logistics (Singapore) Pte Ltd
+[1.00] 30 Tuas Avenue 13
+[0.98] B4 15 pm
+[1.00] #03-01/02
+[1.00] 819454 SGSIN
+[1.00] Singapore 638996
+[1.00] CFS Reference:
+[1.00] Carrier Booking Reference:
+[1.00] Marco
+[1.00] Marco
+[1.00] Available Date:
+[1.00] Estimated Delivery:
+[1.00] 17-Nov-25 15:00
+[1.00] Last Free Day of Storage:
+[1.00] Delivery Required By:
+[0.99] 17-Nov-25 15:00
+[1.00] HAWB
+[1.00] WEIGHT
+[0.92] .R), 0 CTN (INNER)
+[1.00] 567.0 KG
+[1.00] 3.360 M3
+[1.00] 567.0 KG
+[1.00] TYPE
+[1.00] WIDTH
+[1.00] UNDGS
+[1.00] STACKABILITY
+[1.00] PLT
+[1.00] 567.0 KG
+[1.00] 3.360 M3
+[1.00] 100
+[1.00] 120
+[1.00] 140 CM
+[1.00] GOODS
+[1.00] DERKXQCAVMU
+[0.65] 7
+[1.00] P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Routing
+[1.00] Mode
+[1.00] Flight/Date
+[1.00] Carrier
+[1.00] Load
+[1.00] Discharge
+[1.00] ETD
+[1.00] ETA
+[1.00] AIR
+[0.96] KL8410 / 12-Nov
+[1.00] CASS KLM ROYAL DUTCH
+[1.00] DEHAM
+[1.00] NLAMS
+[1.00] 12-Nov-25 22:59 13-Nov-25 07:59
+[1.00] AIR
+[1.00] KL835/13-Nov
+[1.00] CASS KLM ROYAL DUTCH
+[1.00] NLAMS
+[1.00] SGSIN
+[0.99] 13-Nov-25 20:40 14-Nov-25 16:15
+[1.00] NOTES
+[1.00] ON 17/11/25
+[1.00] TO THE
+[1.00] ADDRESS.
+[1.00] Yours Sincerely,
+[0.99] luis.haas@blueharbor.com
+[0.98] Blueharbor Logistics & Services Singapore Pte. Ltd.
+[1.00] Lindenstrasse 1
+[0.73] PLWT,
+[1.00] Quarter
+[1.00] 408533
+[1.00] Fax:
+
+--- PAGE BREAK ---
+
+--- PAGE 4 ---
+[1.00] CARGO
+[1.00] PG : 1 OF
+[1.00] 2
+[1.00] TYPE
+[0.99] : IN-NON-PAYMENT
+[1.00] TYPE
+[1.00] SES/
+[0.95] Cadence PTE. LTD. 81/79/69
+[1.00] TOTAL GROSS WT/UNIT:
+[1.00] 567.000/KGM
+[1.00] TOTAL OUTER PACK/UNIT:
+[1.00] 2/PKG
+[1.00] EXPORTER:
+[1.00] TOT
+[1.00] DUT
+[0.98] : S$
+[1.00] 0.00
+[1.00] TOT
+[1.00] DUT PAYABLE: S$
+[1.00] 0.00
+[1.00] TOT OTHER TAX
+[0.99] : S$
+[1.00] 0.00
+[0.98] TOTAL GST AMT
+[0.91] : S$
+[1.00] 722.76
+[1.00] AGENT:
+[1.00] TOTAL
+[0.99] : S$
+[1.00] 0.00
+[1.00] CARGO
+[0.99] TYPE: OTHER NON-CONTAINERIZED
+[1.00] IN
+[1.00] IDENTIFIER:
+[0.97] NO: KL835
+[0.99] PORT OF LOADING/NEXT PORT OF CALL:
+[0.97] OBL/MAWB NO :
+[0.98] PORT OF DISCHARGE/FINAL PORT OF CALL
+[1.00] DATE
+[0.98] : 14/11/2025
+[0.98] OU
+[1.00] IDENTIFIER:
+[1.00] OF FINAL
+[1.00] NO:
+[0.99] PTE. LTD
+[1.00] DATE
+[0.00] 
+[1.00] AGENT:
+[1.00] NO:
+[1.00] PLACE OF RELEASE:
+[1.00] PLACE OF RECEIPT:
+[1.00] FTZ
+[1.00] MAJOR
+[0.88] CZ
+[1.00] ME
+[1.00] NO:
+[0.98] CODE (CPC) :
+[1.00] REF:
+[1.00] 20251112 1178
+
+--- PAGE BREAK ---
+
+--- PAGE 5 ---
+[1.00] CARGO
+[1.00] PG : 2 OF
+[1.00] 2
+[1.00] NO
+[1.00] (CONTINUATION PAGE)
+[1.00] S/NO
+[0.96] HS CODE
+[0.99] LOT NO
+[0.96] LOT NO
+[0.96] CTY OF
+[1.00] BRAND NAME
+[1.00] MODEL
+[1.00] IN HAWB/HUCR/HBL
+[1.00] OUT HAWB/HUCR/HBL
+[1.00] PACKING/GOODSDERKXQCAVMU
+[1.00] HS
+[1.00] & UNIT
+[0.99] CIF/FOB VALUE (S$)
+[1.00] GST
+[1.00] (S$)
+[1.00] MANUFACTURER'S NAME
+[1.00] 01
+[1.00] 39033090
+[1.00] DE
+[1.00] NA
+[1.00] P2H-AT RED
+[1.00] 0.5500 TNE
+[1.00] 8030.70
+[1.00] 722.76
+[1.00] TRADER'S
+[1.00] INV NO:2279433-82704896
+[0.99] Anja
+[1.00] Costa
+[1.00] NO UNAUTHORISED ADDITION/AMENDMENT TO THIS
+[0.97] MAY BE MADE AFTER
+[1.00] NAME OF
+[0.97] Blueharbor I
+[1.00] &
+[0.97] PTE. LTD.
+[1.00] NAME
+[1.00] Anja
+[1.00] Vidal
+[0.95] CODE :
+[0.97] TEL NO
+[0.99] :65769148
+[0.95] 1
+[0.98] z01
+[0.57] 1
+[1.00] BY
+[1.00] CUSTOMS.
+[1.00] GA
+[1.00] BY
+[1.00] TO THE IMPORTER,
+[1.00] AGENT OR/AND THE
+[1.00] WITH THE
+[1.00] FOR THE
+[1.00] TO BE VALID.
+[1.00] TO
+[1.00] WITH
+[1.00] IS AN OFFENCE.
+[1.00] TX
+[1.00] THE GOODS
+[1.00] IN THIS
+[1.00] ARE IMPORTED/EXPORTED BY A
+[1.00] MA
+[0.99] - THE GOODS AND THIS
+[1.00] WITH INVOICES, BL/AWB, ETC MUST BE
+[1.00] FOR
+[0.99] AT A FREE TRADE ZONE 'OUT' GATE,
+[1.00] TRAIN/WOODLANDS/TUAS
+[0.95] IT IS
+[0.98] TO THE 'GREEN LANE' AT
+[0.99] THE TIME OF CLEARANCE, OR A
+[1.00] OR
+[0.97] AS INSTRUCTED.
+[1.00] A6
+[0.99] - IF THE
+[0.98] IS NOT USED, IT MUST BE
+[1.00] OR RE-VALIDATED NOT LATER
+[1.00] THAN 24 HOURS AFTER ITS EXPIRY.
+[1.00] EEE
+[0.99] - END OF CARGO
+[1.00] PERMIT.
+[1.00] REF:
+[1.00] 20251112 1178
+
+--- PAGE BREAK ---
+
+--- PAGE 6 ---
+[1.00] Sh.
+[1.00] House Airaybill
+[1.00] POLVEX DISTRIBUTION
+[0.98] GMBH & CO.KG
+[1.00] by Aldwin INTERNATIONAL
+[1.00] GMBH
+[1.00] Lindenstrasse 35
+[1.00] Avenida Central 7
+[0.94] 20095, HAMBURG.
+[1.00] HH 20539 DE
+[1.00] TE
+[0.99] Copies 1, 2 and 3 of this Air Waybill are originals and have the same validity.
+[1.00] Consignee's Name and Address
+[1.00] Consignee's Account Number
+[0.95] It is agreed that the noods
+[0.99] herein are accepted in apparent good order and condition (except as
+[0.99] noted) for carriage
+[0.99] TO THE
+[1.00] OF
+[0.98] ON THE
+[1.00] ALL
+[0.99] Cadence PTE. LTD.
+[1.00] GOODS MAY BE
+[0.97] BY ANY OTHER MEANS
+[0.95] ROAD OR ANY OTHER
+[1.00] INSTRUCTIONS ARE GIVEN
+[0.99] BY THE SHIPPER, AND
+[1.00] THAT THE
+[1.00] MAY BE
+[1.00] VIA
+[1.00] Rua do Ouro 18
+[1.00] WHICH THE
+[0.99] DEEMS APPROPRIATE. THE SHIPPER'S
+[1.00] IS DRAWN TO THE
+[0.99] OF LIABILITY. Shipper mav increase such limitation of
+[1.00] liability by
+[1.00] a higher value for carriage and paying a supplemental
+[0.98] if required.
+[1.00] 539775 SG
+[1.00] TE
+[0.99] Issuing Carrier's Agent Name and City
+[1.00] Accounting Information
+[1.00] Agent's IATA Code
+[1.00] Account No.
+[1.00] 23-4 7534/2015
+[0.99] Airport of Departure (Addr. of First Carrier) and Requested Routing
+[1.00] Reference Number
+[0.99] Optional Shipping Information
+[1.00] TERMS: FCA
+[1.00] To
+[0.98] By First Carrier
+[1.00] Routing and Destination
+[1.00] to
+[1.00] by
+[1.00] to
+[1.00] by
+[1.00] CHGS
+[1.00] WT/VAL
+[1.00] Other
+[1.00] Value for Carriage
+[1.00] Value for Customs
+[0.84] Cade
+[1.00] KL
+[1.00] KL
+[1.00] PPD
+[1.00] COLL
+[1.00] PPD
+[1.00] COLL
+[1.00] AMS
+[1.00] SIN
+[1.00] EURCP
+[0.79] X
+[0.81] X
+[1.00] NVD
+[1.00] NCV
+[0.97] Airport of DEHVZCKRPYE
+[1.00] Requested Flight/Date
+[1.00] Amount of insurance
+[0.99] - If Carrier offers Insurance, and such Insurance is
+[1.00] requested in accordance with the conditions thereof, indicate amount to be
+[0.79] SI
+[1.00] KL8410/12
+[1.00] KL835/13
+[0.55] XXx
+[1.00] insured in figures in box marked "amount of insurance".
+[0.97] Handling Information 11.11.2025 16:20 || SPX BY XRY DE/RA/00169-02
+[1.00] BY DE/RA/00095-06
+[0.93] ** NOT
+[1.00] MRN:
+[0.88] SCI
+[0.90] X
+[1.00] Gross
+[0.47] k0
+[1.00] Rate Class
+[1.00] Rate
+[0.99] No. Of
+[1.00] Weight
+[0.98] weignt
+[1.00] Total
+[1.00] Nature and Quantity of Goods
+[1.00] Pieces
+[1.00] Commodity
+[1.00] Charge
+[1.00] RCP
+[1.00] (incl. Dimensions or Volume)
+[0.96] Item No.
+[1.00] 2
+[1.00] 567.0K
+[1.00] Q
+[1.00] 567.0
+[1.00] As Agreed
+[1.00] NOVODUR P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Marks:
+[1.00] HS Codes: 39033000
+[1.00] ORDER
+[1.00] NO
+[0.97] DIMS 100x120x140 CM × 2
+[1.00] VOL 3.360 M3
+[0.96] TA 440162 - 82704896
+[1.00] 2
+[1.00] 567.0
+[1.00] Prepaid
+[1.00] Weight
+[1.00] Collect
+[1.00] Other
+[1.00] Valuation Charge
+[1.00] Tax
+[1.00] Total Other Charges Due Agent
+[1.00] Shipper certifies that the particulars on the face hereof are correct and that insofar as any part of the consignment
+[0.97] Icontains danaerous aoods. such part is properly
+[1.00] by name and is in proper condition for carriage by air according to the
+[1.00] Regulations.
+[1.00] Total Other
+[1.00] Due Carrier
+[1.00] AS AGENT
+[1.00] of Shipper or his Agent
+[1.00] Total Prepaid
+[1.00] Total Collect
+[1.00] INTERNATIONAL AS AGENT
+[1.00] Conversion Rates
+[1.00] CC.
+[0.93] s in
+[1.00] 11-Nov-25
+[1.00] Northwind Distribution GMBH
+[0.96] 1
+[1.00] Executed on (date)
+[0.97] at (place)
+[1.00] of Issuing Carrier or its Agent
+[1.00] Charges at Destination
+[1.00] Total Collect Charges
+[1.00] HAWB No:
+[1.00] For Carrier's use only
+[1.00] at
+[0.98] Original 2 - (for Consignee)
+
+--- PAGE BREAK ---
+
+--- PAGE 7 ---
+[0.99] CARRIERS'
+[1.00] OF
+[0.98] If the carriage involves an ultimate DEHvzckRpYE or stop in a country other than the country of departure, the Montreal Convention or the Warsaw
+[1.00] Convention may be applicable to the liability of the Carrier in respect of loss of, damage or delay to cargo. Carrier's limitation of liability in accordance
+[0.99] with those Conventions shall be as set forth in subparagraph 4 unless a higher value is
+[1.00] OF
+[1.00] 1. In this contract and the Notices appearing hereon:
+[1.00] 6./6.1 For cargo accepted for carriage, the Warsaw Convention and the Montreal Convention
+[0.99] permit shipper to increase the limitation of liability by
+[0.99] a higher value for carriage and
+[0.99] includes the air carrier issuing this air waybill and all carriers that carry or undertake
+[1.00] paying a supplemental
+[0.99] if required.
+[1.00] to carry the cargo or perform any other services related to such carriage.
+[1.00] 6.2 In carriage to which neither the Warsaw Convention nor the Montreal Convention applies
+[0.99] RIGHT (SDR) is a Special Drawing Right as defined by the International
+[0.99] Carrier shall, in accordance with the procedures set forth in its general conditions of carriage and
+[0.98] Monetary Fund.
+[1.00] applicable tariffs, permit shipper to increase the
+[1.00] of liability by
+[1.00] a higher value for
+[1.00] carriage and paying a supplemental
+[1.00] if so required.
+[0.99] means whichever of the following instruments is applicable to the
+[1.00] contract of carriage:
+[0.99] 7./7.1 In cases of loss of, damage or delay to part of the cargo, the weight to be taken into account
+[1.00] in determining Carrier's limit of liability shall be only the weight of the package or packages
+[1.00] the Convention for the Unification of Certain Rules Relating to International Carriage by Air,
+[0.98] concerned
+[1.00] signed at Warsaw, 12 October 1929;
+[1.00] 7.2 Notwithstanding any other provisions, for "foreign air transportation" as defined by the U.S.
+[0.99] that Convention as amended at The Hague on 28 September 1955;
+[1.00] Transportation Code:
+[0.99] that Convention as amended at The Hague 1955 and by Montreal Protocol No. 1, 2. or 4
+[1.00] 7.2.1 in the case of loss of, damage or delay to a shipment, the weight to be used in determining
+[1.00] (1975) as the case may be.
+[1.00] Carrier's limit of liability shall be the weight which is used to determine the
+[1.00] for carriage of
+[1.00] such shipment; and
+[1.00] means the Convention for the Unification of Certain Rules for
+[1.00] International Carriage by Air, done at Montreal on 28 May 1999.
+[1.00] 7.2.2 in the case of loss of, damage or delay to a part of a shipment, the shipment weight in 7.2.1
+[1.00] shall be prorated to the packages covered by the same air waybill whose value is affected by the
+[1.00] 2./2.1 Carriage is subject to the rules relating to liability established by the Warsaw Convention
+[1.00] loss, damage or delay. The weight applicable in the case of loss or damage to one or more articles
+[1.00] or the Montreal Convention unless such carriage is not "international carriage" as defined by
+[0.99] in a package shall be the weight of the entire package.
+[0.99] the applicable Conventions.
+[1.00] 8. Any exclusion or limitation of liability applicable to Carrier shall apply to Carrier's agents,
+[1.00] 2.2 To the extent not in conflict with the foregoing, carriage and other related services
+[1.00] employees, and representatives and to any person whose aircraft or equipment is used by Carrier
+[1.00] performed by each Carrier are subject to:
+[1.00] for carriage and such person's agents, employees and representatives.
+[0.99] 2.2.1 applicable laws and government regulations:
+[0.99] 9. Carrier undertakes to complete the carriage with reasonable dispatch. Where permitted by
+[0.99] applicable laws, tariffs and government regulations, Carrier may use altemative carriers, aircraft or
+[0.99] 2.2.2 provisions contained in the air waybill, Carrier's conditions of carriage and related rules.
+[0.99] modes of transport without notice but with due regard to the interests of the shipper. Carrier is
+[1.00] regulations, and timetables (but not the times of departure and arrival stated therein) and
+[1.00] authorised by the shipper to select the routing and all intermediate stopping places that it deems
+[0.99] applicable tariffs of such Carrier, which are made part hereof, and which may be inspected at
+[1.00] appropriate or to change or deviate from the routing shown on the face hereof.
+[1.00] any airports or other cargo sales offices from which it operates regular services. When carriage
+[0.99] is to/from the USA, the shipper and the consignee are entitled, upon request, to receive a free
+[1.00] 10. Receipt by the person entitled to delivery of the cargo without complaint shall be prima facie
+[1.00] copy of the Carrier's conditions of carriage. The Carrier's conditions of carriage include, but are
+[1.00] evidence that the cargo has been delivered in good condition and in accordance with the contract
+[1.00] not limited to:
+[1.00] of carriage.
+[1.00] 2.2.2.1 limits on the Carrier's liability for loss, damage or delay of goods, including fragile or
+[1.00] 10.1 In the case of loss of, damage or delay to cargo a written complaint must be made to Carrier
+[1.00] perishable goods;
+[1.00] by the person entitled to delivery. Such complaint must be made:
+[1.00] 2.2.2.2 claims restrictions, including time periods within which shippers or consignees must file
+[1.00] 10.1.1 in the case of damage to the cargo, immediately after discovery of the damage and at the
+[0.99] a claim or bring an action against the Carrier for its acts or omissions, or those of its agents;
+[0.99] latest within 14 days from the date of receipt of the cargo;
+[1.00] 2.2.2.3 rights, if any, of the Carrier to change the terms of the contract;
+[1.00] 10.1.2 in the case of delay, within 21 days from the date on which the cargo was placed at the
+[1.00] disposal of the person entitled to delivery.
+[0.99] 2.2.2.4 rules about Carrier's right to refuse to carry;
+[1.00] 10.1.3 in the case of non-delivery of the cargo, within 120 days from the date of issue of the air
+[1.00] 2.2.2.5 rights of the Carrier and limitations concerning delay or failure to perform service,
+[1.00] waybill, or if an air waybill has not been issued, within 120 days from the date of receipt of the
+[1.00] including schedule
+[1.00] substitution of alternate Carrier or aircraft and rerouting.
+[1.00] cargo for transportation by the Carrier.
+[0.99] 3. The agreed stopping places (which may be altered by Carrier in case of necessity) are those
+[1.00] 10.2 Such complaint may be made to the Carrier whose air waybill was used, or to the first Carrier
+[0.97] places, except the place of departure and place of DEivzckRpYEset forth on the face hereof or
+[0.99] or to the last Carrier or to the Carrier, which performed the carriage during which the loss, damage
+[1.00] shown in Carrier's timetables as scheduled stopping places for the route. Carriage to be
+[1.00] or delay took place.
+[0.99] performed hereunder by several successive Carriers is regarded as a single operation.
+[1.00] 10.3 Unless a written complaint is made within the time limits specified in 10.1 no action may be
+[1.00] 4. For carriage to which the Montreal Convention does not apply, Carrier's liability limitation for
+[1.00] brought against Carrier.
+[1.00] cargo lost, damaged or delayed shall be 26 SDRs per kilogram unless a greater per kilogram
+[0.99] monetary limit is provided in any applicable Convention or in Carrier's tariffs or general
+[0.99] 10.4 Any rights to damages against Carrier shall be extinguished unless an action is brought within
+[1.00] conditions of carriage.
+[0.98] two years from the date of arrival at the DEivzckRPYEor from the date on which the aircraft ought to
+[0.99] have arrived, or from the date on which the carriage stopped.
+[0.99] 5./5.1 Except when the Carrier has extended credit to the consignee without the written
+[1.00] consent of the shipper, the shipper guarantees payment of all
+[1.00] for the carriage due in
+[0.99] 11. Shipper shall comply with all applicable laws and government regulations of any country to or
+[0.99] accordance with Carrier's tariff, conditions of carriage and relateo reguiations, applicable laws
+[0.99] from which the cargo may be carried, including those relating to the packing, carriage or delivery of
+[1.00] (including national laws implementing the Warsaw Convention and the Montreal Convention),
+[1.00] the cargo, and shall furnish such information and attach such documents to the air waybill as may
+[0.99] government regulations, orders and requirements.
+[0.99] be necessary to comply with such laws and regulations. Carrier is not liable to shipper and shipper
+[1.00] shall indemnify Carrier for loss or expense due to shipper's failure to comply with this provision.
+[1.00] 5.2 When no part of the consignment is delivered, a claim with respect to such consignment will
+[1.00] be considered even though transportation
+[1.00] thereon are unpaid.
+[0.99] 12. No agent, employee or representative of Carrier has authority to alter, modify or waive any
+[0.98] provisions of this contract.
+
+--- PAGE BREAK ---
+
+--- PAGE 8 ---
+[1.00] Sh.
+[1.00] House Airaybill
+[1.00] POLVEX DISTRIBUTION
+[0.98] GMBH & CO.KG
+[1.00] Aldwin INTERNATIONAL
+[1.00] GMBH
+[1.00] Lindenstrasse 35
+[1.00] Avenida Central 7
+[0.94] 20095, HAMBURG.
+[1.00] HH 20539 DE
+[1.00] TE
+[0.99] Copies 1, 2 and 3 of this Air Waybill are originals and have the same validity.
+[1.00] Consignee's Name and Address
+[0.99] Consignee's Account Number
+[0.99] Received in Good Order and Condition
+[0.97] Cadence PTE.LTD
+[1.00] aan
+[0.95] at (piace)
+[0.99] on (date/time)
+[1.00] Rua do Ouro 18
+[1.00] Signature of Consignee or his Agent
+[1.00] 539775 SG
+[1.00] TE
+[0.99] Issuing Carrier's Agent Name and City
+[1.00] Accounting Information
+[0.98] Agent's IATA Code
+[1.00] Account No.
+[1.00] 23-4 7534/2015
+[0.99] Airport of Departure (Addr. of First Carrier) and Requested Routing
+[1.00] Reference Number
+[0.99] Optional Shipping Information
+[1.00] TERMS: FCA
+[1.00] To
+[0.98] By First Carrier
+[1.00] Routing and Destination
+[1.00] to
+[1.00] by
+[1.00] to
+[1.00] by
+[1.00] CHGS
+[1.00] WT/VAL
+[1.00] Other
+[1.00] Value for Carriage
+[0.97] Value for Customs
+[0.84] Cade
+[1.00] KL
+[1.00] KL
+[1.00] PPD
+[1.00] COLL
+[1.00] PPD
+[1.00] COLL
+[1.00] AMS
+[1.00] SIN
+[1.00] EURCP
+[0.86] X
+[0.81] X
+[1.00] NVD
+[1.00] NCV
+[0.98] Airport of DEHVZCKRPYE
+[1.00] Requested Flight/Date
+[1.00] Amount of insurance
+[0.99] - If Carrier offers Insurance, and such Insurance is
+[1.00] requested in accordance with the conditions thereof, indicate amount to be
+[1.00] KL8410/12
+[1.00] KL835/13
+[0.55] XXx
+[0.99] insured in figures in box marked "amount of insurance".
+[0.97] Handling Information 11.11.2025 16:20 || SPX BY XRY DE/RA/00169-02
+[1.00] BY DE/RA/00095-06
+[0.93] ** NOT
+[1.00] MRN:
+[0.88] SCI
+[0.90] X
+[1.00] Gross
+[0.47] k0
+[1.00] Rate Class
+[1.00] Rate
+[0.99] No. Of
+[1.00] Weight
+[0.98] weignt
+[1.00] Total
+[0.99] Nature and Quantity of Goods
+[1.00] Pieces
+[1.00] Commodity
+[1.00] Charge
+[1.00] RCP
+[1.00] (incl. Dimensions or Volume)
+[0.96] Item No.
+[1.00] 2
+[1.00] 567.0K
+[1.00] Q
+[1.00] 567.0
+[1.00] As Agreed
+[1.00] NOVODUR P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Marks:
+[1.00] HS Codes: 39033000
+[1.00] ORDER
+[1.00] NO
+[0.97] DIMS 100x120x140 CM × 2
+[1.00] PART NO.
+[1.00] VOL 3.360 M3
+[0.96] TA 440162 - 82704896
+[1.00] 2
+[1.00] 567.0
+[1.00] Prepaid
+[1.00] Weight
+[1.00] Collect
+[1.00] Other
+[1.00] Valuation Charge
+[1.00] Tax
+[1.00] Total Other Charges Due Agent
+[0.99] Shipper certifies that the particulars on the face hereof are correct and that insofar as any part of the consignment
+[1.00] contains dangerous goods, such part is properly
+[0.99] by name and is in proper condition for carriage by air according to the
+[1.00] applicable Dangerous Goods Regulations.
+[0.99] Total Other Charges Due Carrier
+[1.00] INTERNATIONAL AS AGENT
+[1.00] of Shipper or his Agent
+[1.00] Total Prepaid
+[1.00] Total Collect
+[1.00] INTERNATIONAL AS AGENT
+[1.00] Conversion Rates
+[1.00] Brightside Distribution CC
+[1.00] 11-Nov-25
+[1.00] Northwind Distribution GMBH
+[0.96] 1
+[1.00] Executed on (date)
+[0.97] at (place)
+[1.00] of Issuing Carrier or its Agent
+[1.00] Charges at Destination
+[0.99] Total Collect Charges
+[1.00] HAWB No: HAM00092526
+[1.00] For Carrier's use only
+[1.00] at
+[0.99] Copy 4 - (Delivery Receipt)
+
+--- PAGE BREAK ---
+
+--- PAGE 9 ---
+[1.00] Sh.
+[1.00] House Airaybill
+[1.00] POLVEX DISTRIBUTION
+[0.98] GMBH & CO.KG
+[1.00] Aldwin INTERNATIONAL
+[1.00] GMBH
+[1.00] Lindenstrasse 35
+[1.00] Avenida Central 7
+[0.94] 20095, HAMBURG.
+[1.00] HH 20539 DE
+[1.00] TE
+[0.99] Copies 1, 2 and 3 of this Air Waybill are originals and have the same validity.
+[1.00] Consignee's Name and Address
+[0.99] Consignee's Account Number
+[0.99] Cadence PTE. LTD.
+[1.00] Rua do Ouro 18
+[1.00] 539775 SG
+[1.00] TE
+[0.99] Issuing Carrier's Agent Name and City
+[1.00] Accounting Information
+[1.00] Agent's IATA Code
+[1.00] Account No.
+[1.00] 23-4 7534/2015
+[0.99] Airport of Departure (Addr. of First Carrier) and Requested Routing
+[1.00] Reference Number
+[0.99] Optional Shipping Information
+[1.00] TERMS: FCA
+[1.00] To
+[0.98] By First Carrier
+[1.00] Routing and Destination
+[1.00] to
+[1.00] by
+[1.00] to
+[1.00] by
+[1.00] CHGS
+[1.00] WT/VAL
+[1.00] Other
+[1.00] Value for Carriage
+[0.97] Value for Customs
+[0.84] Cade
+[1.00] KL
+[1.00] KL
+[1.00] PPD
+[1.00] COLL
+[1.00] PPD
+[1.00] COLL
+[1.00] AMS
+[1.00] SIN
+[1.00] EURCP
+[0.79] X
+[0.81] X
+[1.00] NVD
+[1.00] NCV
+[0.98] Airport of DEHVZCKRPYE
+[1.00] Requested Flight/Date
+[1.00] Amount of insurance
+[1.00] - If Carrier offers Insurance, and such Insurance is
+[0.99] requested in accordance with the conditions thereof, indicate amount to be
+[1.00] KL8410/12
+[1.00] KL835/13
+[0.55] XXx
+[0.99] insured in figures in box marked "amount of insurance".
+[0.98] Handling Information 11.11.2025 16:20 || SPX BY XRY DE/RA/00169-02
+[1.00] BY DE/RA/00095-06
+[0.93] ** NOT
+[1.00] MRN:
+[0.88] SCI
+[0.90] X
+[1.00] Gross
+[0.47] k0
+[1.00] Rate Class
+[1.00] Rate
+[0.99] No. Of
+[1.00] Weight
+[0.98] weignt
+[1.00] Total
+[0.99] Nature and Quantity of Goods
+[1.00] Pieces
+[1.00] Commodity
+[1.00] Charge
+[1.00] RCP
+[1.00] (incl. Dimensions or Volume)
+[0.96] Item No.
+[1.00] 2
+[1.00] 567.0K
+[1.00] Q
+[1.00] 567.0
+[1.00] As Agreed
+[1.00] NOVODUR P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Marks:
+[1.00] HS Codes: 39033000
+[1.00] ORDER
+[0.97] DIMS 100x120x140 CM × 2
+[1.00] PART NO.
+[1.00] VOL 3.360 M3
+[0.97] TA 440162 - 82704896
+[1.00] 2
+[1.00] 567.0
+[1.00] Prepaid
+[1.00] Weight
+[1.00] Collect
+[1.00] Other
+[1.00] Valuation Charge
+[1.00] Tax
+[1.00] Total Other Charges Due Agent
+[1.00] Shipper certifies that the particulars on the face hereof are correct and that insofar as any part of the consignment
+[1.00] contains dangerous goods, such part is properly
+[0.99] by name and is in proper condition for carriage by air according to the
+[1.00] us Goods Regulations.
+[0.99] Total Other Charges Due Carrier
+[1.00] ALDWIN
+[1.00] AS AGENT
+[0.56] S
+[1.00] of Shipper or his Agent
+[1.00] Total Prepaid
+[1.00] Total Collect
+[1.00] INTERNATIONAL AS AGENT
+[1.00] Conversion Rates
+[1.00] CC.
+[0.81] sin
+[1.00] 11-Nov-25
+[1.00] Northwind Distribution GMBH
+[0.96] 1
+[1.00] Executed on (date)
+[0.97] at (place)
+[1.00] of Issuing Carrier or its Agent
+[1.00] Charges at Destination
+[1.00] Total Collect Charges
+[1.00] HAWB No:
+[1.00] For Carrier's use only
+[1.00] at
+[0.98] Copy 5 - (Extra Copy)
+
+--- PAGE BREAK ---
+
+--- PAGE 10 ---
+[1.00] Sh.
+[1.00] House Airaybill
+[1.00] POLVEX DISTRIBUTION
+[0.98] GMBH & CO.KG
+[1.00] Aldwin INTERNATIONAL
+[1.00] GMBH
+[1.00] Lindenstrasse 35
+[1.00] Avenida Central 7
+[0.94] 20095, HAMBURG.
+[1.00] HH 20539 DE
+[1.00] TE
+[0.99] Copies 1, 2 and 3 of this Air Waybill are originals and have the same validity.
+[1.00] Consignee's Name and Address
+[0.99] Consignee's Account Number
+[0.99] Cadence PTE. LTD.
+[1.00] Rua do Ouro 18
+[1.00] 539775 SG
+[1.00] TE
+[0.99] Issuing Carrier's Agent Name and City
+[1.00] Accounting Information
+[1.00] Agent's IATA Code
+[1.00] Account No.
+[1.00] 23-4 7534/2015
+[0.99] Airport of Departure (Addr. of First Carrier) and Requested Routing
+[1.00] Reference Number
+[0.99] Optional Shipping Information
+[1.00] TERMS: FCA
+[1.00] To
+[0.98] By First Carrier
+[1.00] Routing and Destination
+[1.00] to
+[1.00] by
+[1.00] to
+[1.00] by
+[1.00] CHGS
+[1.00] WT/VAL
+[1.00] Other
+[1.00] Value for Carriage
+[0.97] Value for Customs
+[0.84] Cade
+[1.00] KL
+[1.00] KL
+[1.00] PPD
+[1.00] COLL
+[1.00] PPD
+[1.00] COLL
+[1.00] AMS
+[1.00] SIN
+[1.00] EURCP
+[0.79] X
+[0.81] X
+[1.00] NVD
+[1.00] NCV
+[0.98] Airport of DEHVZCKRPYE
+[1.00] Requested Flight/Date
+[1.00] Amount of insurance
+[1.00] - If Carrier offers Insurance, and such Insurance is
+[0.99] requested in accordance with the conditions thereof, indicate amount to be
+[1.00] KL8410/12
+[1.00] KL835/13
+[0.55] XXx
+[0.99] insured in figures in box marked "amount of insurance".
+[0.98] Handling Information 11.11.2025 16:20 | SPX BY XRY DE/RA/00169-02
+[1.00] BY DE/RA/00095-06
+[0.93] ** NOT
+[1.00] MRN:
+[0.88] SCI
+[0.90] X
+[1.00] Gross
+[0.47] k0
+[1.00] Rate Class
+[1.00] Rate
+[0.99] No. Of
+[1.00] Weight
+[0.98] weignt
+[1.00] Total
+[0.99] Nature and Quantity of Goods
+[1.00] Pieces
+[1.00] Commodity
+[1.00] Charge
+[1.00] RCP
+[1.00] (incl. Dimensions or Volume)
+[0.96] Item No.
+[1.00] 2
+[1.00] 567.0K
+[1.00] Q
+[1.00] 567.0
+[1.00] As Agreed
+[1.00] NOVODUR P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Marks:
+[1.00] HS Codes: 39033000
+[1.00] ORDER
+[0.97] DIMS 100x120x140 CM × 2
+[1.00] PART NO.
+[1.00] VOL 3.360 M3
+[0.97] TA 440162 - 82704896
+[1.00] 2
+[1.00] 567.0
+[1.00] Prepaid
+[1.00] Weight
+[1.00] Collect
+[1.00] Other
+[1.00] Valuation Charge
+[1.00] Tax
+[1.00] Total Other Charges Due Agent
+[1.00] Shipper certifies that the particulars on the face hereof are correct and that insofar as any part of the consignment
+[1.00] contains dangerous goods, such part is properly
+[0.99] by name and is in proper condition for carriage by air according to the
+[1.00] us Goods Regulations.
+[0.99] Total Other Charges Due Carrier
+[1.00] ALDWIN
+[1.00] AS AGENT
+[0.56] S
+[1.00] of Shipper or his Agent
+[1.00] Total Prepaid
+[1.00] Total Collect
+[1.00] INTERNATIONAL AS AGENT
+[1.00] Conversion Rates
+[1.00] CC.
+[0.81] sin
+[1.00] 11-Nov-25
+[1.00] Northwind Distribution GMBH
+[0.96] 1
+[1.00] Executed on (date)
+[0.97] at (place)
+[1.00] of Issuing Carrier or its Agent
+[1.00] Charges at Destination
+[1.00] Total Collect Charges
+[1.00] HAWB No:
+[1.00] For Carrier's use only
+[1.00] at
+[1.00] Copy 6 - (Extra Copy)
+
+--- PAGE BREAK ---
+
+--- PAGE 11 ---
+[1.00] Sh.
+[1.00] House Airaybill
+[1.00] POLVEX DISTRIBUTION
+[0.98] GMBH & CO.KG
+[1.00] Aldwin INTERNATIONAL
+[1.00] GMBH
+[1.00] Lindenstrasse 35
+[1.00] Avenida Central 7
+[0.94] 20095, HAMBURG.
+[1.00] HH 20539 DE
+[1.00] TE
+[1.00] Copies 1, 2 and 3 of this Air Waybill are originals and have the same validity.
+[1.00] Consignee's Name and Address
+[1.00] Consignee's Account Number
+[1.00] It is agreed that the goods
+[0.99] herein are accepted in apparent good order and condition (except as
+[0.98] noted) for carriage
+[1.00] TO THE
+[1.00] OF
+[0.98] ON THE
+[1.00] ALL
+[0.99] Cadence PTE. LTD.
+[0.99] GOODS MAY BE
+[1.00] BY ANY OTHER MEANS
+[0.97] ROAD OR ANY OTHER
+[1.00] INSTRUCTIONS ARE GIVEN
+[0.97] BY THE SHIPPER, AND
+[1.00] THAT THE
+[1.00] MAY BE
+[1.00] VIA INTERMEDIATE
+[1.00] Rua do Ouro 18
+[1.00] WHICH THE
+[1.00] DEEMS APPROPRIATE. THE
+[1.00] IS DRAWN TO THE
+[1.00] OF LIABILITY. Shipper mav increase such limitation of
+[1.00] liability by
+[1.00] a higher value for carriage and paying a supplemental
+[0.98] if required.
+[1.00] 539775 SG
+[1.00] TE
+[0.99] Issuing Carrier's Agent Name and City
+[1.00] Accounting Information
+[1.00] Agent's IATA Code
+[1.00] Account No.
+[1.00] 23-4 7534/2015
+[0.99] Airport of Departure (Addr. of First Carrier) and
+[1.00] Routing
+[1.00] Reference Number
+[0.99] Optional Shipping Information
+[1.00] TERMS: FCA
+[1.00] To
+[0.98] By First Carrier
+[1.00] Routing and Destination
+[1.00] to
+[1.00] by
+[1.00] to
+[1.00] by
+[1.00] CHGS
+[1.00] WT/VAL
+[1.00] Other
+[1.00] Value for Carriage
+[1.00] Value for Customs
+[0.84] Cade
+[1.00] KL
+[1.00] KL
+[1.00] PPD
+[1.00] COLL
+[1.00] PPD
+[1.00] COLL
+[1.00] AMS
+[1.00] SIN
+[1.00] EURCP
+[0.79] X
+[0.81] X
+[1.00] NVD
+[1.00] NCV
+[0.97] Airport of DEHVZCKRPYE
+[1.00] Requested Flight/Date
+[1.00] Amount of insurance
+[0.99] - If Carrier offers Insurance, and such Insurance is
+[1.00] requested in accordance with the conditions thereof, indicate amount to be
+[1.00] KL8410/12
+[1.00] KL835/13
+[0.55] XXx
+[1.00] insured in figures in box marked "amount of insurance".
+[0.97] Handling Information 11.11.2025 16:20 || SPX BY XRY DE/RA/00169-02
+[1.00] BY DE/RA/00095-06
+[0.93] ** NOT
+[1.00] MRN:
+[0.88] SCI
+[0.95] X
+[1.00] Gross
+[0.47] k0
+[1.00] Rate Class
+[1.00] Rate
+[0.99] No. Of
+[1.00] Weight
+[0.98] weignt
+[1.00] Total
+[1.00] Nature and Quantity of Goods
+[1.00] Pieces
+[1.00] Commodity
+[1.00] Charge
+[1.00] RCP
+[1.00] (incl. Dimensions or Volume)
+[0.96] Item No.
+[1.00] 2
+[1.00] 567.0K
+[1.00] Q
+[1.00] 567.0
+[1.00] As Agreed
+[1.00] NOVODUR P2H-AT
+[1.00] -NOT RESTRICTED-
+[1.00] Marks:
+[1.00] HS Codes: 39033000
+[1.00] ORDER
+[1.00] NO
+[0.97] DIMS 100x120x140 CM × 2
+[1.00] VOL 3.360 M3
+[0.96] TA 440162 - 82704896
+[1.00] 2
+[1.00] 567.0
+[1.00] Prepaid
+[1.00] Weight
+[1.00] Collect
+[1.00] Other
+[1.00] Valuation Charge
+[1.00] Tax
+[1.00] Total Other Charges Due Agent
+[0.99] Shipper certifies that the particulars on the face hereof are correct and that insofar as any part of the consignment
+[1.00] contains dangerous goods, such part is properly
+[0.99] by name and is in proper condition for carriage by air according to the
+[1.00] applicable Dangerous Goods Regulations.
+[1.00] Total Other Charges Due Carrier
+[1.00] Aldwin
+[1.00] INTERNATIONAL AS AGENT
+[1.00] of Shipper or his Agent
+[1.00] Total Prepaid
+[0.99] Total Collect
+[1.00] INTERNATIONAL AS AGENT
+[1.00] Conversion Rates
+[1.00] CC.
+[0.81] sin
+[1.00] 11-Nov-25
+[0.99] Northwind Distribution GMBH
+[0.96] 1
+[1.00] Executed on (date)
+[0.97] at (place)
+[1.00] of Issuing Carrier or its Agent
+[1.00] Charges at Destination
+[1.00] Total Collect Charges
+[1.00] HAWB No:
+[1.00] For Carrier's use only
+[1.00] at
+[1.00] Copy 7 - (Extra Copy)
+
+--- PAGE BREAK ---
+
+--- PAGE 12 ---
+[0.97] Date : 10/28/2025
+[1.00] Order no.
+[1.00] Cadence PTE. LTD.
+[1.00] High Street 18
+[0.98] #08-08, 539775 Singapore
+[1.00] Attn:
+[1.00] Tan
+[1.00] Email: clara.lind@cadence.com
+[1.00] UNIT PRICE TOTAL
+[1.00] P2H-AT
+[1.00] EUR 8.18
+[1.00] EUR 4,499.00
+[1.00] Polvex
+[1.00] (FAR EAST) LTD
+[0.90] 爱彼思
+[0.73] 变辉(速来)有限公

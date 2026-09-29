@@ -1,0 +1,11 @@
+Engine: paddle
+Python Version: 3.11.9
+Package Versions: paddleocr=3.7.0, paddlepaddle=3.3.1
+--------------------------------------------------
+PDF: DU-03.pdf | Status: SUCCESS | Time: 1566.63s
+PDF: DU-05.pdf | Status: SUCCESS | Time: 86.54s
+PDF: INV-21.pdf | Status: SUCCESS | Time: 127.02s
+PDF: HLD-10.pdf | Status: SUCCESS | Time: 46728.52s
+PDF: INV-37.pdf | Status: SUCCESS | Time: 160.78s
+--------------------------------------------------
+Total Benchmark Execution Time: 48670.42s

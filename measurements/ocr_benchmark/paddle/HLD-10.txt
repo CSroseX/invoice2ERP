@@ -1,0 +1,279 @@
+--- PAGE 1 ---
+[0.98] Northwind Operations OÜ
+[1.00] Arve number:
+[0.70] UINATN ID
+[1.00] Kliendikood:
+[1.00] 10134
+[1.00] Reg. number:
+[1.00] 27044945
+[0.99] Arve kuupäev:
+[1.00] 07-05-26
+[1.00] Lehekülgede arv:
+[1.00] 1/2
+[1.00] Päringud arvete kohta
+[1.00] Telefon:
+[0.46] E
+[1.00] E-post:
+[1.00] cloverdale-media.com
+[1.00] Teenuse liik
+[1.00] Saadetiste Kogukaal
+[1.00] Osade Transpordi-
+[1.00] Lisatasud
+[0.99] KM Kogusum-
+[1.00] arv
+[1.00] arv
+[1.00] tasu
+[1.00] kokku
+[0.96] ma (KM-ga)
+[1.00] 1
+[1.00] 4,00
+[1.00] 1
+[1.00] 65,26
+[1.00] 31,47
+[1.00] 96,73
+[1.00] 3
+[1.00] 38,00
+[1.00] 4
+[1.00] 92,36
+[1.00] 34,89
+[1.00] 30,53
+[1.00] 157,78
+[0.84] UIMARDAIVIINE
+[1.00] 0,01
+[1.00] 0,01
+[1.00] Kokku
+[1.00] 4
+[0.99] 42,00
+[1.00] 5
+[1.00] 157,62
+[1.00] 66,36
+[1.00] 30,54
+[1.00] 254,52
+[1.00] Lisateenuste loetelu
+[1.00] Kokku
+[1.00] FUEL
+[1.00] 64,04
+[0.92] PLUS -
+[1.00] 2,32
+[1.00] Kokku lisateenuste tasud
+[1.00] 66,36
+[0.73] E-aaaapot
+[1.00] KM analüüs
+[1.00] Kokku
+[1.00] Kood
+[1.00] Koodi kirjeldus
+[1.00] KM määr
+[1.00] Maksustatav summa
+[1.00] KM
+[1.00] A
+[1.00] 24,00%
+[1.00] 127,25
+[1.00] 30,54
+[1.00] B
+[1.00] 0,00%
+[1.00] 96,73
+[1.00] 0,00
+[1.00] Kokku KM
+[1.00] 30,54
+[0.98] Kokku (v.a. KM)
+[1.00] KM
+[1.00] Kokku (KM-ga)
+[1.00] Maksetähtaeg: 04-06-26
+[1.00] Kogusumma (EUR)
+[1.00] 223,98
+[1.00] 30,54
+[1.00] 254,52
+[1.00] Speedwell
+[0.95] Estonia AS
+[1.00] (klienditeenindus)
+[0.98] Reg. No.: 18788768
+[0.99] Palume: * märkida oma maksekorraldusele makstava
+[1.00] High Street 36
+[1.00] (raamatupidamine)
+[1.00] KMKR
+[1.00] arve number ja kuupäev
+[1.00] 75310 Harju maakond,
+[0.96] e-mail alex.keller@speedwell.com
+[1.00] IBAN
+[1.00] * märkida saatelehele saatja nimi
+[1.00] Eesti
+[1.00] www.speedwell.ee
+[1.00] Crestline Bank
+
+--- PAGE BREAK ---
+
+--- PAGE 2 ---
+[1.00] Arve number:
+[1.00] Arve
+[1.00] Kliendikood:
+[1.00] Arve kuupäev:
+[1.00] 07-05-26
+[1.00] Lehekülgede arv:
+[1.00] 2/2
+[1.00] Saatelehe Saatja viide
+[0.98] Saadetise Lähtekoht/saatja
+[1.00] Sihtkoht/saaja
+[1.00] Teenuse
+[1.00] Kaal
+[1.00] Osade Standard-
+[1.00] Lisateenuste
+[1.00] Lisatee-
+[1.00] KM/kood Kogusum-
+[1.00] number
+[0.99] kuupäev
+[1.00] liik
+[0.99] (Kg)
+[1.00] arv
+[1.00] hind
+[1.00] kirjeldus
+[1.00] nuste
+[1.00] ma
+[0.66] E--aast
+[1.00] tasud
+[1.00] (KM-ga)
+[1.00] STK-EE003-26-00182 05-05-26
+[0.89] WAW.
+[0.99] OSL,
+[1.00] 4,00 B
+[1.00] 1
+[1.00] 65,26
+[1.00] B
+[1.00] 65,26
+[1.00] 5
+[1.00] Northwind
+[1.00] OU CWH
+[1.00] Northwind
+[0.99] ou
+[1.00] FUEL
+[1.00] 30,67
+[1.00] B
+[1.00] 30,67
+[0.97] Clara Haas
+[0.98] Lena
+[0.99] Meyer
+[1.00] nondoc
+[1.00] PLUS-
+[1.00] 0,80
+[1.00] B
+[1.00] 0,80
+[1.00] Lindenstrasse 20
+[1.00] CWH
+[1.00] Market Road 67
+[1.00] PL-01-940, Warsaw
+[1.00] NO-0196,
+[1.00] 96,73
+[0.98] Vahesumma teenuse järgi -
+[1.00] nondoc
+[1.00] 4,00
+[1.00] 1
+[1.00] 65,26
+[1.00] 31,47
+[1.00] 96,73
+[1.00] STK-EE003-26-00158 22-04-26
+[0.97] WAW,
+[1.00] AMS,
+[1.00] 17,00 B
+[1.00] 1
+[1.00] 35,41
+[1.00] 8,50 A
+[1.00] 43,91
+[1.00] 8
+[0.99] Northwind
+[0.97] OU CWH
+[1.00] Northwind
+[0.88] ou
+[1.00] FUEL
+[1.00] 12,92
+[0.99] 3,10 A
+[1.00] 16,02
+[0.98] Clara Haas
+[0.70] nos
+[1.00] Meyer
+[1.00] PLUS-
+[1.00] 0,68
+[0.99] 0,16 A
+[1.00] 0,84
+[1.00] Lindenstrasse 20
+[1.00] CWH
+[1.00] Het
+[1.00] 31A
+[0.98] PL-01-940, Warsaw
+[0.99] RA,
+[1.00] 60,77
+[1.00] STK-EE003-26-00180 30-04-26
+[1.00] ZPE,
+[0.98] TLL,
+[0.99] 4,00 B
+[1.00] 1
+[1.00] 25,18
+[0.99] 6,04 A
+[1.00] 31,22
+[1.00] 4
+[0.99] Northwind Operations OU
+[0.97] Northwind Operations OU
+[1.00] PLUS-
+[1.00] 0,16
+[0.99] 0,04 A
+[1.00] 0,20
+[0.88] Maria
+[0.99] Moreau Vidal
+[0.91] Siva
+[0.99] Alex
+[0.97] Keller
+[0.98] Lindenstrasse 31
+[1.00] Jaian Ampang 3
+[1.00] FUEL
+[1.00] 9,25
+[0.98] 2,22 A
+[1.00] 11,47
+[1.00] DE-48153,
+[1.00] EE-13619,
+[1.00] 42,89
+[1.00] STK-EE003-26-00187 05-05-26
+[0.99] VNO,
+[0.92] TLL,
+[1.00] 17,00 B
+[1.00] 2
+[1.00] 31,77
+[0.98] 7,62 A
+[1.00] 39,39
+[1.00] 1
+[0.97] Northwind
+[1.00] ou
+[1.00] Northwind
+[1.00] ou
+[0.88] FUEL
+[1.00] 11,20
+[0.93] 2,69 A
+[1.00] 13,89
+[0.98] Alex
+[1.00] Moreau
+[0.99] Alex
+[0.97] 1amm
+[1.00] Keller
+[1.00] PLUS-
+[1.00] 0,68
+[0.98] 0,16 A
+[1.00] 0,84
+[1.00] Bahnhofstrasse 69
+[0.97] Jaian Ampang 3
+[1.00] LT-47214,
+[1.00] EE-13619,
+[1.00] 54,12
+[0.99] Vahesumma teenuse järgi -
+[1.00] 34,89
+[1.00] 30,53
+[1.00] 157,78
+[1.00] ÜMARDAMINE
+[0.99] 0,01
+[0.92] 0,01
+[1.00] Kokku: EUR:
+[1.00] 42,00
+[1.00] 5
+[1.00] 157,62
+[1.00] 66,36
+[1.00] 30,54
+[1.00] 254,52
+[0.97] A = Kliendi poolt arvutatud tegelik kaal V = Kliendi poolt arvutatud mahukaal B = Spedwepoolt arvutatud tegelik kaal speedwel
+[1.00] poolt arvutatud mahukaal
+[0.98] M = sega

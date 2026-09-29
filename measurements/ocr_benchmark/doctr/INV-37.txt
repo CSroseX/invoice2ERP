@@ -1,0 +1,127 @@
+--- PAGE 1 ---
+1120 VERMONT AVENUE. ASSOCIATES, LLP
+UTILITIESI REIMBURSEMENT
+Amerihealth - 2nd Floor
+Attention:
+Accountspayable@amerihealthcaritas.com
+Invoicel Date: 6/12/2018
+Billing Address: AmeriHealth
+Invoice: 5568
+200: Stevens Drive
+Purchase Order: 17816
+Philadelphia, PA 19113
+Service Period: April 30, 2018 tol May 29, 2018 (30 Days)
+ELECTRIC USAGE
+Meter Reading
+MeterN Number
+ReadType
+Present
+Previous
+Multiplier KWHI Used BlendedS/KWH
+Amount
+SM #0201
+Actual
+497649 497625 = 24 x 1
+24 x 0.097958122 = $2.35
+at 2ndftNorth Mech Room
+Demand 1 X 1
+1 x 11.470001 = $11.47
+SM #0202
+Actual
+434313 434122
+191 x 1
+191 x 0.097958122 = $18.71
+at2 2ndftNorth Mech Room
+Demand 0.7 x 1
+0.7 x 11.470001
+$8.03
+SM #0206
+Actual
+703329 687513
+15816 x 1 = 15816 x 0.097958122 = $1,549.31
+Demand 21.5 X 1
+21.5
+11.470001
+$246.61
+Total KWHI Billed: 16,031 Non-Residential-GT: $1,570.37
+Totall Distribution Charged: 23.200 Maximuml Demand: $266.10
+Sales tax at 0.0575 on utility bills: $105.60
+SUB-TOTALFORI ELECTRICALCOSTS: $1,942.07
+EMERGENCY GENERATOR FUELI USAGE
+Meter Reading
+Meter? Number
+Present
+Previous
+Gallons
+Multiplier Consumption
+Rate
+Amount
+#4369148
+815
+815
+0
+0
+$2.76 = $0.00
+Sales tax at 0.0575 on utility bills: $0.00
+COOLING: SYSTEM CONDENSER WATER USAGE
+UnitNumber
+2.1
+2
+2.5
+2.9
+SUB-TOTALFOR EMERGENCY GENERATORI FUEL COSTS: S0.00
+Perlascammalfecof
+CSCW.xcomnectedion
+Model Number InstallDate UsageType UnitBTU's BTUTonnage ConnectedTon /12months*
+Amount
+CCH-042
+07/23/03 Standby
+42,000
+12,000
+3.500
+$63.93
+$61.73
+WCMS.1.024 07/23/03 24Hour
+24,000
+12,000
+2.000 X $63.93
+$35.27
+CCH-024
+01/01/14 241 Hour
+60,000
+12,000
+5.000
+$63.93
+$319.65
+*241 Hour unit utility costs: $740.71, Leasel Hour unit utility costs: $194.7, $26.49for maintenance and repairs to the 24-hour central plant system; per connected ton
+Total Connected' Tonnage: 10.500 Total Energy Costs: $393.47
+BUILDING SERVICEI FEES
+(4-12000.00: : 152.19375)
+0
+Usage History
+40000
+20000
+S 00
+0
+€
+I I E
+!
+PeLlenn Amerihealth Utility Reimbursement.xls
+Cost Per Ton, Common Equipment PM: 2.208 Total C.E. PM Costs: $23.18
+SUB-TOTALI FOR CONDENSER WATER COSTS: S416.65
+$122.00
+Sales tax at( 0.0575 ont building services: $7.02
+NET CURRENTI REIMBURSEMENT: $2,487.73
+E I I
+a
+1
+b
+I
+1 1
+o
+1
+-
+I
+1 I
+€
+I

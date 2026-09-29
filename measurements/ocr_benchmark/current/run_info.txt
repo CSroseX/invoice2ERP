@@ -1,0 +1,11 @@
+Engine: current
+Python Version: 3.14.3
+Package Versions: easyocr=1.7.2, pymupdf=1.28.2, torch=2.14.0
+--------------------------------------------------
+PDF: DU-03.pdf | Status: SUCCESS | Time: 0.03s
+PDF: DU-05.pdf | Status: SUCCESS | Time: 0.01s
+PDF: INV-21.pdf | Status: SUCCESS | Time: 0.01s
+PDF: HLD-10.pdf | Status: SUCCESS | Time: 0.02s
+PDF: INV-37.pdf | Status: SUCCESS | Time: 0.01s
+--------------------------------------------------
+Total Benchmark Execution Time: 0.20s

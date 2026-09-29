@@ -1,0 +1,55 @@
+Northwind Operations OU
+
+10134
+
+Arve number:
+
+number: Reg-
+
+Kliendikood:
+
+Arve kuupaev:
+
+Lehekulgede arv:
+
+## Paringud arvete kohta
+
+Telefon:
+
+E-post:
+
+07-05-26 1/2
+
+| Teenuse Ik   | Suadetiste Kogukaal   |        |                   | kokku   | KM Kogusum- Ia (KM-gal   |
+|--------------|-----------------------|--------|-------------------|---------|--------------------------|
+|              | 4,00                  |        | 65,26 92,36 14,49 | 0,01    | 96,7] 0,01               |
+| Kokku        | 42,00                 | 157,62 | 66,36             | 30,54   | 254,52                   |
+
+Fuel PLUS
+
+66,36
+
+| KM analuus   |             |
+|--------------|-------------|
+| Kood         | KM          |
+| 8            | 127,25 0,00 |
+| Kokku KM     | 40,54       |
+
+|                        |                 |        | KM    |   Kokku (KM ga) |
+|------------------------|-----------------|--------|-------|-----------------|
+| Maksetahtacg: 04-06-26 | Kogusumma (EUR) | 223,98 | 30,54 |          254.52 |
+
+| Klicndikood:     |          |
+|------------------|----------|
+| Arve kuupjev:    | 07-05-26 |
+| Lehekulgede arv: |          |
+
+## Arve Arve
+
+|    |    | hind   |   hind |      | Lisatee-   |       |
+|----|----|--------|--------|------|------------|-------|
+|    |    |        |  65.26 | Flel | 3067       | 65,16 |
+|    | Au |        |        |      |            |       |
+|    |    |        |        |      | 0 16       | 1V7   |
+| ML |    |        |        |      | 925 0 68   |       |
+|    |    |        |        |      | 5636       |       |

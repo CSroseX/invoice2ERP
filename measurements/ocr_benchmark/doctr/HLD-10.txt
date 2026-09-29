@@ -1,0 +1,182 @@
+--- PAGE 1 ---
+Northwind Operations OU
+UIVA IIV 13
+Arve number:
+Kliendikood:
+10134
+Teenuse liik
+UIVARUAIIINE
+Kokku
+Lisateenuste loetelu
+FUEL
+Reg. number:
+Arve kuupaev:
+Lehekulgede arv:
+Paringud arvete kohta
+Telefon:
+E-post:
+Saadetiste Kogukaal Osade Transpordi- Lisatasud
+arv
+1
+4,00
+3 38,00
+4 42,00
+Kokku
+64,04
+27044945
+07-05-26
+1/2
+cloverdale-media.com
+KM Kogusum-
+arv
+1
+4
+tasu kokku
+65,26
+92,36
+5 157,62
+ma (KM-ga)
+31,47
+34,89
+66,36
+Kokku (v.a. KM)
+96,73
+30,53 157,78
+0,01
+0,01
+30,54 254,52
+PLUS
+Kokku lisateenuste tasud
+KM analuus
+Kood
+A
+B
+Kokku KM
+2,32
+66,36
+Kokku
+Koodi kirjeldus
+Maksetahtaeg: 04-06-26
+Speedwell Estonia AS
+HighStreet.36
+KM maar Maksustatav summa
+24,00%
+0,00%
+KM
+127,25
+96,73
+30,54
+0,00
+30,54
+KM Kokku (KM-ga)
+Kogusumma (EUR)
+223,98
+30,54
+254,52
+(klienditeenindus)
+Reg. No.: 18788768
+(raamatupidamine) KMKR
+75310 Harju maakond, Amail alex keller@sp com
+Eesti
+www.speedwell.ee
+CrestineBank
+Palume: * markida oma maksekorraldusele makstava
+arve number jal kuupaev
+IBAN
+* markida saatelehele saatja nimi
+
+--- PAGE BREAK ---
+
+--- PAGE 2 ---
+Arve number:
+Kliendikood:
+Arve kuupaev:
+Lehekulgede arv:
+07-05-26
+2/2
+Saatelehe Saatja viide Saadetise Lahtekoht/saatja
+number
+kuupaev
+STK-EE003-26-00182 05-05-26 WAW,
+5
+Vahesumma teenuse jârgi-
+OUCWH
+Clara Haas
+Linden erstrase20 CWH
+PL-01-940, Warsaw
+nondoc
+STK-EE003-26-00158 22-04-26 WAW,
+Clara Haas
+OUCWM
+Und denstrasse 20 CWH
+PL-01-940, Warsaw
+STK-EE003-26-00180 30-04-26 ZPE,
+4
+DE-48153,
+STK-EE003-26-00187 05-05-26 VNO,
+Bahnhofstrasse 69
+LT-47214,
+Vahesumma teenuse jârgi-
+Arve
+Sihtkoht/s saaja
+OSL,
+Lena
+MarketRoad67
+NO-0196,
+AMS,
+Teenuse Kaal Osade Standard-
+liik
+nondoc
+Lisateenuste Lisatee- KM/kood Kogusum-
+(Kg) arv hind
+4,00 B
+65,26
+4,00 1 65,26
+17,00 B 1 35,41
+kirjeldus nuste
+tasud
+ma
+(KM-ga)
+B 65,26
+ou
+Het 31A
+RA,
+FUEL
+FUEL
+FUEL
+FUEL
+30,67
+PLUS- 0,80
+31,47
+B 30,67
+B 0,80
+96,73
+96,73
+8,50A 43,91
+12,92 3,10A 16,02
+PLUS- 0,68 0,16A 0,84
+60,77
+TLL,
+EE-13619,
+TLL,
+Ameang3
+EE-13619,
+4,00 B 1 25,18
+17,00 B 2 31,77
+Kokku: EUR: 42,00 5 157,62
+6,04A 31,22
+PLUS- 0,16 0,04A 0,20
+9,25 2,22A 11,47
+42,89
+7,62 A 39,39
+11,20 2,69A 13,89
+PLUS- 0,68 0,16A 0,84
+54,12
+34,89
+66,36
+30,53 157,78
+UMARDAMINE
+A= Kliendi poolt arvutatud tegelik kaal V= Kliendi poolt arvutatud mahukaal B=s Spedaspoolt arvutatud tegelik kaal
+0,01 0,01
+30,54 254,52
+poolt arvutatud mahukaal M: = sega

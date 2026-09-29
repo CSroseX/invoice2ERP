@@ -1,0 +1,11 @@
+Engine: doctr
+Python Version: 3.11.9
+Package Versions: python-doctr=1.1.0, torch=2.14.0
+--------------------------------------------------
+PDF: DU-03.pdf | Status: SUCCESS | Time: 101.97s
+PDF: DU-05.pdf | Status: SUCCESS | Time: 10.01s
+PDF: INV-21.pdf | Status: SUCCESS | Time: 11.98s
+PDF: HLD-10.pdf | Status: SUCCESS | Time: 15.60s
+PDF: INV-37.pdf | Status: SUCCESS | Time: 13.70s
+--------------------------------------------------
+Total Benchmark Execution Time: 154.27s

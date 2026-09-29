@@ -1,0 +1,10 @@
+Python: 3.11.9
+OS: Windows 10
+Packages:
+  paddlepaddle==3.3.1
+  paddleocr==3.7.0
+  surya-ocr==0.22.1
+  python-doctr==1.1.0
+  docling==2.130.0
+  pymupdf==1.28.2
+  pillow==10.4.0

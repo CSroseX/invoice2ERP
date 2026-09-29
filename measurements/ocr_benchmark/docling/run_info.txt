@@ -1,0 +1,11 @@
+Engine: docling
+Python Version: 3.11.9
+Package Versions: docling=2.130.0, docling-core=2.99.0
+--------------------------------------------------
+PDF: DU-03.pdf | Status: SUCCESS | Time: 1092.13s
+PDF: DU-05.pdf | Status: SUCCESS | Time: 93.42s
+PDF: INV-21.pdf | Status: SUCCESS | Time: 309.28s
+PDF: HLD-10.pdf | Status: SUCCESS | Time: 199.06s
+PDF: INV-37.pdf | Status: SUCCESS | Time: 151.99s
+--------------------------------------------------
+Total Benchmark Execution Time: 1847.61s
