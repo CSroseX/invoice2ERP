@@ -76,18 +76,26 @@ st.markdown("""
     .stApp {
         background-color: #0e1117;
         color: #e0e6ed;
+        font-size: 19px;
     }
     html, body, [class*="css"] {
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    p, li, span, label, div[data-testid="stMarkdownContainer"] {
+        font-size: 19px !important;
+        line-height: 1.6;
+    }
+    [data-testid="stCaptionContainer"] {
+        font-size: 16px !important;
     }
     .banner {
         background-color: #161b22;
         border: 1px solid #30363d;
         border-left: 3px solid #38bdf8;
         border-radius: 6px;
-        padding: 10px 16px;
-        font-size: 13px;
-        color: #94a3b8;
+        padding: 14px 20px;
+        font-size: 18px;
+        color: #b8c2cf;
         margin-bottom: 18px;
     }
     .banner a { color: #38bdf8; }
@@ -95,41 +103,57 @@ st.markdown("""
         background-color: #161b22;
         border: 1px solid #30363d;
         border-radius: 8px;
-        padding: 12px 10px;
+        padding: 14px 10px;
         text-align: center;
-        min-height: 70px;
+        min-height: 86px;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
+    .stage-card.selected {
+        border-color: #38bdf8;
+        background-color: #0c4a6e33;
+    }
     .stage-num {
-        font-size: 10px;
+        font-size: 13px;
         font-weight: 700;
-        color: #64748b;
+        color: #7b8caa;
         letter-spacing: 0.5px;
     }
     .stage-name {
-        font-size: 12px;
+        font-size: 17px;
         font-weight: 600;
         color: #f8fafc;
-        margin-top: 2px;
+        margin-top: 4px;
+    }
+    div[data-testid="stButton"] button {
+        font-size: 16px;
+        padding: 5px 12px;
+        background-color: transparent;
+        border: 1px solid #30363d;
+        color: #b8c2cf;
+    }
+    div[data-testid="stButton"] button:hover {
+        border-color: #38bdf8;
+        color: #38bdf8;
     }
     .decision-card {
         background-color: #161b22;
         border: 1px solid #30363d;
         border-radius: 8px;
-        padding: 14px 16px;
+        padding: 18px 20px;
         margin-bottom: 8px;
     }
     .decision-title {
-        font-size: 13px;
+        font-size: 18px;
         font-weight: 700;
         color: #38bdf8;
     }
     .decision-body {
-        font-size: 12px;
-        color: #cbd5e1;
-        margin-top: 4px;
+        font-size: 17px;
+        color: #dbe4ee;
+        margin-top: 6px;
+        line-height: 1.55;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -215,19 +239,32 @@ STAGES = [
     },
 ]
 
+if "selected_stage" not in st.session_state:
+    st.session_state.selected_stage = 0
+
 cols = st.columns(7)
-for i, (col, stage) in enumerate(zip(cols, STAGES), start=1):
+for i, (col, stage) in enumerate(zip(cols, STAGES)):
     with col:
+        is_selected = st.session_state.selected_stage == i
+        card_class = "stage-card selected" if is_selected else "stage-card"
         st.markdown(
-            f'<div class="stage-card"><div class="stage-num">STAGE {i}</div>'
+            f'<div class="{card_class}"><div class="stage-num">STAGE {i + 1}</div>'
             f'<div class="stage-name">{stage["name"]}</div></div>',
             unsafe_allow_html=True,
         )
+        if st.button("Details", key=f"stage_btn_{i}", use_container_width=True):
+            st.session_state.selected_stage = i
+            st.rerun()
 
-for i, stage in enumerate(STAGES, start=1):
-    with st.expander(f"Stage {i}: {stage['name']}"):
-        st.markdown(f"**What it does:** {stage['what']}")
-        st.markdown(f"**Why:** {stage['why']}")
+active = STAGES[st.session_state.selected_stage]
+st.markdown(
+    f'<div class="decision-card" style="margin-top:10px;">'
+    f'<div class="decision-title">Stage {st.session_state.selected_stage + 1}: {active["name"]}</div>'
+    f'<div class="decision-body"><strong>What it does:</strong> {active["what"]}</div>'
+    f'<div class="decision-body" style="margin-top:6px;"><strong>Why:</strong> {active["why"]}</div>'
+    f'</div>',
+    unsafe_allow_html=True,
+)
 
 st.divider()
 
@@ -291,21 +328,22 @@ with col_pdf:
 
         st.image(render_pdf_page_bytes(str(pdf_path), current_page), use_container_width=True)
 
-        nav_prev, nav_label, nav_next = st.columns([1, 2, 1])
-        with nav_prev:
-            if st.button("← Prev", disabled=current_page == 0, key=f"prev_{selected_file}"):
-                st.session_state.page_num[selected_file] = current_page - 1
-                st.rerun()
-        with nav_label:
-            st.markdown(
-                f"<div style='text-align:center; padding-top:6px; color:#94a3b8; font-size:12px;'>"
-                f"Page {current_page + 1} of {page_count}</div>",
-                unsafe_allow_html=True,
-            )
-        with nav_next:
-            if st.button("Next →", disabled=current_page >= page_count - 1, key=f"next_{selected_file}"):
-                st.session_state.page_num[selected_file] = current_page + 1
-                st.rerun()
+        if page_count > 1:
+            nav_prev, nav_label, nav_next = st.columns([1, 2, 1])
+            with nav_prev:
+                if st.button("← Prev", disabled=current_page == 0, key=f"prev_{selected_file}"):
+                    st.session_state.page_num[selected_file] = current_page - 1
+                    st.rerun()
+            with nav_label:
+                st.markdown(
+                    f"<div style='text-align:center; padding-top:8px; color:#b8c2cf; font-size:17px;'>"
+                    f"Page {current_page + 1} of {page_count}</div>",
+                    unsafe_allow_html=True,
+                )
+            with nav_next:
+                if st.button("Next →", disabled=current_page >= page_count - 1, key=f"next_{selected_file}"):
+                    st.session_state.page_num[selected_file] = current_page + 1
+                    st.rerun()
     else:
         st.warning(f"`{selected_file}` not found in `documents/`.")
 
