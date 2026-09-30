@@ -17,7 +17,15 @@ def normalize_token(text: str) -> str:
 
 
 def is_grounded_number(value_str: str, ocr_text: str) -> bool:
-    """Check if a numeric value (e.g. '1234.56', '438.00', '15') appears in OCR text."""
+    """Check if a numeric value (e.g. '1234.56', '438.00', '15') appears in OCR text.
+
+    A value with a genuine fractional part must match that fraction, not just its integer
+    portion — matching only `int(508.148)` -> "508" would let a derived decimal (e.g. a
+    price computed to make totals foot) pass grounding merely because its whole-number
+    portion happens to appear somewhere in the text. Whole numbers printed without decimals
+    (e.g. a bare quantity "4" for extracted value "4.00") are still matched by their integer
+    form, since that is the value genuinely printed, not a truncation of a real fraction.
+    """
     if not value_str or not str(value_str).strip():
         return True  # Empty fields are valid (Rule 30)
 
@@ -25,18 +33,19 @@ def is_grounded_number(value_str: str, ocr_text: str) -> bool:
     if val_norm in ocr_text:
         return True
 
-    # Check alternative decimal formats (e.g., '1234.56' vs '1234,56' vs '1 234,56')
+    # Check alternative decimal/thousands formats (e.g. '1234.56' vs '1234,56' vs '1 234,56'),
+    # and bare-integer printing of a whole-number value (e.g. '4.00' printed as '4').
     try:
         val_float = float(val_norm)
-        # Regex search for numeric matches with dot or comma decimal
-        # E.g. for 438.00 -> search 438,00 or 438.00 or 438
-        int_part = str(int(val_float))
-        if int_part in ocr_text:
+        comma_variant = f"{val_float:.2f}".replace(".", ",")
+        if comma_variant in ocr_text:
+            return True
+        if val_float == int(val_float) and str(int(val_float)) in ocr_text:
             return True
     except ValueError:
         pass
 
-    # Check normalized string token
+    # Check normalized string token (full value, not just the integer part)
     norm_val = normalize_token(val_norm)
     norm_ocr = normalize_token(ocr_text)
 
@@ -61,14 +70,27 @@ def is_grounded_text(value_str: str, ocr_text: str, min_match_ratio: float = 0.6
     return norm_val in norm_ocr
 
 
-def verify_payable_grounding(payable_dict: dict, ocr_text: str) -> tuple[dict, list[str]]:
+def verify_payable_grounding(
+    payable_dict: dict, ocr_text: str, reconciliation_audit: dict | None = None
+) -> tuple[dict, list[str]]:
     """Audit a complete Autodraft Payable payload against OCR layout text.
+
+    `reconciliation_audit` (from src.reconciler.reconcile_payable) names the fields that
+    were deliberately derived rather than copied from the page — e.g. a unit_price rewritten
+    because the document's own subtotal+tax==gross corroborated a rounding gap. Those fields
+    are declared, not silently exempted: they are allowed to differ from the OCR text because
+    the reconciler already recorded why, but every other field still must ground literally.
 
     Returns:
         (sanitized_payable_dict, list_of_ungrounded_warnings)
     """
     warnings = []
     sanitized = dict(payable_dict)
+
+    reconciled_lines = {
+        (rec["line_index"], rec["field"])
+        for rec in (reconciliation_audit or {}).get("line_reconciliations", [])
+    }
 
     # 1. Audit Header Numbers
     for field in ["invoice_number", "gross_total", "subtotal", "total_tax_amount", "po_number"]:
@@ -83,6 +105,8 @@ def verify_payable_grounding(payable_dict: dict, ocr_text: str) -> tuple[dict, l
         for idx, line in enumerate(sanitized["line_items"]):
             san_line = dict(line)
             for l_field in ["quantity", "unit_price", "total", "tax_rate", "tax_amount"]:
+                if (idx, l_field) in reconciled_lines:
+                    continue  # declared reconciliation — see docstring
                 l_val = str(san_line.get(l_field, "") or "").strip()
                 if l_val and not is_grounded_number(l_val, ocr_text):
                     warnings.append(f"UNGROUNDED LINE ITEM [{idx}] '{l_field}': '{l_val}' not found in OCR text.")

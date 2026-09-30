@@ -32,6 +32,7 @@ except ImportError:
 
 from src.classifier import classify_file
 from src.grounding import verify_payable_grounding
+from src.reconciler import reconcile_payable
 from src.ocr_engine import extract_text
 
 load_dotenv(override=True)
@@ -316,7 +317,14 @@ def parse_dot_decimal(val_str: str) -> str:
     elif last_period != -1 and last_comma == -1:
         # Only period present
         pass
-    
+
+    # Period used as BOTH thousands and decimal separator ("28.031.70" -> "28031.70").
+    # Without this, float() raises and the unparseable string is returned verbatim,
+    # which erp.num() later reads as 0.0.
+    if cleaned.count('.') > 1:
+        split_at = cleaned.rfind('.')
+        cleaned = cleaned[:split_at].replace('.', '') + '.' + cleaned[split_at + 1:]
+
     try:
         f = float(cleaned)
         if is_negative:
@@ -1002,8 +1010,11 @@ def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback:
             payable_data = apply_locale_decimal_parsing(payable_data)
             payable_data = apply_fix3_and_fix4_postprocessing(payable_data, ocr_text)
             payable_data = deduplicate_tax_placement(payable_data)
-            grounded_payable, _ = verify_payable_grounding(payable_data, ocr_text)
+            payable_data, reconciliation_audit = reconcile_payable(payable_data)
+            grounded_payable, _ = verify_payable_grounding(payable_data, ocr_text, reconciliation_audit)
             verify_structural_integrity(grounded_payable)
+            if reconciliation_audit:
+                grounded_payable["__reconciliation__"] = reconciliation_audit
             return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
         except Exception as e:
             if not allow_fallback:
