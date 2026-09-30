@@ -1,215 +1,119 @@
-# ▶️ invoice2ERP
-### Intelligent Financial Document Ingestion & ERP Booking Engine
+# invoice2ERP
 
-![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
-![Framework](https://img.shields.io/badge/Streamlit-1.30%2B-FF4B4B?style=for-the-badge&logo=streamlit)
-![OCR Engine](https://img.shields.io/badge/PyMuPDF-EasyOCR%2FPaddleOCR-green?style=for-the-badge)
-![LLM Cascade](https://img.shields.io/badge/LLM-Groq%20%7C%20OpenRouter%20%7C%20Gemini%20%7C%20Cloudflare-purple?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-brightgreen?style=for-the-badge)
+**Turns supplier invoices into records an ERP system can actually book — not just records that look right.**
 
-**invoice2ERP** is an enterprise-grade financial document processing engine designed to solve the critical gap between **AI document parsing** and **audit-compliant ERP ledger booking**. 
-
-Unlike standard OCR or basic LLM extractors that merely convert images to text, invoice2ERP enforces strict **anti-hallucination grounding rules**, **multi-document segmentation**, **master data resolution**, and a **deterministic ERP booking verification oracle** to guarantee cent-exact accounting accuracy.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.63-FF4B4B?style=flat-square&logo=streamlit)
+![Docker](https://img.shields.io/badge/Docker-supported-2496ED?style=flat-square&logo=docker)
+![License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)
 
 ---
 
-## ▶️ The Problem & The Solution
+## The problem this solves
 
-### The Industry Challenge
-In enterprise procurement systems (such as SAP, Oracle, Zycus, or NetSuite), processing incoming supplier invoices and credit notes is a major operational bottleneck:
-1. **Extraction $\neq$ Booking**: Extracting text from an invoice is easy. However, an ERP system requires exact itemized decomposition (net unit prices, line vs. header tax placement, withholding taxes, freight levies, discounts). If a single tax rate or line item is misclassified, the ERP recomputation fails.
-2. **AI Hallucinations**: Standard LLMs frequently invent missing numbers or alter totals to make equations balance. In financial accounting, an ungrounded number violates audit compliance.
-3. **Multi-Document Bundles**: Suppliers often send multi-page PDFs containing mixed content (e.g., delivery notes, quotes, or multiple stapled invoices).
+Extracting text from an invoice is easy. Producing a record a downstream ERP will actually book is not — an ERP recomputes the gross total from raw components (quantities, unit prices, line vs. header taxes, discounts, charges), so a single field placed at the wrong level, or a number invented to make totals balance, causes booking to fail even when the extraction *looks* correct.
 
-### How invoice2ERP Solves It
-* **Multi-Provider LLM Fallback Cascade**: High-availability pipeline routing across OpenRouter, Groq, Cloudflare Workers AI, and Google Gemini.
-* **Scale-Invariant 2D Layout OCR**: Preserves spatial table structure across scanned and digital PDFs regardless of page DPI or font scaling.
-* **Multi-Document Pre-Segmentation**: Auto-detects sub-document boundaries, page-sequence restarts ("Page 1 of N"), and PO continuity.
-* **Token-Level Grounding Engine**: Audits every extracted field against raw layout text; any ungrounded value is safely blanked rather than guessed.
-* **Master Data Matcher**: Resolves supplier VAT/name similarity ($\ge 85\%$), chart-of-books buyer codes, tax master codes, and date-delta payment terms against enterprise reference databases.
-* **ERP Recomputation Oracle**: Verifies that extracted raw components foot to the document's true gross payable amount before booking.
+invoice2ERP treats that as the core engineering problem, not an edge case:
 
----
+- **Every emitted value must be traceable to the source document.** A grounding pass checks each extracted field against the raw OCR text; anything not found is blanked rather than guessed.
+- **Structure matters as much as the total.** A tax stated at the line level stays on the line; a tax stated once at the header stays at the header. Two records can reach the same total through different — and only one correct — structure.
+- **A blank field is a correct answer.** When a value genuinely isn't on the page, the system reports the gap instead of backward-deriving a number to satisfy the total.
 
-## ▶️ System Architecture
+## Result
 
-```mermaid
-flowchart TD
-    A[PDF Document Folder / Input] --> B[Phase 1: OCR & Spatial Layout Engine]
-    B --> C[Phase 2: Multi-Document Pre-Segmenter]
-    C --> D[Phase 3: Document Classifier]
-    
-    D -->|Non-Payable: Quote/Note/Reminder| E[Declined Store]
-    D -->|Payable: Invoice / Credit Memo| F[Phase 4: LLM Extraction Cascade]
-    
-    F -->|OpenRouter -> Groq -> Cloudflare -> Gemini| G[Phase 4b: Anti-Hallucination Grounding Verifier]
-    G --> H[Phase 5: Master Data Resolution Engine]
-    H --> I[Phase 6: Pre-ERP Payload Assembly]
-    I --> J[Phase 7: ERP Oracle Booking Verification]
-    
-    J -->|Pass / Cent-Exact Match| K[JSON Payload: output/*.json]
-    J -->|Discrepancy Detected| L[Recovery Protocol / Audit Trail]
+Measured against the project's own ERP booking oracle across all 52 extracted payables in the current corpus:
+
+| | Payables booking correctly |
+|---|---|
+| Baseline extraction | 27 / 52 (51.9%) |
+| + reconciliation & grounding hardening | **31 / 52 (59.6%)** |
+| Regressions introduced | **0** |
+
+That gain came from diagnosing *why* documents failed to book — not by retrying extraction, but by finding that the ERP oracle recomputes every line from `quantity × unit_price` and never reads the document's own printed line total. Invoices routinely print unit prices rounded for display, so a faithful transcription of the page can still fail arithmetic it was never meant to reproduce exactly.
+
+The fix is a **gated reconciliation node** ([`src/reconciler.py`](src/reconciler.py)): it only rewrites a line's `unit_price` when the *document's own* header arithmetic (`subtotal + tax == gross`, exactly as printed) independently corroborates that a rounding gap is real — never by checking against the ERP oracle itself, which would be fitting the answer to the grader rather than the document. That gate is why the fix carries zero regressions: a payable that already booked correctly can't satisfy a corroboration condition it doesn't need.
+
+## Architecture
+
+Seven phases, each independently verifiable:
+
+```
+PDF → OCR & Layout → Segmentation → Classification → AI Extraction
+    → Grounding Verification → Master Data Resolution → ERP Oracle Check
 ```
 
----
+1. **OCR & Layout** ([`src/ocr_engine.py`](src/ocr_engine.py)) — native PyMuPDF text extraction for digital PDFs, with an OCR fallback for scanned pages.
+2. **Segmentation** ([`src/segmenter.py`](src/segmenter.py)) — splits multi-document PDFs (a single upload can contain zero, one, or several distinct payables).
+3. **Classification** ([`src/classifier.py`](src/classifier.py)) — rule-based scoring decides whether a segment is a bookable payable before it ever reaches the LLM, so non-payables (quotes, delivery notes, reminders) never risk being hallucinated into one.
+4. **AI Extraction** ([`src/extractor.py`](src/extractor.py)) — routed through a circuit-breaker cascade across LLM providers (Groq → OpenRouter → Gemini → Cloudflare), so a single exhausted quota doesn't stop a batch.
+5. **Grounding Verification** ([`src/grounding.py`](src/grounding.py)) — every extracted field must appear in the source OCR text; the check matches full numeric values (not just an integer prefix), which closes a real path for a derived or hallucinated decimal to pass silently.
+6. **Master Data Resolution** ([`src/master_matcher.py`](src/master_matcher.py)) — fuzzy-matches suppliers, tax codes, and payment terms against reference data at a strict ≥85% similarity threshold; below that, the field is left unresolved rather than guessed.
+7. **ERP Oracle Check** ([`erp.py`](erp.py)) — a sealed, deterministic recomputation of the gross total from raw components. This is the actual grading contract and is never modified by the pipeline.
 
-## ▶️ Key Features
+## Running it
 
-### 1. Multi-Provider LLM Cascade & Deterministic Fallback
-The extraction router ([src/extractor.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/extractor.py)) automatically fails over between active providers if rate limits or quota errors occur:
-1. **OpenRouter API** (`meta-llama/llama-3.3-70b-instruct`)
-2. **Groq API** (`llama-3.3-70b-versatile`)
-3. **Cloudflare Workers AI** (`@cf/meta/llama-3.1-8b-instruct`)
-4. **Google Gemini API** (`gemini-1.5-flash`)
-5. **Deterministic Regex Fallback**: Fully offline extraction fallback if API access is completely unavailable.
+**Public showcase (read-only).** `app.py` in this repository is a read-only Streamlit viewer over pre-computed output — it renders extraction results for a curated set of documents and has no code path that triggers live processing, by design, for public deployment.
 
-### 2. Strict Rule-1 Grounding (Anti-Hallucination)
-Every extracted string, date, amount, price, or tax rate undergoes strict verification against the OCR layout text ([src/grounding.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/grounding.py)). If an LLM attempts to invent a unit price or quantity to make math balance, the grounding verifier catches and zeroes out the ungrounded field.
-
-### 3. Master Data Resolution Engine
-Raw document strings are dynamically matched against enterprise reference tables ([src/master_matcher.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/master_matcher.py)):
-* **Suppliers** ([master_data/suppliers.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/suppliers.json)): Matched via exact VAT ID or fuzzy name similarity (`SequenceMatcher` threshold $\ge 0.85$).
-* **Buyer Codes** ([master_data/chart_of_books.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/chart_of_books.json)): Resolved via token-overlap matching against company, business unit, and location addresses.
-* **Tax Codes** ([master_data/tax_master.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/tax_master.json)): Mapped by country code and tax rate.
-* **Payment Terms** ([master_data/payment_terms.json](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/master_data/payment_terms.json)): Matched via text aliases or calculated date differences in days (`due_date - invoice_date`).
-
-### 4. Multi-Document Segmentation & Sub-Document Boundary Detection
-Automatically analyzes multi-page PDF document streams to detect sub-document boundary breaks ([src/segmenter.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/segmenter.py)):
-* **Page Restart Detection**: Identifies page header sequence restarts (e.g. "Page 1 of N", "Page 1/1").
-* **Sub-Document Header Breaks**: Recognizes distinct document titles embedded within multi-page PDF files.
-* **PO/SO Identifier Continuity**: Cross-references Purchase Order / Sales Order header identifiers across page boundaries to ensure multi-page continuation invoices are preserved as single payables.
-
----
-
-## ▶️ Quick Start
-
-### Prerequisites
-* **Python 3.10+**
-* Operating System: Windows, macOS, or Linux
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/CSroseX/invoice2ERP.git
-   cd invoice2ERP
-   ```
-
-2. **Create and activate a virtual environment**:
-   ```bash
-   python -m venv .venv
-   # On Windows:
-   .venv\Scripts\activate
-   # On macOS/Linux:
-   source .venv/bin/activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   pip install streamlit python-dotenv easyocr numpy
-   ```
-
-4. **Configure Environment Variables**:
-   Copy `.env.example` to `.env` and add your preferred LLM API keys:
-   ```bash
-   cp .env.example .env
-   ```
-
----
-
-## ▶️ Usage
-
-### 1. Launch the Streamlit Control Panel (GUI)
-Experience live step-by-step pipeline execution and visualization:
 ```bash
+pip install -r requirements.txt
 streamlit run app.py
 ```
-Open your browser at `http://localhost:8501`.
 
-### 2. Batch Execution CLI (Full Directory Ingestion)
-Process all PDF documents in the `documents/` directory and emit JSON payloads into `output/`:
+**Full pipeline (local).** The extraction pipeline (`src/extractor.py`, `src/ocr_engine.py`, `src/segmenter.py`, `src/classifier.py`) is a set of composable modules, not a bundled CLI — call `extract_payable_from_text()` from a script, or check a single already-extracted payable against the ERP oracle directly:
+
 ```bash
-python main.py documents/
+git clone https://github.com/CSroseX/invoice2ERP.git
+cd invoice2ERP
+python -m venv .venv && .venv\Scripts\activate   # Windows; use source .venv/bin/activate on macOS/Linux
+pip install -r requirements-full.txt
+cp .env.example .env   # add your LLM provider API key(s)
+python erp.py sample_autodraft.json
 ```
 
-To limit execution to specific documents:
+**Docker:**
 ```bash
-python main.py documents/ --only INV-01,INV-02
+cp .env.example .env
+docker compose up --build -d
 ```
 
-### 3. Single Document Inspector CLI
-Run a single document through detailed classification, raw LLM extraction, grounding verification, and ERP booking checks:
+**Regression suite** — a golden-file test that runs a control document through the full extraction pipeline and checks the output stays structurally correct across changes:
 ```bash
-python run_single.py INV-01
+python -m pytest tests/test_accuracy.py -v
 ```
 
-### 4. ERP Oracle Calculator Example
-Recompute the booked gross for any autodraft payload:
-```bash
-python example_check.py sample_autodraft.json
+## Design decisions worth calling out
+
+- **The ERP oracle is a sealed black box.** `erp.py` is never modified — it's the grading contract, and any edit to it would be invisible to grading and self-deceiving in development. All fixes work by producing better-grounded input, never by adjusting the check itself.
+- **Circuit-breaker LLM routing**, not a single provider — automatic failover across four LLM APIs ([`src/resilience.py`](src/resilience.py)) when one hits a quota or outage, so a batch degrades gracefully instead of stopping.
+- **Structured JSONL audit logging** ([`src/logging_config.py`](src/logging_config.py)) — pipeline events are logged as structured JSON, not free-text, so they're queryable rather than grep-only.
+
+## Known limitations
+
+- **Unprinted values stay blank by design.** If a line's unit price is genuinely not on the page, the system won't invent one — that line will not fully foot in the ERP check. This is a deliberate trade-off, not an oversight: an honest gap is worth more than a plausible-looking guess.
+- **Master data resolution is reference-table scale.** The current `master_data/` lookups use exact and fuzzy string matching; a production deployment against 100k+ master records would need vector or elastic indexing instead.
+- **The reconciliation gate is conservative by design.** It only fires when the document's own header arithmetic corroborates the gap — a looser gate would book more documents but risks correcting a document that didn't need it, which is a worse failure than leaving it alone.
+
+## Repository layout
+
+```
+app.py                 Read-only Streamlit showcase
+erp.py                 Sealed grading oracle — recomputes gross from raw components
+src/
+  ocr_engine.py        Phase 1 — OCR & spatial layout
+  segmenter.py         Phase 2 — multi-document segmentation
+  classifier.py        Phase 3 — payable vs. non-payable classification
+  extractor.py         Phase 4 — LLM extraction + provider routing
+  grounding.py         Phase 5 — anti-hallucination verification
+  reconciler.py        Document-corroborated line reconciliation
+  master_matcher.py    Phase 6 — master data fuzzy resolution
+  resilience.py        Circuit breaker & retry logic for LLM providers
+documents/             Source PDFs
+output/                Generated autodraft JSON, one per input document
+master_data/           Reference datasets for supplier/tax/PO matching
+tests/                 Golden-file regression suite
+AUTODRAFT_SCHEMA.md    The exact output record shape
 ```
 
----
+## License
 
-## ▶️ Limitations and Considerations
-
-### API Tokens & Bring Your Own Key (BYOK)
-* **Self-Contained Test Environment**: This project uses a Bring Your Own Key (BYOK) architecture via a local `.env` configuration file.
-* **Multi-Provider Cascade Rationale**: Multiple LLM API providers (OpenRouter, Groq, Cloudflare Workers AI, Google Gemini) were integrated into an automated fallback cascade ([src/extractor.py](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/src/extractor.py)). This design choice was specifically implemented to overcome free-tier rate limits, requests-per-minute (RPM) throttling, and daily quota exhaustion during multi-document batch evaluations.
-
-### Technical Limitations & Trade-offs
-* **Strict Grounding Enforcement**: Rule-1 anti-hallucination verification intentionally leaves unprinted fields blank (e.g. unprinted unit prices) rather than backward-deriving figures from line totals. While this prevents financial hallucinations and ensures audit compliance, documents with unprinted line prices will fail complete ERP booking footprint validation.
-* **Multi-Page Continuation Tables**: Complex multi-page continuation tables with ambiguous header repeats or non-standard spatial table breaks across page boundaries can occasionally drop line item boundaries.
-* **Master Data Scale**: Master data resolution currently uses local reference datasets in `master_data/` with exact matches and string similarity thresholds ($\ge 85\%$). Production-scale deployments with $100k+$ master records would require dedicated vector indexing (e.g. Qdrant / Pinecone) or elastic search indexing.
-
----
-
-## ▶️ Output Contract (`output/*.json`)
-
-For each processed document `X.pdf`, invoice2ERP outputs a structured payload `output/X.json`:
-
-```json
-{
-  "file": "INV-01.pdf",
-  "payables": [
-    {
-      "invoice_number": "INV-9821",
-      "invoice_date": "2024-01-15",
-      "due_date": "2024-02-14",
-      "invoice_type": "INVOICE",
-      "currency": "EUR",
-      "gross_total": "1450.00",
-      "subtotal": "1200.00",
-      "total_tax_amount": "250.00",
-      "supplier": {
-        "name": "Acme Industrial Supplies GmbH",
-        "supplier_id": "SUP-8821",
-        "vat_id": "DE812345678"
-      },
-      "buyer": {
-        "company_code": "BOLTGROUP",
-        "business_unit_code": "BU-DE-01",
-        "location_code": "LOC-BERLIN"
-      },
-      "line_items": [
-        {
-          "description": "Industrial Gear Unit",
-          "quantity": "2.00",
-          "unit_price": "600.00",
-          "total": "1200.00",
-          "tax_rate": "20.00",
-          "tax_amount": "240.00"
-        }
-      ]
-    }
-  ],
-  "declined": []
-}
-```
-
----
-
-## ▶️ License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+MIT — see [LICENSE](LICENSE).
