@@ -1,0 +1,14 @@
+# Full dependency set for local processing (includes OCR engines)
+PyMuPDF>=1.24.0
+Pillow>=10.0.0
+streamlit==1.63.0
+python-dotenv>=1.0.0
+paddleocr>=2.9.0
+paddlepaddle>=2.6.0
+python-doctr>=1.1.0
+docling>=2.130.0
+surya-ocr>=0.22.1
+rapidfuzz>=3.0.0
+google-generativeai>=0.8.0
+pydantic-settings>=2.0.0
+torch>=2.0.0

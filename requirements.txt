@@ -1,18 +1,6 @@
-# PDF rendering
+# Minimal dependencies for the read-only Streamlit showcase
 PyMuPDF>=1.24.0
-
-# OCR
-paddleocr>=2.9.0
-paddlepaddle>=2.6.0
-
-# Image handling
 Pillow>=10.0.0
-
-# Fuzzy matching (Phase 5)
-rapidfuzz>=3.0.0
-
-# Gemini API (Phase 4)
-google-generativeai>=0.8.0
-
-# Config management
+streamlit==1.63.0
 pydantic-settings>=2.0.0
+rapidfuzz>=3.0.0
