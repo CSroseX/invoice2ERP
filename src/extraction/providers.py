@@ -57,11 +57,20 @@ class QuotaExhaustedError(RuntimeError):
     pass
 
 
-@with_retries(max_retries=2, base_delay=2.0)
+class ProviderConfigError(ValueError):
+    """Raised when a provider's API key or client is missing or invalid."""
+    pass
+
+
+# Errors a retry cannot fix: skip the backoff and let the cascade try the next provider.
+NON_RETRYABLE_ERRORS = (QuotaExhaustedError, ProviderConfigError)
+
+
+@with_retries(max_retries=2, base_delay=2.0, no_retry_on=NON_RETRYABLE_ERRORS)
 def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Groq API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
     if not has_groq_key():
-        raise ValueError("settings.groq_api_key is missing or invalid.")
+        raise ProviderConfigError("settings.groq_api_key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
@@ -134,11 +143,11 @@ def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
         raise RuntimeError(f"Groq API Error: {e}") from e
 
 
-@with_retries(max_retries=2, base_delay=2.0)
+@with_retries(max_retries=2, base_delay=2.0, no_retry_on=NON_RETRYABLE_ERRORS)
 def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call OpenRouter API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
     if not has_openrouter_key():
-        raise ValueError("OPEN_ROUTER_API key is missing or invalid.")
+        raise ProviderConfigError("OPEN_ROUTER_API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
@@ -189,12 +198,12 @@ def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
         raise RuntimeError(f"OpenRouter API Error: {e}") from e
 
 
-@with_retries(max_retries=2, base_delay=2.0)
+@with_retries(max_retries=2, base_delay=2.0, no_retry_on=NON_RETRYABLE_ERRORS)
 def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Gemini API directly and return the raw unparsed JSON string response."""
     client = _get_gemini_client()
     if client is None:
-        raise ValueError("Gemini API key is missing or invalid.")
+        raise ProviderConfigError("Gemini API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
@@ -217,11 +226,11 @@ def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dic
         raise e
 
 
-@with_retries(max_retries=2, base_delay=2.0)
+@with_retries(max_retries=2, base_delay=2.0, no_retry_on=NON_RETRYABLE_ERRORS)
 def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Cloudflare Workers AI API via stdlib urllib.request."""
     if not has_cloudflare_key():
-        raise ValueError("CLOUDFLARE_WORKERS_AI key is missing or invalid.")
+        raise ProviderConfigError("CLOUDFLARE_WORKERS_AI key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 

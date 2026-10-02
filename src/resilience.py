@@ -49,9 +49,12 @@ class CircuitBreaker:
             self.state = "OPEN"
 
 
-def with_retries(max_retries: int = 3, base_delay: float = 2.0, max_delay: float = 10.0, exceptions=(Exception,)):
+def with_retries(max_retries: int = 3, base_delay: float = 2.0, max_delay: float = 10.0, exceptions=(Exception,),
+                 no_retry_on=()):
     """
     Decorator for exponential backoff retries.
+    Exceptions matching `no_retry_on` are re-raised immediately: they cannot succeed on a
+    retry (e.g. exhausted quota, missing key), so the caller should move on instead of waiting.
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -61,6 +64,8 @@ def with_retries(max_retries: int = 3, base_delay: float = 2.0, max_delay: float
                 try:
                     return func(*args, **kwargs)
                 except exceptions as e:
+                    if no_retry_on and isinstance(e, no_retry_on):
+                        raise
                     retries += 1
                     if retries > max_retries:
                         logger.error(f"Function {func.__name__} failed after {max_retries} retries: {e}")
