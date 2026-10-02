@@ -1,5 +1,8 @@
 """Unit tests for src/reconciler.py (document-corroborated line reconciliation)."""
+import pytest
+
 from src.reconciler import (
+    _format_price,
     dedupe_charges_against_header_tax,
     detect_self_consistency_gap,
     reconcile_line_items,
@@ -23,7 +26,7 @@ def _payable(**overrides):
 def test_rewrites_unit_price_when_header_corroborates():
     out, records = reconcile_line_items(_payable())
 
-    assert abs(7 * float(out["line_items"][0]["unit_price"]) - 100.00) < 1e-9
+    assert abs(7 * float(out["line_items"][0]["unit_price"]) - 100.00) < 0.005  # books to the cent
     assert len(records) == 1
     assert records[0]["line_index"] == 0
     assert records[0]["before"] == "14.29"
@@ -78,3 +81,14 @@ def test_reconcile_payable_audit_lists_changes():
     _, audit = reconcile_payable(_payable())
     assert "line_reconciliations" in audit
     assert "self_consistency_gap" not in audit
+
+
+def test_derived_unit_price_rounded_to_six_decimals():
+    out, _ = reconcile_line_items(_payable())
+    assert out["line_items"][0]["unit_price"] == "14.285714"  # 100 / 7
+
+
+@pytest.mark.parametrize("value, expected", [(1.6325, "1.6325"), (5.0, "5.00"), (2743.44, "2743.44"),
+                                             (100 / 3, "33.333333")])
+def test_format_price(value, expected):
+    assert _format_price(value) == expected
