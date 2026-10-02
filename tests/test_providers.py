@@ -1,10 +1,11 @@
-"""Offline tests for provider configuration and request handling in src/extractor.py."""
+"""Offline tests for provider configuration and request handling (src/extraction/providers.py)."""
 import io
 import json
 import logging
 
 import pytest
 
+import src.extraction.providers as providers
 import src.extractor as extractor
 from src.config import AppSettings, has_cloudflare_key, has_gemini_key, has_groq_key, has_openrouter_key
 
@@ -52,14 +53,14 @@ def _fake_urlopen(calls):
 ])
 def test_requests_have_timeout_and_do_not_log_document_text(monkeypatch, caplog, capsys, func, key_field, key):
     calls = []
-    monkeypatch.setattr(extractor.settings, key_field, key)
-    monkeypatch.setattr(extractor.urllib.request, "urlopen", _fake_urlopen(calls))
+    monkeypatch.setattr(providers.settings, key_field, key)
+    monkeypatch.setattr(providers.urllib.request, "urlopen", _fake_urlopen(calls))
     secret_text = "IBAN DE89370400440532013000 SECRET-SUPPLIER"
 
-    with caplog.at_level(logging.DEBUG, logger="src.extractor"):
-        getattr(extractor, func)(secret_text, filename="doc.pdf")
+    with caplog.at_level(logging.DEBUG, logger="src.extraction.providers"):
+        getattr(providers, func)(secret_text, filename="doc.pdf")
 
-    assert calls == [extractor.LLM_HTTP_TIMEOUT_SECONDS]
+    assert calls == [providers.LLM_HTTP_TIMEOUT_SECONDS]
     captured = capsys.readouterr()
     assert "SECRET-SUPPLIER" not in captured.out + captured.err
     assert "SECRET-SUPPLIER" not in caplog.text
@@ -77,8 +78,8 @@ def _chat_response(content):
 
 def test_extracted_llm_fields_survive_end_to_end(monkeypatch):
     """Regression: providers return (content, usage); the content must not be discarded."""
-    monkeypatch.setattr(extractor.settings, "open_router_api_key", "sk-test")
-    monkeypatch.setattr(extractor.urllib.request, "urlopen", lambda req, timeout=None: _chat_response(LLM_JSON))
+    monkeypatch.setattr(providers.settings, "open_router_api_key", "sk-test")
+    monkeypatch.setattr(providers.urllib.request, "urlopen", lambda req, timeout=None: _chat_response(LLM_JSON))
 
     payable = extractor.extract_payable_from_text(OCR_TEXT, filename="t.pdf")
 
@@ -87,7 +88,7 @@ def test_extracted_llm_fields_survive_end_to_end(monkeypatch):
 
 def test_groq_json_validation_retry_returns_content_and_usage(monkeypatch):
     responses = iter([
-        extractor.urllib.error.HTTPError(
+        providers.urllib.error.HTTPError(
             "https://api.groq.com", 400, "Bad Request", {}, io.BytesIO(b'{"error": "json_validate_failed"}')
         ),
         _chat_response("```json\n" + LLM_JSON + "\n```"),
@@ -99,10 +100,10 @@ def test_groq_json_validation_retry_returns_content_and_usage(monkeypatch):
             raise r
         return r
 
-    monkeypatch.setattr(extractor.settings, "groq_api_key", "gsk_test")
-    monkeypatch.setattr(extractor.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(providers.settings, "groq_api_key", "gsk_test")
+    monkeypatch.setattr(providers.urllib.request, "urlopen", urlopen)
 
-    content, usage = extractor.call_groq_api(OCR_TEXT)
+    content, usage = providers.call_groq_api(OCR_TEXT)
 
     assert json.loads(content)["invoice_number"] == "INV-42"
     assert usage == {"total_tokens": 7}
@@ -114,10 +115,10 @@ def test_gemini_returns_content_and_usage(monkeypatch):
     fake_client = SimpleNamespace(models=SimpleNamespace(
         generate_content=lambda **kwargs: SimpleNamespace(text=LLM_JSON + "\n")
     ))
-    monkeypatch.setattr(extractor, "_gemini_client", fake_client)
-    monkeypatch.setattr(extractor, "types", SimpleNamespace(GenerateContentConfig=lambda **kwargs: None))
+    monkeypatch.setattr(providers, "_gemini_client", fake_client)
+    monkeypatch.setattr(providers, "types", SimpleNamespace(GenerateContentConfig=lambda **kwargs: None))
 
-    content, usage = extractor.get_raw_gemini_response(OCR_TEXT)
+    content, usage = providers.get_raw_gemini_response(OCR_TEXT)
 
     assert json.loads(content)["invoice_number"] == "INV-42"
     assert usage == {}
