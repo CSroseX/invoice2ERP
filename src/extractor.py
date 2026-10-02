@@ -711,7 +711,7 @@ def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
                     end_idx = content.rfind("}")
                     if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                         content = content[start_idx:end_idx+1]
-                    return content
+                    return content, resp_data.get("usage", {})
             except Exception as retry_err:
                 raise RuntimeError(f"Groq API Call Failed: HTTP 400 - {err_body}") from retry_err
 
@@ -795,7 +795,7 @@ def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dic
                 temperature=0.1,
             )
         )
-        return response.text.strip()
+        return response.text.strip(), {}
     except Exception as e:
         err_msg = str(e)
         if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg or "quota" in err_msg.lower():
@@ -1004,7 +1004,8 @@ def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback:
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
-            raw_json = get_raw_llm_response(ocr_text, filename=filename)
+            raw_json, usage = get_raw_llm_response(ocr_text, filename=filename)
+            logger.info("LLM usage for %s: %s", filename or "DOCUMENT", usage)
             try:
                 payable_data = json.loads(raw_json, strict=False)
             except Exception:
