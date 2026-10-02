@@ -45,7 +45,7 @@ The pipeline runs in 7 sequential phases per document:
 
 3. **Classification** (`src/classifier.py`) — Rule-based heuristics decide if a segment is a bookable payable (INVOICE / CREDIT_MEMO) or not; declined segments never reach the LLM.
 
-4. **AI Extraction + Grounding** (`src/extractor.py`, `src/extraction/`, `src/grounding.py`) — `src/extractor.py` orchestrates; `src/extraction/providers.py` holds the LLM API calls, `postprocessing.py` the deterministic clean-up rules, `fallback.py` the regex extractor, `prompts.py` the system prompt. Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade: Groq → OpenRouter → Gemini → Cloudflare). After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
+4. **AI Extraction + Grounding** (`src/extractor.py`, `src/extraction/`, `src/grounding.py`) — `src/extractor.py` orchestrates; `src/extraction/providers.py` holds the LLM API calls, `postprocessing.py` the deterministic clean-up rules, `fallback.py` the regex extractor, `prompts.py` the system prompt. Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade, cheapest model first: OpenRouter → Cloudflare → Groq → Gemini; see `DEFAULT_PROVIDER_ORDER` in `src/extraction/providers.py`). After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
 
 4b. **Reconciliation** (`src/reconciler.py`, called from `src/extractor.py`) — Gated line-item reconciliation: rewrites a line's `unit_price` when the document's header math is self-consistent (printed `subtotal + total_tax_amount == gross_total`) and that line's `quantity * unit_price` disagrees with its printed total. Also deduplicates charges (drops a header charge field like `excise_duties` when the same amount is stated as a header tax) and detects self-consistency gaps in payable structure. Improved OCR decimal parsing (`parse_dot_decimal`) handles ambiguous period usage (e.g. "28.031.70" as thousands+decimal separators). Grounding verification now skips reconciler-derived fields via optional `reconciliation_audit` parameter, documenting intentional derivations.
 
@@ -70,7 +70,7 @@ CLOUDFLARE_WORKERS_AI=...
 CLOUDFLARE_ACCOUNT_ID=...
 ```
 
-The `primary_provider` field in `AppSettings` controls which provider the circuit breaker tries first.
+The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `OpenRouter`) moves one provider to the front of the cascade; the rest follow the cheapest-first order. Quota (HTTP 429) and missing-key errors skip retries and move straight to the next provider.
 
 ## Key Data Contracts
 

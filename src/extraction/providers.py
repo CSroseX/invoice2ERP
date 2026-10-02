@@ -297,6 +297,14 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[s
         raise RuntimeError(f"Cloudflare Workers AI Error: {e}") from e
 
 
+# Default cascade order, cheapest model first. Paid list prices per 1M input/output tokens
+# for the default models in src/config.py, checked 2026-10-02:
+#   OpenRouter  meta-llama/llama-3.2-3b-instruct   $0.05 / $0.33
+#   Cloudflare  @cf/meta/llama-3.1-8b-instruct     $0.282 / $0.827
+#   Groq        llama-3.3-70b-versatile            $0.59 / $0.79
+#   Gemini      gemini-3.5-flash                   $0.75 / $4.50
+DEFAULT_PROVIDER_ORDER = ("OpenRouter", "Cloudflare", "Groq", "Gemini")
+
 openrouter_breaker = CircuitBreaker("OpenRouter", failure_threshold=2, cooldown_seconds=60)
 groq_breaker = CircuitBreaker("Groq", failure_threshold=2, cooldown_seconds=60)
 cloudflare_breaker = CircuitBreaker("Cloudflare", failure_threshold=2, cooldown_seconds=60)
@@ -350,7 +358,6 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
                 print(f"Gemini API failed ({e}), trying fallback providers...", file=sys.stderr)
         return None
 
-    # Priority mapping
     providers = {
         "OpenRouter": run_openrouter,
         "Groq": run_groq,
@@ -358,9 +365,9 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
         "Cloudflare": run_cloudflare
     }
 
-    # Order providers: put primary_provider first
-    primary = getattr(settings, "primary_provider", "OpenRouter")
-    execution_order = [primary] + [p for p in providers.keys() if p != primary]
+    # Cheapest first; settings.primary_provider (env PRIMARY_PROVIDER) moves one provider to the front.
+    primary = getattr(settings, "primary_provider", DEFAULT_PROVIDER_ORDER[0])
+    execution_order = [p for p in [primary] if p in providers] + [p for p in DEFAULT_PROVIDER_ORDER if p != primary]
 
     for p_name in execution_order:
         result = providers[p_name]()

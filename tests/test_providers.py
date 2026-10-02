@@ -122,3 +122,40 @@ def test_gemini_returns_content_and_usage(monkeypatch):
 
     assert json.loads(content)["invoice_number"] == "INV-42"
     assert usage == {}
+
+
+def _record_cascade(monkeypatch):
+    called = []
+    for name, func in [("OpenRouter", "call_openrouter_api"), ("Groq", "call_groq_api"),
+                       ("Gemini", "get_raw_gemini_response"), ("Cloudflare", "call_cloudflare_workers_ai_api")]:
+        def fail(ocr_text, filename="", _name=name):
+            called.append(_name)
+            raise RuntimeError("down")
+        monkeypatch.setattr(providers, func, fail)
+    for key, value in [("open_router_api_key", "sk"), ("groq_api_key", "gsk_x"), ("cloudflare_workers_ai_key", "cf")]:
+        monkeypatch.setattr(providers.settings, key, value)
+    for breaker in (providers.openrouter_breaker, providers.groq_breaker,
+                    providers.cloudflare_breaker, providers.gemini_breaker):
+        monkeypatch.setattr(breaker, "state", "CLOSED")
+        monkeypatch.setattr(breaker, "failures", 0)
+    return called
+
+
+def test_cascade_tries_cheapest_provider_first(monkeypatch):
+    called = _record_cascade(monkeypatch)
+    monkeypatch.setattr(providers.settings, "primary_provider", "OpenRouter")
+
+    with pytest.raises(RuntimeError, match="All LLM providers"):
+        providers.get_raw_llm_response("text")
+
+    assert called == ["OpenRouter", "Cloudflare", "Groq", "Gemini"]
+
+
+def test_primary_provider_moves_to_front(monkeypatch):
+    called = _record_cascade(monkeypatch)
+    monkeypatch.setattr(providers.settings, "primary_provider", "Groq")
+
+    with pytest.raises(RuntimeError, match="All LLM providers"):
+        providers.get_raw_llm_response("text")
+
+    assert called == ["Groq", "OpenRouter", "Cloudflare", "Gemini"]
