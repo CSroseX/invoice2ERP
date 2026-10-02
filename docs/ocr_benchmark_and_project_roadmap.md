@@ -20,7 +20,7 @@ The primary objective of this project is to build a robust, end-to-end **Invoice
 - **Windows C++ & DLL Isolation**: Resolved OpenMP symbol collisions and `torch\lib\shm.dll` `WinError 127` errors by enforcing deterministic import order and runtime flags (`KMP_DUPLICATE_LIB_OK="TRUE"`).
 
 ### B. Benchmark Harness Implementation
-- Created [`tools/ocr_benchmark/run_engine.py`](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/tools/ocr_benchmark/run_engine.py) to provide:
+- Created [`tools/ocr_benchmark/run_engine.py`](../tools/ocr_benchmark/run_engine.py) to provide:
   - Isolated, sequential single-engine benchmarking.
   - Per-PDF memory management (`gc.collect()`), per-page progress tracking, and latency profiling.
   - Standardized output generation in `measurements/ocr_benchmark/<engine>/` with `run_info.txt`.
@@ -49,12 +49,7 @@ The primary objective of this project is to build a robust, end-to-end **Invoice
    - **Total Runtime**: **1847.61s** (~30 minutes total).
    - **Status**: **Completed (100% Success across all 5 PDFs)**.
 
-5. **Surya OCR (`surya`)**
-   - **Root Cause & Fix**: Identified that `surya-ocr==0.22.1` requires `llama-server.exe` for its `chandra` VLM recognition backend on CPU.
-   - Configured `C:\llama.cpp\llama-server.exe` with `LLAMA_CPP_BINARY`.
-   - Verified model weights download (`datalab-to/surya-ocr-2-gguf`) and confirmed successful extraction of 21 layout blocks on `DU-05.pdf`.
-   - Updated `run_engine.py` to parse Surya 0.22.1's HTML block format.
-   - **Status**: **Integration verified**; 5-document benchmark run pending.
+Surya OCR was evaluated for integration but has been **dropped** from the benchmark; it is not run or compared.
 
 ---
 
@@ -62,34 +57,28 @@ The primary objective of this project is to build a robust, end-to-end **Invoice
 
 | Engine | Method / Architecture | 5-PDF Benchmark Status | Total Runtime | Output Folder |
 | :--- | :--- | :---: | :---: | :--- |
-| **`current`** | Baseline Text Extractor | ✅ Completed | 0.20s | [`measurements/ocr_benchmark/current/`](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/measurements/ocr_benchmark/current) |
-| **`paddle`** | PaddleOCR 3.7 (PP-OCRv6 Det + Rec) | ✅ Completed | 48670.42s | [`measurements/ocr_benchmark/paddle/`](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/measurements/ocr_benchmark/paddle) |
-| **`doctr`** | docTR 1.1.0 (FAST + CRNN-VGG16) | ✅ Completed | 154.27s | [`measurements/ocr_benchmark/doctr/`](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/measurements/ocr_benchmark/doctr) |
-| **`docling`** | Layout Heron + TableFormer + EasyOCR | ✅ Completed | 1847.61s | [`measurements/ocr_benchmark/docling/`](file:///c:/Users/chitr/Desktop/coding/Zycus%20Assignment/candidate_kit/measurements/ocr_benchmark/docling) |
-| **`surya`** | Surya 0.22.1 (VLM via llama.cpp) | ⏳ Ready to Run | — | `measurements/ocr_benchmark/surya/` (Pending) |
+| **`current`** | Baseline Text Extractor | ✅ Completed | 0.20s | [`measurements/ocr_benchmark/current/`](../measurements/ocr_benchmark/current) |
+| **`paddle`** | PaddleOCR 3.7 (PP-OCRv6 Det + Rec) | ✅ Completed | 48670.42s* | [`measurements/ocr_benchmark/paddle/`](../measurements/ocr_benchmark/paddle) |
+| **`doctr`** | docTR 1.1.0 (FAST + CRNN-VGG16) | ✅ Completed | 154.27s | [`measurements/ocr_benchmark/doctr/`](../measurements/ocr_benchmark/doctr) |
+| **`docling`** | Layout Heron + TableFormer + EasyOCR | ✅ Completed | 1847.61s | [`measurements/ocr_benchmark/docling/`](../measurements/ocr_benchmark/docling) |
+
+\* Paddle's total is dominated by one outlier: `run_info.txt` records 46728.52s (~13 h) for `HLD-10.pdf` alone, versus 46–1567s for the other four PDFs. This looks like a stalled or suspended run rather than real inference cost and should be re-measured before Paddle's latency is compared.
 
 ---
 
 ## 4. Next High-Level Steps
 
-### Step 1: Run Final Surya Benchmark (Optional / Recommended)
-- Execute the Surya benchmark across all 5 PDFs:
-  ```powershell
-  python tools/ocr_benchmark/run_engine.py --engine surya
-  ```
-- Generates `measurements/ocr_benchmark/surya/` outputs and `run_info.txt`.
-
-### Step 2: Comparative Quality & Accuracy Analysis
+### Step 1: Comparative Quality & Accuracy Analysis
 - Perform a systematic evaluation across the 5 target PDFs comparing:
   1. **Character Error Rate (CER) / Word Accuracy**: Precision of amounts, dates, and item codes.
   2. **Table & Column Integrity**: Whether line-item columns (Qty, Unit Price, Tax, Line Total) remain aligned or collapse into single strings.
   3. **Multi-page & AWB Handling (`DU-03`)**: Separation of shipping headers vs invoice items.
   4. **Formula & Calculation Preservation (`INV-37`)**: Retaining multipliers and unit rates without distortion.
 
-### Step 3: Architecture Decision & Production Recommendation
+### Step 2: Architecture Decision & Production Recommendation
 - Synthesize findings into a final architectural decision matrix:
   - **Latency vs Quality Trade-off**: Balancing runtime (docTR ~2.5 min vs Docling ~30 min) against structural table understanding.
   - **Selected Engine**: Select the optimal engine (or hybrid strategy: fast text-layer extraction with selective deep OCR fallback).
 
-### Step 4: Pipeline Integration
+### Step 3: Pipeline Integration
 - Integrate the selected engine into the ingestion workflow (`src/extractor.py`, `src/ocr_engine.py`) ensuring zero regression on clean digital PDFs and robust recovery on complex/scanned invoices.
