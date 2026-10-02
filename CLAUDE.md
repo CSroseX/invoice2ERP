@@ -9,11 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 streamlit run app.py
 ```
 
-**Install dependencies:**
+**Install dependencies** (Python 3.12):
 ```bash
-pip install -r requirements.txt
-# For full pipeline (OCR, ML deps):
-pip install -r requirements-full.txt
+pip install -r requirements.txt           # read-only showcase
+pip install -r requirements-full.txt      # full pipeline: EasyOCR + LLM clients
+pip install -r requirements-benchmark.txt # extra OCR engines for tools/ocr_benchmark/ only
 ```
 
 **Run the test suite:**
@@ -39,7 +39,7 @@ cp .env.example .env     # Add your API keys
 
 The pipeline runs in 7 sequential phases per document:
 
-1. **OCR & Layout** (`src/ocr_engine.py`) — PyMuPDF native extraction for digital PDFs; falls back to 300 DPI render + EasyOCR for scanned documents. Caches extracted text in `parsed_files/<stem>.txt`.
+1. **OCR & Layout** (`src/ocr_engine.py`) — PyMuPDF native extraction for digital PDFs; falls back to 300 DPI render + EasyOCR (the only supported OCR engine) for scanned documents. Caches extracted text in `parsed_files/<stem>.txt`.
 
 2. **Segmentation** (`src/segmenter.py`) — Splits multi-document PDFs into individual sub-documents.
 
@@ -93,7 +93,7 @@ The `app.py` Streamlit UI is in **read-only showcase mode** — live processing 
 
 ## Docker
 
-`Dockerfile` / `docker-compose.yml` build the read-only showcase from `requirements.txt` only; they do not include the OCR/ML dependencies needed to run the live pipeline.
+`Dockerfile` is based on `python:3.12-slim`, needs no system packages, and runs as a non-root user with a Streamlit health check. Default target `showcase` (read-only app, `requirements.txt`); `--target full` adds the pipeline dependencies with CPU-only PyTorch. `docker-compose.yml` builds the showcase target.
 
 ## Master Data
 

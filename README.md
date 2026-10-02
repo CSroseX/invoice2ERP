@@ -2,7 +2,7 @@
 
 **Turns supplier invoices into records an ERP system can actually book — not just records that look right.**
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python)
+![Python](https://img.shields.io/badge/Python-3.12-blue?style=flat-square&logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.63-FF4B4B?style=flat-square&logo=streamlit)
 ![Docker](https://img.shields.io/badge/Docker-supported-2496ED?style=flat-square&logo=docker)
 ![License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)
@@ -42,10 +42,10 @@ PDF → OCR & Layout → Segmentation → Classification → AI Extraction
     → Grounding Verification → Master Data Resolution → ERP Oracle Check
 ```
 
-1. **OCR & Layout** ([`src/ocr_engine.py`](src/ocr_engine.py)) — native PyMuPDF text extraction for digital PDFs, with an OCR fallback for scanned pages.
+1. **OCR & Layout** ([`src/ocr_engine.py`](src/ocr_engine.py)) — native PyMuPDF text extraction for digital PDFs, with an EasyOCR fallback for scanned pages.
 2. **Segmentation** ([`src/segmenter.py`](src/segmenter.py)) — splits multi-document PDFs (a single upload can contain zero, one, or several distinct payables).
 3. **Classification** ([`src/classifier.py`](src/classifier.py)) — rule-based scoring decides whether a segment is a bookable payable before it ever reaches the LLM, so non-payables (quotes, delivery notes, reminders) never risk being hallucinated into one.
-4. **AI Extraction** ([`src/extractor.py`](src/extractor.py)) — routed through a circuit-breaker cascade across LLM providers (Groq → OpenRouter → Gemini → Cloudflare), so a single exhausted quota doesn't stop a batch.
+4. **AI Extraction** ([`src/extractor.py`](src/extractor.py)) — routed through a circuit-breaker cascade across LLM providers, cheapest model first (OpenRouter → Cloudflare → Groq → Gemini), so a single exhausted quota doesn't stop a batch.
 5. **Grounding Verification** ([`src/grounding.py`](src/grounding.py)) — every extracted field must appear in the source OCR text; the check matches full numeric values (not just an integer prefix), which closes a real path for a derived or hallucinated decimal to pass silently.
 6. **Master Data Resolution** ([`src/master_matcher.py`](src/master_matcher.py)) — fuzzy-matches suppliers, tax codes, and payment terms against reference data at a strict ≥85% similarity threshold; below that, the field is left unresolved rather than guessed.
 7. **ERP Oracle Check** ([`erp.py`](erp.py)) — a sealed, deterministic recomputation of the gross total from raw components. This is the actual grading contract and is never modified by the pipeline.
@@ -70,15 +70,18 @@ cp .env.example .env   # add your LLM provider API key(s)
 python erp.py sample_autodraft.json
 ```
 
+Supported setup: Python 3.12 on Linux, macOS or Windows, CPU only. Scanned pages are OCR'd with EasyOCR, which installs from pip wheels on all three. The extra engines used by the OCR benchmark are in `requirements-benchmark.txt`.
+
 **Docker:**
 ```bash
 cp .env.example .env
-docker compose up --build -d
+docker compose up --build -d                     # read-only showcase (default target)
+docker build --target full -t invoice2erp:full .  # image with the OCR/LLM pipeline (CPU PyTorch)
 ```
 
-**Regression suite** — a golden-file test that runs a control document through the full extraction pipeline and checks the output stays structurally correct across changes:
+**Tests** — unit tests run offline; the golden-file test that runs a control document through the full pipeline is skipped unless an LLM key is configured:
 ```bash
-python -m pytest tests/test_accuracy.py -v
+python -m pytest tests -v
 ```
 
 ## Design decisions worth calling out

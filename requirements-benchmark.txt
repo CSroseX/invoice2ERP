@@ -1,0 +1,7 @@
+# Extra OCR engines used only by tools/ocr_benchmark/ (not needed to run the pipeline).
+# These have narrower platform support than requirements-full.txt.
+-r requirements-full.txt
+paddleocr>=3.0.0
+paddlepaddle>=3.0.0
+python-doctr>=1.1.0
+docling>=2.130.0

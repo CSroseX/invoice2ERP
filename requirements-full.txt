@@ -1,14 +1,9 @@
-# Full dependency set for local processing (includes OCR engines)
-PyMuPDF>=1.24.0
-Pillow>=10.0.0
-streamlit==1.63.0
+# Full dependency set for running the live pipeline locally (OCR + LLM extraction).
+# Supported: Python 3.12 on Linux, macOS (Intel/Apple Silicon) and Windows; CPU only.
+# For a smaller, CPU-only PyTorch install add:
+#   --extra-index-url https://download.pytorch.org/whl/cpu
+-r requirements.txt
 python-dotenv>=1.0.0
-paddleocr>=2.9.0
-paddlepaddle>=2.6.0
-python-doctr>=1.1.0
-docling>=2.130.0
-surya-ocr>=0.22.1
-rapidfuzz>=3.0.0
-google-generativeai>=0.8.0
-pydantic-settings>=2.0.0
-torch>=2.0.0
+numpy>=1.26
+easyocr>=1.7.2
+google-genai>=1.0.0
