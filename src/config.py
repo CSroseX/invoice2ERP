@@ -31,3 +31,28 @@ def get_settings() -> AppSettings:
     return AppSettings()
 
 settings = get_settings()
+
+
+# ---------------------------------------------------------------------------
+# Provider readiness checks — the single place that decides whether a key is
+# usable. A key containing "<" is a .env.example placeholder ("<your-key>").
+# ---------------------------------------------------------------------------
+
+def _is_real_key(key: str) -> bool:
+    return bool(key) and "<" not in key
+
+
+def has_groq_key(s: AppSettings = settings) -> bool:
+    return _is_real_key(s.groq_api_key) and "gsk_" in s.groq_api_key
+
+
+def has_openrouter_key(s: AppSettings = settings) -> bool:
+    return _is_real_key(s.open_router_api_key)
+
+
+def has_cloudflare_key(s: AppSettings = settings) -> bool:
+    return _is_real_key(s.cloudflare_workers_ai_key)
+
+
+def has_gemini_key(s: AppSettings = settings) -> bool:
+    return _is_real_key(s.gemini_api_key) and "lang-client" not in s.gemini_api_key

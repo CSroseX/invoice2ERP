@@ -1,11 +1,11 @@
 """
-extractor.py — Phase 4: Structured Auto-Draft Extraction via Groq / Gemini API.
+extractor.py — Phase 4: Structured Auto-Draft Extraction via an LLM provider cascade.
 
 Extracts structured header fields, line items, and taxes from OCR layout text
 into autodraft JSON format complying strictly with AUTODRAFT_SCHEMA.md.
 
 Includes:
-- Dual LLM Client Support: Groq API (settings.groq_api_key) & Gemini API (settings.gemini_api_key).
+- Multi-provider LLM cascade (OpenRouter, Groq, Gemini, Cloudflare Workers AI) with circuit breakers.
 - Rule 1 Grounding Verifier (src/grounding.py) to eliminate hallucinations.
 - Rule 8 Prompt Constraint (unprinted unit_price remains blank "").
 - Structural Audit Verifier (tax placement & component decomposition).
@@ -14,13 +14,21 @@ Includes:
 from __future__ import annotations
 
 import json
-import os
-from src.config import settings
+import logging
 import re
 import sys
+from pathlib import Path
 import urllib.error
 import urllib.request
 from dotenv import load_dotenv
+
+from src.config import (
+    settings,
+    has_cloudflare_key,
+    has_gemini_key,
+    has_groq_key,
+    has_openrouter_key,
+)
 
 from src.resilience import CircuitBreaker, with_retries
 try:
@@ -37,15 +45,28 @@ from src.ocr_engine import extract_text
 
 load_dotenv(override=True)
 
-# 1. Groq API Configuration
-# 2. OpenRouter API Configuration
-# 3. Gemini API Configuration
-# 4. Cloudflare Workers AI Configuration
+logger = logging.getLogger(__name__)
 
-if not settings.gemini_api_key or "lang-client" in settings.gemini_api_key or "<" in settings.gemini_api_key:
-    settings.gemini_api_key = os.environ.get("settings.gemini_api_key", "")
+# Upper bound on any single provider HTTP request, so a hung connection cannot stall a batch.
+LLM_HTTP_TIMEOUT_SECONDS = 45
 
-client = genai.Client(api_key=settings.gemini_api_key) if genai and settings.gemini_api_key and "<" not in settings.gemini_api_key else None
+_gemini_client = None
+
+
+def _get_gemini_client():
+    """Build the Gemini client on first use rather than at import time."""
+    global _gemini_client
+    if _gemini_client is None and genai and has_gemini_key():
+        _gemini_client = genai.Client(api_key=settings.gemini_api_key)
+    return _gemini_client
+
+
+def _log_llm_request(provider: str, model: str, filename: str, prompt: str) -> None:
+    """Log request metadata only — never the document text, which carries supplier/bank data."""
+    logger.info(
+        "LLM request: provider=%s model=%s file=%s chars=%d est_tokens=~%d",
+        provider, model, filename or "DOCUMENT", len(prompt), len(prompt) // 4,
+    )
 
 SYSTEM_PROMPT = """
 You are an expert financial invoice parsing system. Convert the provided document OCR layout text into a single JSON object conforming strictly to AUTODRAFT_SCHEMA.md.
@@ -625,17 +646,12 @@ class QuotaExhaustedError(RuntimeError):
 @with_retries(max_retries=2, base_delay=2.0)
 def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Groq API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
-    if not settings.groq_api_key or "gsk_" not in settings.groq_api_key:
+    if not has_groq_key():
         raise ValueError("settings.groq_api_key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
-    print("\n" + "=" * 80, flush=True)
-    print(f"=== EXACT AI INPUT PAYLOAD FED TO GROQ FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {settings.groq_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
-    print("=" * 80, flush=True)
-    print(full_prompt_input, flush=True)
-    print("=" * 80 + "\n", flush=True)
+    _log_llm_request("Groq", settings.groq_model, filename, full_prompt_input)
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     payload = {
@@ -660,7 +676,7 @@ def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     )
 
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=LLM_HTTP_TIMEOUT_SECONDS) as resp:
             resp_data = json.loads(resp.read().decode("utf-8"))
             content = resp_data["choices"][0]["message"]["content"]
             return content.strip(), resp_data.get("usage", {})
@@ -683,7 +699,7 @@ def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
                 method="POST"
             )
             try:
-                with urllib.request.urlopen(req_retry) as resp:
+                with urllib.request.urlopen(req_retry, timeout=LLM_HTTP_TIMEOUT_SECONDS) as resp:
                     resp_data = json.loads(resp.read().decode("utf-8"))
                     content = resp_data["choices"][0]["message"]["content"].strip()
                     # Clean markdown code block or extract JSON substring
@@ -707,15 +723,12 @@ def call_groq_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
 @with_retries(max_retries=2, base_delay=2.0)
 def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call OpenRouter API (OpenAI-compatible Chat Completions) via stdlib urllib.request."""
-    if not settings.open_router_api_key or "<" in settings.open_router_api_key:
+    if not has_openrouter_key():
         raise ValueError("OPEN_ROUTER_API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
-    print("\n" + "=" * 80, flush=True)
-    print(f"=== EXACT AI INPUT PAYLOAD FED TO OPENROUTER FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {settings.open_router_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
-    print("=" * 80, flush=True)
+    _log_llm_request("OpenRouter", settings.open_router_model, filename, full_prompt_input)
 
     url = "https://openrouter.ai/api/v1/chat/completions"
     payload = {
@@ -741,7 +754,7 @@ def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
+        with urllib.request.urlopen(req, timeout=LLM_HTTP_TIMEOUT_SECONDS) as resp:
             resp_data = json.loads(resp.read().decode("utf-8"))
             content = resp_data["choices"][0]["message"]["content"].strip()
             if "```json" in content:
@@ -765,17 +778,13 @@ def call_openrouter_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
 @with_retries(max_retries=2, base_delay=2.0)
 def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Gemini API directly and return the raw unparsed JSON string response."""
-    if not (client and settings.gemini_api_key and "<" not in settings.gemini_api_key and "lang-client" not in settings.gemini_api_key):
+    client = _get_gemini_client()
+    if client is None:
         raise ValueError("Gemini API key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
-    print("\n" + "=" * 80, flush=True)
-    print(f"=== EXACT AI INPUT PAYLOAD FED TO GEMINI FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {settings.gemini_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
-    print("=" * 80, flush=True)
-    print(full_prompt_input, flush=True)
-    print("=" * 80 + "\n", flush=True)
+    _log_llm_request("Gemini", settings.gemini_model, filename, full_prompt_input)
 
     try:
         response = client.models.generate_content(
@@ -797,17 +806,12 @@ def get_raw_gemini_response(ocr_text: str, filename: str = "") -> tuple[str, dic
 @with_retries(max_retries=2, base_delay=2.0)
 def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     """Call Cloudflare Workers AI API via stdlib urllib.request."""
-    if not settings.cloudflare_workers_ai_key or "<" in settings.cloudflare_workers_ai_key:
+    if not has_cloudflare_key():
         raise ValueError("CLOUDFLARE_WORKERS_AI key is missing or invalid.")
 
     full_prompt_input = f"{SYSTEM_PROMPT}\n\nDOCUMENT TEXT:\n{ocr_text}"
 
-    print("\n" + "=" * 80, flush=True)
-    print(f"=== EXACT AI INPUT PAYLOAD FED TO CLOUDFLARE WORKERS AI FOR [{filename or 'DOCUMENT'}] ===", flush=True)
-    print(f"Model Name: {settings.cloudflare_model} | Chars: {len(full_prompt_input)} | Est Tokens: ~{len(full_prompt_input) // 4}", flush=True)
-    print("=" * 80, flush=True)
-    print(full_prompt_input, flush=True)
-    print("=" * 80 + "\n", flush=True)
+    _log_llm_request("Cloudflare", settings.cloudflare_model, filename, full_prompt_input)
 
     if settings.cloudflare_account_id:
         url = f"https://api.cloudflare.com/client/v4/accounts/{settings.cloudflare_account_id}/ai/v1/chat/completions"
@@ -843,7 +847,7 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[s
     )
 
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=LLM_HTTP_TIMEOUT_SECONDS) as resp:
             resp_data = json.loads(resp.read().decode("utf-8"))
             if "choices" in resp_data and resp_data["choices"]:
                 content = resp_data["choices"][0]["message"]["content"].strip()
@@ -880,7 +884,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     
     # Define provider execution blocks
     def run_openrouter():
-        if settings.open_router_api_key and "<" not in settings.open_router_api_key and openrouter_breaker.can_execute():
+        if has_openrouter_key() and openrouter_breaker.can_execute():
             try:
                 res = call_openrouter_api(ocr_text, filename=filename)
                 openrouter_breaker.record_success()
@@ -891,7 +895,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
         return None
 
     def run_groq():
-        if settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key and groq_breaker.can_execute():
+        if has_groq_key() and groq_breaker.can_execute():
             try:
                 res = call_groq_api(ocr_text, filename=filename)
                 groq_breaker.record_success()
@@ -902,7 +906,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
         return None
 
     def run_cloudflare():
-        if settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key and cloudflare_breaker.can_execute():
+        if has_cloudflare_key() and cloudflare_breaker.can_execute():
             try:
                 res = call_cloudflare_workers_ai_api(ocr_text, filename=filename)
                 cloudflare_breaker.record_success()
@@ -993,10 +997,10 @@ def repair_json_string(s: str) -> str:
 
 def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback: bool = False) -> dict:
     """Extract structured autodraft JSON from OCR layout text using OpenRouter, Groq, Cloudflare, or Gemini API."""
-    has_openrouter = bool(settings.open_router_api_key and "<" not in settings.open_router_api_key)
-    has_groq = bool(settings.groq_api_key and "gsk_" in settings.groq_api_key and "<" not in settings.groq_api_key)
-    has_cloudflare = bool(settings.cloudflare_workers_ai_key and "<" not in settings.cloudflare_workers_ai_key)
-    has_gemini = bool(client and settings.gemini_api_key and "<" not in settings.gemini_api_key and "lang-client" not in settings.gemini_api_key)
+    has_openrouter = has_openrouter_key()
+    has_groq = has_groq_key()
+    has_cloudflare = has_cloudflare_key()
+    has_gemini = _get_gemini_client() is not None
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
