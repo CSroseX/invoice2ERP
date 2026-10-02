@@ -51,7 +51,7 @@ The pipeline runs in 7 sequential phases per document:
 
 5. **Master Data Resolution** (`src/master_matcher.py`) — Fuzzy-matches extracted supplier/buyer names against `master_data/*.json` reference files (exact VAT/name match first, then ≥85% similarity via `difflib.SequenceMatcher`).
 
-6. **Payload Assembly** — Resolved payable written to `output/<stem>.json`.
+6. **Payload Assembly** — Resolved payable written to `output/<stem>.json`. `process_document_file` also appends one metadata-only record per document to `logs/audit.jsonl` (provider, model, token usage, outcome per segment, grounding/reconciliation counts, ERP pass) — never document values.
 
 7. **ERP Oracle** (`erp.py`) — Deterministic recompute of the gross total from line items, taxes, discounts, and charges. The output `will_book_gross` must match the document's stated gross within $0.05 for a PASS verdict.
 

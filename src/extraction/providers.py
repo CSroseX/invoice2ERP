@@ -297,6 +297,16 @@ def call_cloudflare_workers_ai_api(ocr_text: str, filename: str = "") -> tuple[s
         raise RuntimeError(f"Cloudflare Workers AI Error: {e}") from e
 
 
+def provider_model(provider: str) -> str:
+    """The configured model name for a provider in the cascade."""
+    return {
+        "OpenRouter": settings.open_router_model,
+        "Cloudflare": settings.cloudflare_model,
+        "Groq": settings.groq_model,
+        "Gemini": settings.gemini_model,
+    }.get(provider, "")
+
+
 # Default cascade order, cheapest model first. Paid list prices per 1M input/output tokens
 # for the default models in src/config.py, checked 2026-10-02:
 #   OpenRouter  meta-llama/llama-3.2-3b-instruct   $0.05 / $0.33
@@ -310,8 +320,11 @@ groq_breaker = CircuitBreaker("Groq", failure_threshold=2, cooldown_seconds=60)
 cloudflare_breaker = CircuitBreaker("Cloudflare", failure_threshold=2, cooldown_seconds=60)
 gemini_breaker = CircuitBreaker("Gemini", failure_threshold=2, cooldown_seconds=60)
 
-def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
-    """Route LLM extraction call dynamically prioritizing settings.primary_provider, then falling back to others."""
+def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict, str]:
+    """Route LLM extraction call dynamically prioritizing settings.primary_provider, then falling back to others.
+
+    Returns (content, usage, provider_name) from the first provider that succeeds.
+    """
     
     # Define provider execution blocks
     def run_openrouter():
@@ -372,6 +385,7 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict]:
     for p_name in execution_order:
         result = providers[p_name]()
         if result is not None:
-            return result
+            content, usage = result
+            return content, usage, p_name
 
     raise RuntimeError("All LLM providers are offline or circuits are OPEN. Cannot extract document.")

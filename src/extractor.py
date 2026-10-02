@@ -18,6 +18,8 @@ from __future__ import annotations
 import json
 import logging
 import sys
+import time
+import uuid
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -33,8 +35,10 @@ from src.extraction.postprocessing import (
     repair_json_string,
     verify_structural_integrity,
 )
-from src.extraction.providers import _get_gemini_client, get_raw_llm_response
+from erp import erp_book, num
+from src.extraction.providers import _get_gemini_client, get_raw_llm_response, provider_model
 from src.grounding import verify_payable_grounding
+from src.logging_config import configure_console_logging, get_audit_logger
 from src.master_matcher import MasterDataMatcher
 from src.ocr_engine import extract_text
 from src.reconciler import reconcile_payable
@@ -47,8 +51,16 @@ logger = logging.getLogger(__name__)
 _matcher = MasterDataMatcher()
 
 
-def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback: bool = False) -> dict:
-    """Extract structured autodraft JSON from OCR layout text using OpenRouter, Groq, Cloudflare, or Gemini API."""
+def extract_payable_from_text(
+    ocr_text: str, filename: str = "", allow_fallback: bool = False, audit: dict | None = None
+) -> dict:
+    """Extract structured autodraft JSON from OCR layout text using OpenRouter, Groq, Cloudflare, or Gemini API.
+
+    If `audit` is a dict, it is filled with run metadata for the audit trail (provider, model,
+    token usage, counts of grounding warnings and reconciliation changes). It never receives
+    document values.
+    """
+    audit = audit if audit is not None else {}
     has_openrouter = has_openrouter_key()
     has_groq = has_groq_key()
     has_cloudflare = has_cloudflare_key()
@@ -56,20 +68,27 @@ def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback:
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
-            raw_json, usage = get_raw_llm_response(ocr_text, filename=filename)
+            raw_json, usage, provider = get_raw_llm_response(ocr_text, filename=filename)
             logger.info("LLM usage for %s: %s", filename or "DOCUMENT", usage)
+            audit.update(provider=provider, model=provider_model(provider), tokens=usage, json_repaired=False)
             try:
                 payable_data = json.loads(raw_json, strict=False)
             except Exception:
                 repaired_str = repair_json_string(raw_json)
                 payable_data = json.loads(repaired_str, strict=False)
+                audit["json_repaired"] = True
             payable_data = apply_currency_stripping(payable_data)
             payable_data = apply_locale_decimal_parsing(payable_data)
             payable_data = apply_fix3_and_fix4_postprocessing(payable_data, ocr_text)
             payable_data = deduplicate_tax_placement(payable_data)
             payable_data, reconciliation_audit = reconcile_payable(payable_data)
-            grounded_payable, _ = verify_payable_grounding(payable_data, ocr_text, reconciliation_audit)
+            grounded_payable, grounding_warnings = verify_payable_grounding(payable_data, ocr_text, reconciliation_audit)
             verify_structural_integrity(grounded_payable)
+            audit.update(
+                grounding_warnings=len(grounding_warnings),
+                reconciliation_changes=len(reconciliation_audit.get("line_reconciliations", []))
+                + len(reconciliation_audit.get("charge_dedup_warnings", [])),
+            )
             if reconciliation_audit:
                 grounded_payable["__reconciliation__"] = reconciliation_audit
             return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
@@ -80,15 +99,27 @@ def extract_payable_from_text(ocr_text: str, filename: str = "", allow_fallback:
 
     if allow_fallback:
         payable_data = deterministic_extract_payable(ocr_text, filename=filename)
-        grounded_payable, _ = verify_payable_grounding(payable_data, ocr_text)
+        grounded_payable, grounding_warnings = verify_payable_grounding(payable_data, ocr_text)
+        audit.update(provider="deterministic_fallback", grounding_warnings=len(grounding_warnings))
         return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
 
     raise ValueError("No valid OPEN_ROUTER_API, settings.groq_api_key, CLOUDFLARE_WORKERS_AI or settings.gemini_api_key configured and allow_fallback=False.")
 
 
+def _erp_pass(payable: dict) -> bool | None:
+    """Whether the ERP oracle books the payable's printed gross (None if no gross was extracted)."""
+    if not str(payable.get("gross_total") or "").strip():
+        return None
+    return abs(erp_book(payable)["will_book_gross"] - num(payable["gross_total"])) < 0.05
+
+
 def process_document_file(pdf_or_txt_path: str | Path) -> dict:
-    """Process a single document PDF or .txt into per-file Autodraft JSON payload with multi-document segmentation."""
+    """Process a single document PDF or .txt into per-file Autodraft JSON payload with multi-document segmentation.
+
+    Writes one metadata-only record per document to the audit trail (logs/audit.jsonl).
+    """
     path = Path(pdf_or_txt_path)
+    started = time.monotonic()
 
     if path.suffix == ".pdf":
         pages = extract_text(str(path))
@@ -102,22 +133,45 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
 
     payables = []
     declined = []
+    segments = []
 
     for idx, seg_text in enumerate(subdoc_texts, 1):
         seg_file_label = f"{file_name}#subdoc{idx}" if len(subdoc_texts) > 1 else file_name
         class_res = classify_document_text(seg_text, filename=seg_file_label)
+        seg_audit = {"segment": idx, "doc_type": class_res.doc_type}
 
         if class_res.is_payable:
             try:
-                payable = extract_payable_from_text(seg_text, filename=seg_file_label)
+                payable = extract_payable_from_text(seg_text, filename=seg_file_label, audit=seg_audit)
                 if class_res.doc_type == "CREDIT_MEMO":
                     payable["invoice_type"] = "CREDIT_MEMO"
                 payables.append(payable)
+                seg_audit.update(outcome="payable", erp_pass=_erp_pass(payable))
             except Exception as e:
                 print(f"Error extracting payable from {seg_file_label}: {e}", file=sys.stderr)
                 declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction failed: {e}"})
+                # Error type only: provider error messages can echo request content.
+                seg_audit.update(outcome="failed", error_type=type(e.__cause__ or e).__name__)
         else:
             declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
+            seg_audit.update(outcome="declined")
+        segments.append(seg_audit)
+
+    outcomes = [s["outcome"] for s in segments]
+    get_audit_logger("invoice2erp.audit").info(
+        "document processed: %s payables=%d declined=%d failed=%d",
+        file_name, outcomes.count("payable"), outcomes.count("declined"), outcomes.count("failed"),
+        extra={
+            "trace_id": uuid.uuid4().hex,
+            "doc_filename": file_name,
+            "status": "failed" if "failed" in outcomes else "ok",
+            "audit": {
+                "event": "document_processed",
+                "duration_s": round(time.monotonic() - started, 3),
+                "segments": segments,
+            },
+        },
+    )
 
     return {
         "file": file_name,
@@ -127,6 +181,7 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
 
 
 if __name__ == "__main__":
+    configure_console_logging()
     if len(sys.argv) < 2:
         print("Usage: python -m src.extractor <pdf_or_txt_path>", file=sys.stderr)
         sys.exit(1)
