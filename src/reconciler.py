@@ -24,6 +24,15 @@ _LINE_TOLERANCE = 0.02
 _CHARGE_FIELDS = ("freight_charges", "insurance_charges", "extra_charges", "excise_duties")
 
 
+def _format_price(value: float) -> str:
+    """Round a derived unit price to 6 decimals, dropping trailing zeros but keeping at least 2
+    ("14.285714", "1.6325", "5.00"). 6 decimals keep quantity x price within a cent of the
+    printed total for any realistic quantity; 2 would reintroduce the rounding gap."""
+    whole, _, frac = f"{value:.6f}".partition(".")
+    frac = frac.rstrip("0").ljust(2, "0")
+    return f"{whole}.{frac}"
+
+
 def _document_self_consistent(payable: dict) -> bool:
     """Gate 1: does the document's own printed subtotal + tax foot to its own printed gross?"""
     sub = str(payable.get("subtotal") or "").strip()
@@ -82,7 +91,7 @@ def reconcile_line_items(payable: dict) -> tuple[dict, list[dict]]:
 
         derived_price = printed_total_val / qty
         new_li = dict(li)
-        new_li["unit_price"] = repr(derived_price)
+        new_li["unit_price"] = _format_price(derived_price)
         new_lines.append(new_li)
         records.append({
             "line_index": idx,

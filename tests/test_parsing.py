@@ -1,7 +1,7 @@
-"""Unit tests for the deterministic number normalisation in src/extractor.py."""
+"""Unit tests for the deterministic number normalisation in src/extraction/postprocessing.py."""
 import pytest
 
-from src.extractor import apply_locale_decimal_parsing, parse_dot_decimal
+from src.extraction.postprocessing import apply_locale_decimal_parsing, parse_dot_decimal
 
 
 @pytest.mark.parametrize("raw, expected", [

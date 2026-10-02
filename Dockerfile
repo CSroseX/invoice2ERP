@@ -1,28 +1,32 @@
-FROM python:3.10-slim
+# Python 3.12 on Debian slim: every dependency ships as a prebuilt wheel for amd64 and arm64,
+# so no system packages or compilers are needed.
+FROM python:3.12-slim AS base
 
-# Install system dependencies required for OCR and generic builds
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    wget \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
+RUN useradd --create-home --uid 10001 app
 WORKDIR /app
 
-# Copy requirements first to leverage Docker layer caching
-COPY requirements.txt .
-
-# Upgrade pip and install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Copy application files
-COPY . .
-
-# Expose Streamlit port
 EXPOSE 8501
-
-# Run the Streamlit application
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=4)"
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+
+# Full pipeline (OCR + LLM extraction):  docker build --target full -t invoice2erp:full .
+# CPU-only PyTorch keeps the image small and runs on any host.
+FROM base AS full
+COPY requirements.txt requirements-full.txt ./
+RUN pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements-full.txt
+COPY --chown=app:app . .
+USER app
+
+
+# Read-only showcase (default target):  docker build -t invoice2erp .
+FROM base AS showcase
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+COPY --chown=app:app . .
+USER app

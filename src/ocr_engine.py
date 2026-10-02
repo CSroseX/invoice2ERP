@@ -1,7 +1,7 @@
 """
 ocr_engine.py — Phase 1: PDF → Raw OCR Text with bounding boxes.
 
-Renders each PDF page to a 300 DPI image via PyMuPDF, then runs OCR (EasyOCR / PaddleOCR)
+Renders each PDF page to a 300 DPI image via PyMuPDF, then runs OCR (EasyOCR)
 or native text extraction to obtain text fragments with spatial coordinates and confidence scores.
 
 Usage:
@@ -25,7 +25,8 @@ import pymupdf as fitz  # PyMuPDF
 
 # ---------------------------------------------------------------------------
 # Lazy OCR Reader initialization
-# Supports EasyOCR (primary for Py 3.14+) and PaddleOCR if available.
+# EasyOCR is the supported engine: it installs from pip wheels on Linux, macOS and
+# Windows and runs on CPU. Other engines are benchmark-only (tools/ocr_benchmark/).
 # ---------------------------------------------------------------------------
 _ocr_instance = None
 _ocr_type = None
@@ -37,17 +38,13 @@ def _get_ocr():
     if _ocr_instance is None:
         try:
             import easyocr
-            _ocr_instance = easyocr.Reader(["en"], gpu=False, verbose=False)
-            _ocr_type = "easyocr"
-        except ImportError:
-            from paddleocr import PaddleOCR
-            _ocr_instance = PaddleOCR(
-                use_angle_cls=True,
-                lang="en",
-                use_gpu=False,
-                show_log=False,
-            )
-            _ocr_type = "paddleocr"
+        except ImportError as e:
+            raise ImportError(
+                "Scanned pages need EasyOCR. Install the full pipeline dependencies: "
+                "pip install -r requirements-full.txt"
+            ) from e
+        _ocr_instance = easyocr.Reader(["en"], gpu=False, verbose=False)
+        _ocr_type = "easyocr"
     return _ocr_instance, _ocr_type
 
 
@@ -90,17 +87,6 @@ def ocr_image(img_array: np.ndarray) -> list[dict]:
                 "bbox": clean_bbox,
                 "confidence": float(prob),
             })
-
-    elif ocr_type == "paddleocr":
-        raw_result = ocr.ocr(img_array, cls=True)
-        if raw_result and raw_result[0] is not None:
-            for line in raw_result[0]:
-                bbox, (text, confidence) = line
-                fragments.append({
-                    "text": text.strip(),
-                    "bbox": bbox,
-                    "confidence": float(confidence),
-                })
 
     return fragments
 

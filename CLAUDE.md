@@ -9,11 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 streamlit run app.py
 ```
 
-**Install dependencies:**
+**Install dependencies** (Python 3.12):
 ```bash
-pip install -r requirements.txt
-# For full pipeline (OCR, ML deps):
-pip install -r requirements-full.txt
+pip install -r requirements.txt           # read-only showcase
+pip install -r requirements-full.txt      # full pipeline: EasyOCR + LLM clients
+pip install -r requirements-benchmark.txt # extra OCR engines for tools/ocr_benchmark/ only
 ```
 
 **Run the test suite:**
@@ -39,19 +39,19 @@ cp .env.example .env     # Add your API keys
 
 The pipeline runs in 7 sequential phases per document:
 
-1. **OCR & Layout** (`src/ocr_engine.py`) — PyMuPDF native extraction for digital PDFs; falls back to 300 DPI render + EasyOCR for scanned documents. Caches extracted text in `parsed_files/<stem>.txt`.
+1. **OCR & Layout** (`src/ocr_engine.py`) — PyMuPDF native extraction for digital PDFs; falls back to 300 DPI render + EasyOCR (the only supported OCR engine) for scanned documents. Caches extracted text in `parsed_files/<stem>.txt`.
 
 2. **Segmentation** (`src/segmenter.py`) — Splits multi-document PDFs into individual sub-documents.
 
 3. **Classification** (`src/classifier.py`) — Rule-based heuristics decide if a segment is a bookable payable (INVOICE / CREDIT_MEMO) or not; declined segments never reach the LLM.
 
-4. **AI Extraction + Grounding** (`src/extractor.py`, `src/grounding.py`) — Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade: Groq → OpenRouter → Gemini → Cloudflare). After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
+4. **AI Extraction + Grounding** (`src/extractor.py`, `src/extraction/`, `src/grounding.py`) — `src/extractor.py` orchestrates; `src/extraction/providers.py` holds the LLM API calls, `postprocessing.py` the deterministic clean-up rules, `fallback.py` the regex extractor, `prompts.py` the system prompt. Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade, cheapest model first: OpenRouter → Cloudflare → Groq → Gemini; see `DEFAULT_PROVIDER_ORDER` in `src/extraction/providers.py`). After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
 
 4b. **Reconciliation** (`src/reconciler.py`, called from `src/extractor.py`) — Gated line-item reconciliation: rewrites a line's `unit_price` when the document's header math is self-consistent (printed `subtotal + total_tax_amount == gross_total`) and that line's `quantity * unit_price` disagrees with its printed total. Also deduplicates charges (drops a header charge field like `excise_duties` when the same amount is stated as a header tax) and detects self-consistency gaps in payable structure. Improved OCR decimal parsing (`parse_dot_decimal`) handles ambiguous period usage (e.g. "28.031.70" as thousands+decimal separators). Grounding verification now skips reconciler-derived fields via optional `reconciliation_audit` parameter, documenting intentional derivations.
 
 5. **Master Data Resolution** (`src/master_matcher.py`) — Fuzzy-matches extracted supplier/buyer names against `master_data/*.json` reference files (exact VAT/name match first, then ≥85% similarity via `difflib.SequenceMatcher`).
 
-6. **Payload Assembly** — Resolved payable written to `output/<stem>.json`.
+6. **Payload Assembly** — Resolved payable written to `output/<stem>.json`. `process_document_file` also appends one metadata-only record per document to `logs/audit.jsonl` (provider, model, token usage, outcome per segment, grounding/reconciliation counts, ERP pass) — never document values.
 
 7. **ERP Oracle** (`erp.py`) — Deterministic recompute of the gross total from line items, taxes, discounts, and charges. The output `will_book_gross` must match the document's stated gross within $0.05 for a PASS verdict.
 
@@ -70,7 +70,7 @@ CLOUDFLARE_WORKERS_AI=...
 CLOUDFLARE_ACCOUNT_ID=...
 ```
 
-The `primary_provider` field in `AppSettings` controls which provider the circuit breaker tries first.
+The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `OpenRouter`) moves one provider to the front of the cascade; the rest follow the cheapest-first order. Quota (HTTP 429) and missing-key errors skip retries and move straight to the next provider.
 
 ## Key Data Contracts
 
@@ -93,7 +93,7 @@ The `app.py` Streamlit UI is in **read-only showcase mode** — live processing 
 
 ## Docker
 
-`Dockerfile` / `docker-compose.yml` build the read-only showcase from `requirements.txt` only; they do not include the OCR/ML dependencies needed to run the live pipeline.
+`Dockerfile` is based on `python:3.12-slim`, needs no system packages, and runs as a non-root user with a Streamlit health check. Default target `showcase` (read-only app, `requirements.txt`); `--target full` adds the pipeline dependencies with CPU-only PyTorch. `docker-compose.yml` builds the showcase target.
 
 ## Master Data
 

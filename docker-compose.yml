@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   invoice2erp:
-    build: .
+    build:
+      context: .
+      target: showcase   # use "full" to include the OCR/LLM pipeline dependencies
     container_name: invoice2erp-app
     ports:
       - "8501:8501"
@@ -17,5 +17,5 @@ services:
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
-      # Overrides can go here, e.g., 
+      # Overrides can go here, e.g.,
       # - PRIMARY_PROVIDER=OpenRouter

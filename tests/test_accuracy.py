@@ -5,7 +5,8 @@ import pytest
 
 from src.classifier import classify_document_text
 from src.config import has_cloudflare_key, has_groq_key, has_openrouter_key
-from src.extractor import _get_gemini_client, process_document_file
+from src.extraction.providers import _get_gemini_client
+from src.extractor import process_document_file
 from src.segmenter import segment_document_text
 
 ROOT = Path(__file__).resolve().parents[1]

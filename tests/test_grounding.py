@@ -30,14 +30,44 @@ def test_fractional_value_does_not_ground_on_integer_prefix():
     assert not is_grounded_number("508.148", "Line total 508 EUR")
 
 
-@pytest.mark.xfail(strict=True, reason="issue #3: normalised substring match crosses separators")
 def test_digits_spread_across_unrelated_tokens_are_not_grounded():
     assert not is_grounded_number("1234.56", "Account 1234 56 ref")
 
 
-@pytest.mark.xfail(strict=True, reason="issue #3: whole numbers match any digit run in the text")
 def test_whole_number_does_not_ground_inside_another_number():
     assert not is_grounded_number("7.00", "Phone +372 555 7123")
+
+
+@pytest.mark.parametrize("value, printed", [
+    ("1234.56", "Total 1,234.56 EUR"),
+    ("1234.56", "Summe 1.234,56"),
+    ("1234.56", "Net 1 234,56"),
+    ("4499.00", "EUR 4.499.00"),    # OCR: dot as both separators
+    ("24.00", "Qty 24,000"),         # 3-decimal quantity
+    ("468.00", "468.0  1000"),       # 1-decimal print
+    ("83.21", "EUR 83 , 21"),        # OCR-spaced separator
+    ("-400.00", "Credit (400.00)"),  # sign printed differently
+    ("0.097958122", "x 0.097958122 = $2.35"),
+])
+def test_printed_spellings_are_grounded(value, printed):
+    assert is_grounded_number(value, printed)
+
+
+@pytest.mark.parametrize("value, printed", [
+    ("16.50", "Total 16.500,40 TRY"),  # misread of 16,500.40
+    ("532.37", "532.370,06 TRY"),
+    ("53.40", "53  40"),               # no separator: not distinguishable from two numbers
+    ("0.52", "Unit 0,521"),            # rounded, not as printed
+])
+def test_values_inside_larger_or_different_numbers_are_not_grounded(value, printed):
+    assert not is_grounded_number(value, printed)
+
+
+def test_header_amount_does_not_ground_as_text():
+    # "1234.56" normalises to "123456", which appears in the IBAN; amounts must ground as numbers.
+    out, warnings = verify_payable_grounding({"gross_total": "1234.56"}, "IBAN DE00 1234 56XX")
+    assert out["gross_total"] == ""
+    assert len(warnings) == 1
 
 
 def test_text_grounding():
