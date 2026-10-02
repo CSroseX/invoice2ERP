@@ -1,6 +1,0 @@
-{
-  "filename": "dlq_test.pdf",
-  "error": "Failed to open file 'dlq_test.pdf' as type pdf.",
-  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\.venv\\Lib\\site-packages\\pymupdf\\__init__.py\", line 3013, in __init__\n    doc = mupdf.fz_open_document_with_stream_and_dir(suffix, fz_stream, archive.this)\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\.venv\\Lib\\site-packages\\pymupdf\\mupdf.py\", line 53426, in fz_open_document_with_stream_and_dir\n    return _mupdf.fz_open_document_with_stream_and_dir(magic, stream, dir)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\npymupdf.mupdf.FzErrorFormat: code=7: no objects found\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\app.py\", line 378, in run_pipeline_generator\n    doc = fitz.open(str(pdf))\n  File \"C:\\Users\\chitr\\Desktop\\coding\\Zycus Assignment\\candidate_kit\\.venv\\Lib\\site-packages\\pymupdf\\__init__.py\", line 3016, in __init__\n    raise FileDataError(f'Failed to open file {filename!r} as type {suffix}.') from e\npymupdf.FileDataError: Failed to open file 'dlq_test.pdf' as type pdf.\n",
-  "partial_trace": []
-}

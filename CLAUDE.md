@@ -16,10 +16,11 @@ pip install -r requirements.txt
 pip install -r requirements-full.txt
 ```
 
-**Run the regression test suite:**
+**Run the test suite:**
 ```bash
-python -m pytest tests/test_accuracy.py -v
+python -m pytest tests -v
 ```
+Unit tests run offline. The live golden-file test (`tests/test_accuracy.py::test_golden_file_extraction`) is skipped unless an LLM provider key is configured, and also needs the OCR dependencies from `requirements-full.txt`.
 
 **Run the ERP oracle directly on a JSON payload:**
 ```bash
@@ -48,13 +49,15 @@ The pipeline runs in 7 sequential phases per document:
 
 4b. **Reconciliation** (`src/reconciler.py`, called from `src/extractor.py`) — Gated line-item reconciliation: rewrites a line's `unit_price` when the document's header math is self-consistent (printed `subtotal + total_tax_amount == gross_total`) and that line's `quantity * unit_price` disagrees with its printed total. Also deduplicates charges (drops a header charge field like `excise_duties` when the same amount is stated as a header tax) and detects self-consistency gaps in payable structure. Improved OCR decimal parsing (`parse_dot_decimal`) handles ambiguous period usage (e.g. "28.031.70" as thousands+decimal separators). Grounding verification now skips reconciler-derived fields via optional `reconciliation_audit` parameter, documenting intentional derivations.
 
-5. **Master Data Resolution** (`src/master_matcher.py`) — Fuzzy-matches extracted supplier/buyer names against `master_data/*.json` reference files (≥85% similarity threshold via `rapidfuzz`).
+5. **Master Data Resolution** (`src/master_matcher.py`) — Fuzzy-matches extracted supplier/buyer names against `master_data/*.json` reference files (exact VAT/name match first, then ≥85% similarity via `difflib.SequenceMatcher`).
 
 6. **Payload Assembly** — Resolved payable written to `output/<stem>.json`.
 
 7. **ERP Oracle** (`erp.py`) — Deterministic recompute of the gross total from line items, taxes, discounts, and charges. The output `will_book_gross` must match the document's stated gross within $0.05 for a PASS verdict.
 
 **Key constraint:** `erp.py` is the grading oracle — it must not be modified. All extraction work must satisfy its exact accounting formula.
+
+**Current accuracy:** the committed `output/*.json` predates the reconciler and gives 27/52 payables passing the ERP oracle (`measurements/payables_baseline.csv`). Commit 2981e70 reports 31/52 after replaying reconciliation and grounding over those payables; the output files have not been regenerated since.
 
 ## Configuration
 
@@ -80,6 +83,17 @@ The `primary_provider` field in `AppSettings` controls which provider the circui
 ## Current State
 
 The `app.py` Streamlit UI is in **read-only showcase mode** — live processing (background workers, sidebar controls) is intentionally disabled. The UI reads from pre-generated `output/*.json` files only. The full processing pipeline code exists in `_process_single_pdf()` but is short-circuited at the top of that function.
+
+## Tools & Measurements
+
+- `tools/measure_payables.py` — replays every payable in `output/*.json` through `erp_book()` offline and writes `measurements/payables_baseline.csv`. Use it to measure accuracy changes; it needs no API keys.
+- `tools/diag_five.py` — prints `erp_book()` internals for named payables, for diagnosing failures.
+- `tools/ocr_benchmark/` — OCR-engine benchmark harness; results in `measurements/ocr_benchmark/`, write-up in `docs/ocr_benchmark_and_project_roadmap.md`.
+- `parsed_files/<stem>.txt` — cached OCR text, usable for offline tests without an OCR engine.
+
+## Docker
+
+`Dockerfile` / `docker-compose.yml` build the read-only showcase from `requirements.txt` only; they do not include the OCR/ML dependencies needed to run the live pipeline.
 
 ## Master Data
 

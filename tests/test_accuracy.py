@@ -1,61 +1,61 @@
 import json
-import pytest
 from pathlib import Path
-from src.extractor import extract_payable_from_text
-from src.ocr_engine import extract_pages, extract_text, is_digital_vector_page
 
-# Paths
+import pytest
+
+from src.classifier import classify_document_text
+from src.config import has_cloudflare_key, has_groq_key, has_openrouter_key
+from src.extractor import _get_gemini_client, process_document_file
+from src.segmenter import segment_document_text
+
+ROOT = Path(__file__).resolve().parents[1]
 GOLDEN_DIR = Path(__file__).parent / "golden_control"
+PARSED_DIR = ROOT / "parsed_files"
+
+# Header fields that must match the golden payload exactly (the schema's real names).
+HEADER_FIELDS = ["invoice_number", "invoice_date", "currency", "gross_total", "total_tax_amount"]
+
 
 def load_json(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-@pytest.mark.parametrize("pdf_filename", [
-    "DU-02.pdf"
-])
-def test_golden_file_extraction(pdf_filename):
+
+def _any_llm_configured() -> bool:
+    return has_openrouter_key() or has_groq_key() or has_cloudflare_key() or _get_gemini_client() is not None
+
+
+@pytest.mark.parametrize("stem", ["DU-02"])
+def test_segmentation_and_classification_match_golden(stem):
+    """Offline: the cached OCR text segments and classifies into the golden payable count.
+
+    Uses parsed_files/<stem>.txt so it needs neither an OCR engine nor an LLM.
     """
-    Golden File Regression Test.
-    Runs the actual extraction pipeline on a control document and compares 
-    the structured output against a known-good expected JSON payload.
+    expected = load_json(GOLDEN_DIR / f"{stem}.expected.json")
+    text = (PARSED_DIR / f"{stem}.txt").read_text(encoding="utf-8")
+
+    segments = segment_document_text(text)
+    payable_segments = [s for s in segments if classify_document_text(s).is_payable]
+
+    assert len(payable_segments) == len(expected["payables"])
+
+
+@pytest.mark.skipif(not _any_llm_configured(), reason="needs an LLM provider key in .env")
+@pytest.mark.parametrize("pdf_filename", ["DU-02.pdf"])
+def test_golden_file_extraction(pdf_filename):
+    """Live golden-file regression test: runs the full pipeline (OCR + real LLM calls) on a
+    control document and compares critical fields per payable against the expected output.
+
+    LLMs are non-deterministic, so only critical structured fields are compared rather than
+    the whole payload. No deterministic fallback is allowed, so an LLM failure fails the test.
     """
     pdf_path = GOLDEN_DIR / pdf_filename
-    expected_path = GOLDEN_DIR / f"{pdf_path.stem}.expected.json"
-    
-    assert pdf_path.exists(), f"Missing control document: {pdf_path}"
-    assert expected_path.exists(), f"Missing expected output: {expected_path}"
-    
-    expected_data = load_json(expected_path)
-    
-    # 1. Run OCR Extraction
-    # We bypass caching here to ensure we test the raw OCR engine if needed, 
-    # but for speed in CI we can just use extract_text
-    ocr_text = extract_text(pdf_path)
-    if isinstance(ocr_text, list):
-        ocr_text = "\n".join(ocr_text)
-    assert len(ocr_text) > 100, "OCR extraction failed or returned too little text"
-    
-    # 2. Run LLM Extraction (Real LLM Call)
-    # This intentionally hits the LLM to verify prompt/model integrity
-    payable = extract_payable_from_text(ocr_text, filename=pdf_filename, allow_fallback=True)
-    
-    # 3. Compare Outputs
-    # Since LLMs are non-deterministic, we check critical structured fields
-    # rather than a direct string-to-string match.
-    
-    # Check Header Fields
-    assert payable.get("invoice_id") == expected_data.get("invoice_id")
-    assert payable.get("invoice_date") == expected_data.get("invoice_date")
-    assert payable.get("currency") == expected_data.get("currency")
-    
-    # Check Financials (These must match exactly or grounding failed)
-    assert payable.get("gross_amount") == expected_data.get("gross_amount")
-    assert payable.get("tax_amount") == expected_data.get("tax_amount")
-    
-    # Check Line Items count
-    assert len(payable.get("line_items", [])) == len(expected_data.get("line_items", []))
-    
-    # Ensure token metadata was injected by our Cost Tracking patch
-    tokens = payable.pop("__tokens__", None)
-    assert tokens is not None, "Tokens metadata failed to inject into payload"
+    expected = load_json(GOLDEN_DIR / f"{pdf_path.stem}.expected.json")
+
+    result = process_document_file(pdf_path)
+
+    assert len(result["payables"]) == len(expected["payables"])
+    for got, want in zip(result["payables"], expected["payables"]):
+        for field in HEADER_FIELDS:
+            assert got.get(field) == want.get(field), f"{want.get('invoice_number')}: {field}"
+        assert len(got.get("line_items", [])) == len(want.get("line_items", []))
