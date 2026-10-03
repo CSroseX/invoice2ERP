@@ -61,6 +61,8 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+The sidebar also has a **Needs review** view (`?view=review`) listing every output item that needs a person: segments whose extraction failed, payables the pipeline flagged with `__review__`, and payables the ERP oracle does not book at their printed gross. It shows the PDF page beside the extracted fields. Decisions (Approve / Reject / Needs re-run, with a note) are appended to `review/decisions.jsonl`, but only when the app is started with `INVOICE2ERP_REVIEW_EDIT=1`; the public deployment shows the controls disabled.
+
 **Full pipeline (local).** The extraction pipeline (`src/extractor.py`, `src/ocr_engine.py`, `src/segmenter.py`, `src/classifier.py`) is a set of composable modules, not a bundled CLI — call `extract_payable_from_text()` from a script, or check a single already-extracted payable against the ERP oracle directly:
 
 ```bash
@@ -112,6 +114,7 @@ src/
   reconciler.py        Document-corroborated line reconciliation
   master_matcher.py    Phase 6 — master data fuzzy resolution
   resilience.py        Circuit breaker & retry logic for LLM providers
+  review.py            Review queue + decisions behind the app's "Needs review" view
 documents/             Source PDFs
 output/                Generated autodraft JSON, one per input document
 master_data/           Reference datasets for supplier/tax/PO matching

@@ -5,6 +5,10 @@ Public, read-only Streamlit deployment. Renders pre-computed pipeline output
 (output/*.json) for a curated set of documents. Does not run live processing —
 the full pipeline (src/extractor.py, src/ocr_engine.py, etc.) is unaffected and
 runnable locally, but this UI has no path that invokes it.
+
+A second view, "Needs review" (sidebar, or ?view=review), lists every output item
+that needs a human (src/review.py). Recording decisions is disabled unless the
+INVOICE2ERP_REVIEW_EDIT=1 env var is set, so the public deployment stays read-only.
 """
 from __future__ import annotations
 
@@ -17,6 +21,8 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
 import pymupdf as fitz
+
+from src import review
 
 CURATED_FILES = [
     "DU-02.pdf",
@@ -60,6 +66,135 @@ def load_autodraft_json_for(pdf_name: str) -> dict | None:
 def non_empty_items(d: dict) -> dict:
     """Filter a flat dict down to fields with a non-empty value, for a readable key/value view."""
     return {k: v for k, v in d.items() if str(v or "").strip()}
+
+
+def render_payable(p: dict, show_gross: bool = False) -> None:
+    """Header fields, line items and the full payload of one extracted payable."""
+    header_fields = {
+        "Invoice #": p.get("invoice_number"),
+        "Type": p.get("invoice_type"),
+        "Date": p.get("invoice_date"),
+        "Currency": p.get("currency"),
+        "Supplier": (p.get("supplier") or {}).get("name"),
+        "Buyer Company Code": (p.get("buyer") or {}).get("company_code"),
+    }
+    if show_gross:
+        header_fields |= {
+            "Gross total": p.get("gross_total"),
+            "Subtotal": p.get("subtotal"),
+            "Total tax": p.get("total_tax_amount"),
+        }
+    for label, val in non_empty_items(header_fields).items():
+        st.markdown(f"**{label}:** {val}")
+
+    line_items = [li for li in (p.get("line_items") or []) if isinstance(li, dict)]
+    if line_items:
+        st.markdown(f"**Line Items ({len(line_items)}):**")
+        display_rows = [non_empty_items(li) for li in line_items]
+        st.dataframe(display_rows, use_container_width=True, hide_index=True)
+
+    with st.expander("Full extracted payload"):
+        st.json(non_empty_items(p) | {
+            k: v for k, v in p.items()
+            if isinstance(v, (list, dict)) and v
+        })
+
+
+@st.cache_data(show_spinner=False, ttl=60)
+def load_review_items() -> list[review.ReviewItem]:
+    return review.collect_review_items(Path("output"))
+
+
+def render_review_page() -> None:
+    """The "Needs review" view: every output item that needs a human, plus the decisions recorded so far."""
+    st.markdown("# 🔎 Needs review")
+    st.markdown(
+        "Every document in `output/` with a failed extraction, a payable the pipeline flagged for "
+        "review (`__review__`), or a payable the ERP oracle does not book at its printed gross."
+    )
+
+    items = load_review_items()
+    counts = review.category_counts(items)
+    count_cols = st.columns(len(review.CATEGORIES) + 1)
+    count_cols[0].metric("Items", len(items))
+    for col, (cat, label) in zip(count_cols[1:], review.CATEGORIES.items()):
+        col.metric(label, counts[cat])
+
+    if not items:
+        st.success("Nothing needs review.")
+        return
+
+    decisions = review.latest_decisions()
+    shown_cats = st.multiselect(
+        "Categories", options=list(review.CATEGORIES), default=list(review.CATEGORIES),
+        format_func=review.CATEGORIES.get, key="review_categories",
+    )
+    shown = [i for i in items if set(i.categories) & set(shown_cats)]
+    st.dataframe(
+        [
+            {
+                "File": i.file,
+                "Item": i.label.split(" · ", 1)[1],
+                "Category": ", ".join(review.CATEGORIES[c] for c in i.categories),
+                "Reasons": "; ".join(i.reasons),
+                "Latest decision": (decisions.get(i.key) or {}).get("decision", ""),
+            }
+            for i in shown
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+    if not shown:
+        return
+
+    by_key = {i.key: i for i in shown}
+    item = by_key[st.selectbox("Item", list(by_key), format_func=lambda k: by_key[k].label, key="review_item")]
+    st.markdown(f"**Category:** {', '.join(review.CATEGORIES[c] for c in item.categories)}")
+    for reason in item.reasons:
+        st.markdown(f"- {reason}")
+
+    col_pdf, col_data = st.columns([1, 1])
+    with col_pdf:
+        pdf_path = Path("documents") / item.file
+        if pdf_path.exists():
+            page_count = get_pdf_page_count(str(pdf_path))
+            page = 1
+            if page_count > 1:
+                page = st.number_input(
+                    f"Page (of {page_count})", min_value=1, max_value=page_count, value=1,
+                    key=f"review_page_{item.key}",
+                )
+            st.image(render_pdf_page_bytes(str(pdf_path), int(page) - 1), use_container_width=True)
+        else:
+            st.warning(f"`{item.file}` not found in `documents/`.")
+    with col_data:
+        if item.payable is not None:
+            render_payable(item.payable, show_gross=True)
+        else:
+            st.markdown("**No payable was extracted from this segment.**")
+            st.json(item.entry or {})
+
+    st.markdown("### Decision")
+    latest = decisions.get(item.key)
+    if latest:
+        note = f" — {latest['note']}" if latest.get("note") else ""
+        st.markdown(f"**Latest:** {latest['decision']} ({latest.get('timestamp', '')}){note}")
+    else:
+        st.markdown("**Latest:** no decision recorded yet.")
+
+    can_edit = review.review_edit_enabled()
+    if not can_edit:
+        st.caption(
+            f"This is a read-only showcase, so decisions are disabled. To record them locally, "
+            f"run the app with `{review.EDIT_ENV_VAR}=1`; they are appended to `review/decisions.jsonl`."
+        )
+    with st.form(key=f"decision_form_{item.key}", clear_on_submit=True):
+        decision = st.radio("Decision", review.DECISIONS, horizontal=True, disabled=not can_edit)
+        note = st.text_area("Note", disabled=not can_edit)
+        submitted = st.form_submit_button("Record decision", disabled=not can_edit)
+    if submitted and can_edit:
+        review.record_decision(item, decision, note)
+        st.rerun()
 
 
 # ---------------------------------------------------------------------------
@@ -157,6 +292,19 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# VIEW SWITCH — "Needs review" renders its own page and stops here
+# ---------------------------------------------------------------------------
+VIEWS = ("Showcase", "Needs review")
+if "view" not in st.session_state:
+    st.session_state.view = VIEWS[1] if st.query_params.get("view") == "review" else VIEWS[0]
+view = st.sidebar.radio("View", VIEWS, key="view")
+if view == VIEWS[1]:
+    st.query_params["view"] = "review"
+    render_review_page()
+    st.stop()
+st.query_params.pop("view", None)
 
 # ---------------------------------------------------------------------------
 # HERO
@@ -384,29 +532,7 @@ with col_data:
             else:
                 idx = 0
 
-            p = payables[idx]
-            header_fields = {
-                "Invoice #": p.get("invoice_number"),
-                "Type": p.get("invoice_type"),
-                "Date": p.get("invoice_date"),
-                "Currency": p.get("currency"),
-                "Supplier": (p.get("supplier") or {}).get("name"),
-                "Buyer Company Code": (p.get("buyer") or {}).get("company_code"),
-            }
-            for label, val in non_empty_items(header_fields).items():
-                st.markdown(f"**{label}:** {val}")
-
-            line_items = [li for li in (p.get("line_items") or []) if isinstance(li, dict)]
-            if line_items:
-                st.markdown(f"**Line Items ({len(line_items)}):**")
-                display_rows = [non_empty_items(li) for li in line_items]
-                st.dataframe(display_rows, use_container_width=True, hide_index=True)
-
-            with st.expander("Full extracted payload"):
-                st.json(non_empty_items(p) | {
-                    k: v for k, v in p.items()
-                    if isinstance(v, (list, dict)) and v
-                })
+            render_payable(payables[idx])
         elif not failed:
             st.info("This document produced no payables and no decline record.")
 
