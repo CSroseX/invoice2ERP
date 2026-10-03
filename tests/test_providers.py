@@ -124,6 +124,21 @@ def test_gemini_returns_content_and_usage(monkeypatch):
     assert usage == {}
 
 
+def test_gemini_client_gets_request_timeout(monkeypatch):
+    from types import SimpleNamespace
+
+    built = []
+    fake_genai = SimpleNamespace(Client=lambda **kwargs: built.append(kwargs) or "client")
+    monkeypatch.setattr(providers, "genai", fake_genai)
+    monkeypatch.setattr(providers, "types", SimpleNamespace(HttpOptions=lambda **kwargs: kwargs))
+    monkeypatch.setattr(providers, "_gemini_client", None)
+    monkeypatch.setattr(providers.settings, "gemini_api_key", "AIza-test")
+
+    assert providers._get_gemini_client() == "client"
+    # google-genai takes the timeout in milliseconds.
+    assert built[0]["http_options"] == {"timeout": providers.LLM_HTTP_TIMEOUT_SECONDS * 1000}
+
+
 def _record_cascade(monkeypatch):
     called = []
     for name, func in [("OpenRouter", "call_openrouter_api"), ("Groq", "call_groq_api"),

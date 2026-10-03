@@ -40,7 +40,11 @@ def _get_gemini_client():
     """Build the Gemini client on first use rather than at import time."""
     global _gemini_client
     if _gemini_client is None and genai and has_gemini_key():
-        _gemini_client = genai.Client(api_key=settings.gemini_api_key)
+        # google-genai takes the request timeout in milliseconds.
+        _gemini_client = genai.Client(
+            api_key=settings.gemini_api_key,
+            http_options=types.HttpOptions(timeout=LLM_HTTP_TIMEOUT_SECONDS * 1000),
+        )
     return _gemini_client
 
 

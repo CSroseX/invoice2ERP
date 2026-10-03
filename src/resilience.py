@@ -1,5 +1,6 @@
 import time
 import logging
+import threading
 from typing import Callable, Any
 from functools import wraps
 
@@ -11,6 +12,9 @@ class CircuitBreaker:
     CLOSED -> normal operation.
     OPEN -> fails fast, skips execution for a cooldown period.
     HALF_OPEN -> tests if the downstream service has recovered.
+
+    State transitions are guarded by a lock, so one breaker can be shared by worker threads.
+    Breaker state is per-process and in memory only: it resets when the process restarts.
     """
     def __init__(self, name: str, failure_threshold: int = 3, cooldown_seconds: int = 120):
         self.name = name
@@ -20,33 +24,37 @@ class CircuitBreaker:
         self.failures = 0
         self.last_failure_time = 0
         self.state = "CLOSED"
-    
+        self._lock = threading.Lock()
+
     def can_execute(self) -> bool:
-        if self.state == "CLOSED":
-            return True
-        if self.state == "OPEN":
-            if time.time() - self.last_failure_time > self.cooldown_seconds:
-                self.state = "HALF_OPEN"
-                logger.info(f"Circuit Breaker [{self.name}] entered HALF_OPEN state.")
+        with self._lock:
+            if self.state == "CLOSED":
                 return True
-            return False
-        if self.state == "HALF_OPEN":
+            if self.state == "OPEN":
+                if time.time() - self.last_failure_time > self.cooldown_seconds:
+                    self.state = "HALF_OPEN"
+                    logger.info(f"Circuit Breaker [{self.name}] entered HALF_OPEN state.")
+                    return True
+                return False
+            if self.state == "HALF_OPEN":
+                return True
             return True
-        return True
 
     def record_success(self):
-        if self.state != "CLOSED":
-            logger.info(f"Circuit Breaker [{self.name}] entered CLOSED state (recovered).")
-        self.failures = 0
-        self.state = "CLOSED"
+        with self._lock:
+            if self.state != "CLOSED":
+                logger.info(f"Circuit Breaker [{self.name}] entered CLOSED state (recovered).")
+            self.failures = 0
+            self.state = "CLOSED"
 
     def record_failure(self):
-        self.failures += 1
-        self.last_failure_time = time.time()
-        if self.state == "HALF_OPEN" or self.failures >= self.failure_threshold:
-            if self.state != "OPEN":
-                logger.warning(f"Circuit Breaker [{self.name}] entered OPEN state. Skipping for {self.cooldown_seconds}s.")
-            self.state = "OPEN"
+        with self._lock:
+            self.failures += 1
+            self.last_failure_time = time.time()
+            if self.state == "HALF_OPEN" or self.failures >= self.failure_threshold:
+                if self.state != "OPEN":
+                    logger.warning(f"Circuit Breaker [{self.name}] entered OPEN state. Skipping for {self.cooldown_seconds}s.")
+                self.state = "OPEN"
 
 
 def with_retries(max_retries: int = 3, base_delay: float = 2.0, max_delay: float = 10.0, exceptions=(Exception,),
