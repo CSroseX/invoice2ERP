@@ -137,7 +137,8 @@ def extract_payable_from_text(
                 grounded_payable["__review__"] = {
                     "needed": True,
                     "reasons": [
-                        f"llm_response_truncated: repaired JSON after {len(providers_tried)} providers"
+                        f"llm_response_truncated: repaired JSON after {len(providers_tried)} "
+                        f"provider{'s' if len(providers_tried) != 1 else ''}"
                     ],
                 }
             return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
