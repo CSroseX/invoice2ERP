@@ -353,6 +353,14 @@ with col_data:
     else:
         declined = data.get("declined", [])
         payables = data.get("payables", [])
+        failed = data.get("failed", [])  # absent in output files written before #8
+
+        if failed:
+            st.warning(
+                f"{len(failed)} segment(s) failed extraction (an LLM or processing error, "
+                "not a classifier decision): "
+                + "; ".join(f.get("reason", "No reason recorded.") for f in failed)
+            )
 
         if declined and not payables:
             st.markdown("**Classifier decision: declined**")
@@ -399,7 +407,7 @@ with col_data:
                     k: v for k, v in p.items()
                     if isinstance(v, (list, dict)) and v
                 })
-        else:
+        elif not failed:
             st.info("This document produced no payables and no decline record.")
 
 st.divider()

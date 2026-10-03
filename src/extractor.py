@@ -182,6 +182,7 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
 
     payables = []
     declined = []
+    failed = []
     segments = []
 
     for idx, seg_text in enumerate(subdoc_texts, 1):
@@ -198,9 +199,15 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
                 seg_audit.update(outcome="payable", erp_pass=_erp_pass(payable))
             except Exception as e:
                 print(f"Error extracting payable from {seg_file_label}: {e}", file=sys.stderr)
-                declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction failed: {e}"})
                 # Error type only: provider error messages can echo request content.
-                seg_audit.update(outcome="failed", error_type=type(e.__cause__ or e).__name__)
+                error_type = type(e.__cause__ or e).__name__
+                failed.append({
+                    "segment": idx,
+                    "doc_type": class_res.doc_type,
+                    "error_type": error_type,
+                    "reason": f"Extraction failed ({error_type}); see the processing log for details",
+                })
+                seg_audit.update(outcome="failed", error_type=error_type)
         else:
             declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
             seg_audit.update(outcome="declined")
@@ -225,7 +232,8 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
     return {
         "file": file_name,
         "payables": payables,
-        "declined": declined
+        "declined": declined,
+        "failed": failed,
     }
 
 

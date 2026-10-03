@@ -50,6 +50,8 @@ PDF → OCR & Layout → Segmentation → Classification → AI Extraction
 6. **Master Data Resolution** ([`src/master_matcher.py`](src/master_matcher.py)) — fuzzy-matches suppliers, tax codes, and payment terms against reference data at a strict ≥85% similarity threshold; below that, the field is left unresolved rather than guessed.
 7. **ERP Oracle Check** ([`erp.py`](erp.py)) — a sealed, deterministic recomputation of the gross total from raw components. This is the actual grading contract and is never modified by the pipeline.
 
+Each input document yields one `output/<stem>.json`: `{"file", "payables", "declined", "failed"}`. `declined` lists segments the classifier judged not to be payables; `failed` lists segments whose extraction errored (provider outage, unparseable response), so a processing failure is never mistaken for a document decision. The full shape is in [`AUTODRAFT_SCHEMA.md`](AUTODRAFT_SCHEMA.md).
+
 ## Running it
 
 **Public showcase (read-only).** `app.py` in this repository is a read-only Streamlit viewer over pre-computed output — it renders extraction results for a curated set of documents and has no code path that triggers live processing, by design, for public deployment.

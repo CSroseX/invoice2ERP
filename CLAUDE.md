@@ -75,7 +75,7 @@ The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `
 ## Key Data Contracts
 
 - **Input**: PDFs in `documents/`
-- **Output**: `output/<stem>.json` with `{"file": str, "payables": [...], "declined": [...]}`
+- **Output**: `output/<stem>.json` with `{"file": str, "payables": [...], "declined": [...], "failed": [...]}` — `declined` holds classifier decisions (not a payable), `failed` holds extraction errors (`{"segment", "doc_type", "error_type", "reason"}`, no raw error text). Older output files have no `failed` key; readers must default it to `[]`.
 - **Payable schema**: Documented in `AUTODRAFT_SCHEMA.md`
 - **Sample payload**: `sample_autodraft.json`
 - **ERP pass condition**: `abs(erp_book(p)["will_book_gross"] - float(p["gross_total"])) < 0.05`
