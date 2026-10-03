@@ -97,6 +97,22 @@ The record the ERP consumes. You emit **one payable object per bookable payable*
   | `po_id` | `po_master.json` |
 - **Ground every value** to the document; leave unknown fields empty rather than inventing them.
 
+## Pipeline metadata keys
+
+The pipeline may add keys wrapped in double underscores to a payable. They describe how the payable was produced, are not document values, and are ignored by `erp.py`:
+
+- **`__reconciliation__`** — what the reconciler changed (`src/reconciler.py`), e.g. a rewritten line `unit_price` or a dropped duplicate charge.
+- **`__review__`** — present when the payable must be checked by a person before booking:
+
+  ```jsonc
+  "__review__": {
+    "needed": true,
+    "reasons": ["llm_response_truncated: repaired JSON after 4 providers"]
+  }
+  ```
+
+  `llm_response_truncated` means every LLM provider in the cascade returned JSON that only parsed after repair (usually output cut off mid-array, which can drop line items), so the first repaired response was kept. The key is absent when no review is needed.
+
 ## Checking your work
 
 Feed one payable to the oracle:

@@ -51,6 +51,46 @@ logger = logging.getLogger(__name__)
 _matcher = MasterDataMatcher()
 
 
+def _get_parsed_llm_payable(ocr_text: str, filename: str) -> tuple[dict | None, dict, str, list]:
+    """Call the provider cascade until one provider returns JSON that parses without repair.
+
+    A response that only parses after repair_json_string() was usually cut off mid-output
+    (a repaired truncation silently drops line items), so the same payload is retried on
+    every provider not yet tried. Returns (payable, usage, provider, tried), where tried is
+    [(provider, raw_json, usage), ...] in call order; payable is None if no provider
+    returned clean JSON.
+    """
+    tried: list[tuple[str, str, dict]] = []
+    while True:
+        try:
+            raw_json, usage, provider = get_raw_llm_response(
+                ocr_text, filename=filename, exclude=[name for name, _, _ in tried]
+            )
+        except RuntimeError:
+            if not tried:
+                raise
+            return None, {}, "", tried  # every remaining provider failed or none are left
+        tried.append((provider, raw_json, usage))
+        try:
+            return json.loads(raw_json, strict=False), usage, provider, tried
+        except Exception:
+            logger.warning(
+                "LLM response from %s for %s needs JSON repair; retrying on other providers",
+                provider, filename or "DOCUMENT",
+            )
+
+
+def _repair_first(tried: list[tuple[str, str, dict]]) -> tuple[dict, dict, str]:
+    """Parse the first response that repair_json_string() can turn into valid JSON."""
+    error: Exception | None = None
+    for provider, raw_json, usage in tried:
+        try:
+            return json.loads(repair_json_string(raw_json), strict=False), usage, provider
+        except Exception as e:
+            error = error or e
+    raise error
+
+
 def extract_payable_from_text(
     ocr_text: str, filename: str = "", allow_fallback: bool = False, audit: dict | None = None
 ) -> dict:
@@ -68,15 +108,17 @@ def extract_payable_from_text(
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
-            raw_json, usage, provider = get_raw_llm_response(ocr_text, filename=filename)
+            payable_data, usage, provider, providers_tried = _get_parsed_llm_payable(ocr_text, filename)
+            json_repaired = payable_data is None
+            if json_repaired:
+                # No provider returned clean JSON: keep the first repairable response, flag it for review.
+                payable_data, usage, provider = _repair_first(providers_tried)
             logger.info("LLM usage for %s: %s", filename or "DOCUMENT", usage)
-            audit.update(provider=provider, model=provider_model(provider), tokens=usage, json_repaired=False)
-            try:
-                payable_data = json.loads(raw_json, strict=False)
-            except Exception:
-                repaired_str = repair_json_string(raw_json)
-                payable_data = json.loads(repaired_str, strict=False)
-                audit["json_repaired"] = True
+            audit.update(
+                provider=provider, model=provider_model(provider), tokens=usage, json_repaired=json_repaired,
+                providers_tried=[name for name, _, _ in providers_tried],
+                json_repair_retries=len(providers_tried) - 1, needs_review=json_repaired,
+            )
             payable_data = apply_currency_stripping(payable_data)
             payable_data = apply_locale_decimal_parsing(payable_data)
             payable_data = apply_fix3_and_fix4_postprocessing(payable_data, ocr_text)
@@ -91,6 +133,13 @@ def extract_payable_from_text(
             )
             if reconciliation_audit:
                 grounded_payable["__reconciliation__"] = reconciliation_audit
+            if json_repaired:
+                grounded_payable["__review__"] = {
+                    "needed": True,
+                    "reasons": [
+                        f"llm_response_truncated: repaired JSON after {len(providers_tried)} providers"
+                    ],
+                }
             return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
         except Exception as e:
             if not allow_fallback:

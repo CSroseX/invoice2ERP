@@ -10,6 +10,7 @@ import logging
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Iterable
 
 from src.config import (
     settings,
@@ -324,10 +325,13 @@ groq_breaker = CircuitBreaker("Groq", failure_threshold=2, cooldown_seconds=60)
 cloudflare_breaker = CircuitBreaker("Cloudflare", failure_threshold=2, cooldown_seconds=60)
 gemini_breaker = CircuitBreaker("Gemini", failure_threshold=2, cooldown_seconds=60)
 
-def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict, str]:
+def get_raw_llm_response(
+    ocr_text: str, filename: str = "", exclude: Iterable[str] = ()
+) -> tuple[str, dict, str]:
     """Route LLM extraction call dynamically prioritizing settings.primary_provider, then falling back to others.
 
     Returns (content, usage, provider_name) from the first provider that succeeds.
+    Providers named in `exclude` are skipped (e.g. ones already tried for this document).
     """
     
     # Define provider execution blocks
@@ -385,6 +389,8 @@ def get_raw_llm_response(ocr_text: str, filename: str = "") -> tuple[str, dict, 
     # Cheapest first; settings.primary_provider (env PRIMARY_PROVIDER) moves one provider to the front.
     primary = getattr(settings, "primary_provider", DEFAULT_PROVIDER_ORDER[0])
     execution_order = [p for p in [primary] if p in providers] + [p for p in DEFAULT_PROVIDER_ORDER if p != primary]
+    skipped = set(exclude)
+    execution_order = [p for p in execution_order if p not in skipped]
 
     for p_name in execution_order:
         result = providers[p_name]()
