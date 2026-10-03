@@ -65,3 +65,23 @@ def test_missing_key_is_not_retried(monkeypatch, sleeps):
     with pytest.raises(providers.ProviderConfigError):
         providers.call_groq_api("text")
     assert sleeps == []
+
+
+def test_circuit_breaker_counts_concurrent_failures():
+    import threading
+
+    breaker = resilience.CircuitBreaker("test", failure_threshold=3)
+
+    def fail_many():
+        for _ in range(500):
+            breaker.record_failure()
+
+    threads = [threading.Thread(target=fail_many) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert breaker.failures == 8 * 500
+    assert breaker.state == "OPEN"
+    assert not breaker.can_execute()

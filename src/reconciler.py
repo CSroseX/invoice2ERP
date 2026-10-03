@@ -8,8 +8,9 @@ This module rewrites a line's unit_price ONLY when the document's own arithmetic
 the residual is real: subtotal + total_tax_amount == gross_total, exactly as the document
 states them. That corroboration is the independent fact required before a correction fires
 (a payable already correct never satisfies gate 1, so this node cannot regress it). It never
-calls erp_book — an unprinted number chosen to satisfy the oracle is exactly what Rule 1
-forbids.
+uses erp_book to choose a number — an unprinted number chosen to satisfy the oracle is exactly
+what Rule 1 forbids. Charge de-duplication calls erp_book only as evidence for dropping a
+printed charge that the printed gross shows is double-counted.
 
 Reuses num()/round2() from erp.py rather than reimplementing decimal parsing.
 """
@@ -17,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from erp import num, round2
+from erp import erp_book, num, round2
 
 _TOLERANCE = 0.05
 _LINE_TOLERANCE = 0.02
@@ -109,14 +110,22 @@ def reconcile_line_items(payable: dict) -> tuple[dict, list[dict]]:
 
 
 def dedupe_charges_against_header_tax(payable: dict) -> tuple[dict, list[dict]]:
-    """Drop a header-level charge field when the same amount is also stated as a header tax.
+    """Drop a header-level charge field when the same amount is also stated as a header tax
+    and the charge is provably double-counted.
 
-    Keeps the placement the document itself uses (the header tax) and blanks the duplicate
-    charge field rather than guessing which one is "real" — the document already told us.
+    A matching amount alone is not proof: a genuine freight charge can coincidentally equal
+    the tax. The charge is dropped only when the payable books the document's printed gross
+    without it and does not book it with it. No number is invented — the choice is between
+    two printed values. Without a printed gross the charge is kept.
     """
     warnings: list[dict] = []
     taxes = payable.get("taxes")
     if not isinstance(taxes, list) or not taxes:
+        return payable, warnings
+
+    printed_gross = num(payable.get("gross_total"))
+    if printed_gross == 0:
+        # Missing or unparseable gross: no evidence either way, so keep every charge.
         return payable, warnings
 
     tax_amounts = []
@@ -134,7 +143,12 @@ def dedupe_charges_against_header_tax(payable: dict) -> tuple[dict, list[dict]]:
         charge_val = num(reconciled.get(field))
         if charge_val == 0:
             continue
-        if any(abs(charge_val - ta) < _TOLERANCE for ta in tax_amounts):
+        if not any(abs(charge_val - ta) < _TOLERANCE for ta in tax_amounts):
+            continue
+        without_charge = {**reconciled, field: ""}
+        foots_with = abs(erp_book(reconciled)["will_book_gross"] - printed_gross) < _TOLERANCE
+        foots_without = abs(erp_book(without_charge)["will_book_gross"] - printed_gross) < _TOLERANCE
+        if foots_without and not foots_with:
             warnings.append({
                 "field": field,
                 "value": reconciled.get(field),
