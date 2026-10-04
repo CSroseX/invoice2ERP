@@ -360,8 +360,8 @@ STAGES = [
     },
     {
         "name": "AI Extraction",
-        "what": "Routes OCR text to an LLM provider through a circuit-breaker cascade (Groq → "
-               "OpenRouter → Gemini → Cloudflare) to extract structured fields.",
+        "what": "Routes OCR text to an LLM provider through a circuit-breaker cascade, cheapest "
+               "model first (OpenRouter → Cloudflare → Groq → Gemini), to extract structured fields.",
         "why": "A cascade rather than a single provider means one API outage or exhausted quota "
                "doesn't stop the pipeline.",
     },
