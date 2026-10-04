@@ -1,5 +1,6 @@
 import time
 import logging
+import threading
 from typing import Callable, Any
 from functools import wraps
 
@@ -10,7 +11,14 @@ class CircuitBreaker:
     State machine for preventing cascading failures.
     CLOSED -> normal operation.
     OPEN -> fails fast, skips execution for a cooldown period.
-    HALF_OPEN -> tests if the downstream service has recovered.
+    HALF_OPEN -> lets a single probe call through to test whether the service has recovered.
+
+    Thread-safe: state changes happen under a lock, and only one caller gets the HALF_OPEN
+    probe, so concurrent workers don't all hit a provider that may still be down. A probe
+    that never reports back is treated as abandoned after another cooldown period.
+
+    State lives in memory and is per process: it resets when the process restarts and is not
+    shared between worker processes.
     """
     def __init__(self, name: str, failure_threshold: int = 3, cooldown_seconds: int = 120):
         self.name = name
@@ -20,33 +28,42 @@ class CircuitBreaker:
         self.failures = 0
         self.last_failure_time = 0
         self.state = "CLOSED"
+        self._probe_started_at = None
+        self._lock = threading.Lock()
     
     def can_execute(self) -> bool:
-        if self.state == "CLOSED":
-            return True
-        if self.state == "OPEN":
-            if time.time() - self.last_failure_time > self.cooldown_seconds:
+        with self._lock:
+            now = time.time()
+            if self.state == "OPEN":
+                if now - self.last_failure_time <= self.cooldown_seconds:
+                    return False
                 self.state = "HALF_OPEN"
                 logger.info(f"Circuit Breaker [{self.name}] entered HALF_OPEN state.")
-                return True
-            return False
-        if self.state == "HALF_OPEN":
+            if self.state == "HALF_OPEN":
+                probe_abandoned = (self._probe_started_at is not None
+                                   and now - self._probe_started_at > self.cooldown_seconds)
+                if self._probe_started_at is not None and not probe_abandoned:
+                    return False
+                self._probe_started_at = now
             return True
-        return True
 
     def record_success(self):
-        if self.state != "CLOSED":
-            logger.info(f"Circuit Breaker [{self.name}] entered CLOSED state (recovered).")
-        self.failures = 0
-        self.state = "CLOSED"
+        with self._lock:
+            if self.state != "CLOSED":
+                logger.info(f"Circuit Breaker [{self.name}] entered CLOSED state (recovered).")
+            self.failures = 0
+            self.state = "CLOSED"
+            self._probe_started_at = None
 
     def record_failure(self):
-        self.failures += 1
-        self.last_failure_time = time.time()
-        if self.state == "HALF_OPEN" or self.failures >= self.failure_threshold:
-            if self.state != "OPEN":
-                logger.warning(f"Circuit Breaker [{self.name}] entered OPEN state. Skipping for {self.cooldown_seconds}s.")
-            self.state = "OPEN"
+        with self._lock:
+            self.failures += 1
+            self.last_failure_time = time.time()
+            self._probe_started_at = None
+            if self.state == "HALF_OPEN" or self.failures >= self.failure_threshold:
+                if self.state != "OPEN":
+                    logger.warning(f"Circuit Breaker [{self.name}] entered OPEN state. Skipping for {self.cooldown_seconds}s.")
+                self.state = "OPEN"
 
 
 def with_retries(max_retries: int = 3, base_delay: float = 2.0, max_delay: float = 10.0, exceptions=(Exception,),

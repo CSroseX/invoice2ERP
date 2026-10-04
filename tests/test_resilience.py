@@ -65,3 +65,48 @@ def test_missing_key_is_not_retried(monkeypatch, sleeps):
     with pytest.raises(providers.ProviderConfigError):
         providers.call_groq_api("text")
     assert sleeps == []
+
+
+def test_breaker_opens_and_recovers_after_cooldown(monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr(resilience.time, "time", lambda: now[0])
+    breaker = resilience.CircuitBreaker("test", failure_threshold=2, cooldown_seconds=60)
+
+    breaker.record_failure()
+    assert breaker.can_execute()
+    breaker.record_failure()
+    assert breaker.state == "OPEN"
+    assert not breaker.can_execute()
+
+    now[0] += 61
+    assert breaker.can_execute()
+    assert breaker.state == "HALF_OPEN"
+    breaker.record_success()
+    assert breaker.state == "CLOSED"
+
+
+def test_half_open_lets_only_one_probe_through(monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr(resilience.time, "time", lambda: now[0])
+    breaker = resilience.CircuitBreaker("test", failure_threshold=1, cooldown_seconds=60)
+    breaker.record_failure()
+
+    now[0] += 61
+    assert breaker.can_execute()
+    assert not breaker.can_execute()  # a second worker must not probe as well
+
+    breaker.record_failure()  # the probe failed: back to OPEN for a full cooldown
+    assert breaker.state == "OPEN"
+    assert not breaker.can_execute()
+
+
+def test_abandoned_probe_is_replaced_after_cooldown(monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr(resilience.time, "time", lambda: now[0])
+    breaker = resilience.CircuitBreaker("test", failure_threshold=1, cooldown_seconds=60)
+    breaker.record_failure()
+
+    now[0] += 61
+    assert breaker.can_execute()  # this probe never reports back
+    now[0] += 61
+    assert breaker.can_execute()
