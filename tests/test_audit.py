@@ -65,6 +65,7 @@ def test_one_metadata_record_per_document(monkeypatch, tmp_path):
     assert seg["model"] == providers.settings.open_router_model
     assert seg["tokens"] == {"total_tokens": 11}
     assert seg["json_repaired"] is False
+    assert seg["needs_review"] is False
     assert seg["erp_pass"] is True
     # Metadata only: no document values in the audit trail.
     for secret in ("INV-777\"", "Secretco", "DE89370400440532013000", "100.00"):

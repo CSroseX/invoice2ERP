@@ -45,7 +45,7 @@ The pipeline runs in 7 sequential phases per document:
 
 3. **Classification** (`src/classifier.py`) — Rule-based heuristics decide if a segment is a bookable payable (INVOICE / CREDIT_MEMO) or not; declined segments never reach the LLM.
 
-4. **AI Extraction + Grounding** (`src/extractor.py`, `src/extraction/`, `src/grounding.py`) — `src/extractor.py` orchestrates; `src/extraction/providers.py` holds the LLM API calls, `postprocessing.py` the deterministic clean-up rules, `fallback.py` the regex extractor, `prompts.py` the system prompt. Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade, cheapest model first: OpenRouter → Cloudflare → Groq → Gemini; see `DEFAULT_PROVIDER_ORDER` in `src/extraction/providers.py`). After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
+4. **AI Extraction + Grounding** (`src/extractor.py`, `src/extraction/`, `src/grounding.py`) — `src/extractor.py` orchestrates; `src/extraction/providers.py` holds the LLM API calls, `postprocessing.py` the deterministic clean-up rules, `fallback.py` the regex extractor, `prompts.py` the system prompt. Routes OCR text to an LLM provider via `src/resilience.py` (circuit-breaker cascade, cheapest model first: OpenRouter → Cloudflare → Groq → Gemini; see `DEFAULT_PROVIDER_ORDER` in `src/extraction/providers.py`). A response that only parses after JSON repair (usually truncated output) is retried on the providers not yet tried; if none returns clean JSON, the first repaired payable is kept and flagged with `__review__`. After extraction, `grounding.py` verifies every extracted field appears verbatim in the source text; ungrounded fields are blanked rather than kept.
 
 4b. **Reconciliation** (`src/reconciler.py`, called from `src/extractor.py`) — Gated line-item reconciliation: rewrites a line's `unit_price` when the document's header math is self-consistent (printed `subtotal + total_tax_amount == gross_total`) and that line's `quantity * unit_price` disagrees with its printed total. Also deduplicates charges (drops a header charge field like `excise_duties` when the same amount is stated as a header tax) and detects self-consistency gaps in payable structure. Improved OCR decimal parsing (`parse_dot_decimal`) handles ambiguous period usage (e.g. "28.031.70" as thousands+decimal separators). Grounding verification now skips reconciler-derived fields via optional `reconciliation_audit` parameter, documenting intentional derivations.
 
@@ -75,7 +75,7 @@ The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `
 ## Key Data Contracts
 
 - **Input**: PDFs in `documents/`
-- **Output**: `output/<stem>.json` with `{"file": str, "payables": [...], "declined": [...]}`
+- **Output**: `output/<stem>.json` with `{"file": str, "payables": [...], "declined": [...], "failed": [...]}` — `declined` holds classifier decisions (not a payable), `failed` holds extraction errors (`{"segment", "doc_type", "error_type", "reason"}`, no raw error text). Older output files have no `failed` key; readers must default it to `[]`.
 - **Payable schema**: Documented in `AUTODRAFT_SCHEMA.md`
 - **Sample payload**: `sample_autodraft.json`
 - **ERP pass condition**: `abs(erp_book(p)["will_book_gross"] - float(p["gross_total"])) < 0.05`
@@ -83,6 +83,8 @@ The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `
 ## Current State
 
 The `app.py` Streamlit UI is in **read-only showcase mode** — live processing (background workers, sidebar controls) is intentionally disabled. The UI reads from pre-generated `output/*.json` files only. The full processing pipeline code exists in `_process_single_pdf()` but is short-circuited at the top of that function.
+
+The app has two views, switched in the sidebar: **Showcase** (curated documents, `CURATED_FILES`) and **Needs review** (`?view=review`), which lists every item in `output/*.json` with `failed` entries, a `__review__.needed` payable, or a payable failing the ERP oracle, with counts per category, the PDF page next to the extracted fields, and the latest human decision. The loading/classification and decision logic lives in `src/review.py` (tested offline in `tests/test_review.py`). Recording decisions (Approve / Reject / Needs re-run + note, appended to the git-ignored `review/decisions.jsonl`) is only enabled when `INVOICE2ERP_REVIEW_EDIT=1` is set; otherwise the controls are shown disabled.
 
 ## Tools & Measurements
 

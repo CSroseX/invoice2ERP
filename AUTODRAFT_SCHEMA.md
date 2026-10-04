@@ -8,9 +8,13 @@ The record the ERP consumes. You emit **one payable object per bookable payable*
 {
   "file": "X.pdf",
   "payables": [ <payable>, ... ],   // 0..N
-  "declined": [ { "doc_type": "...", "reason": "..." }, ... ]
+  "declined": [ { "doc_type": "...", "reason": "..." }, ... ],
+  "failed":   [ { "segment": 1, "doc_type": "INVOICE", "error_type": "RuntimeError", "reason": "..." }, ... ]
 }
 ```
+
+- **`declined`** — segments the classifier decided are not bookable payables (quotes, delivery notes, reminders). This is a decision about the document.
+- **`failed`** — segments classified as payables whose extraction raised an error (LLM provider outage, unparseable response, ...). This is a processing failure: re-running may produce a payable. `segment` is the 1-based segment index within the file, `error_type` the exception class name, and `reason` a fixed summary — never the raw error message, which can echo document text. Output files written before this key existed have no `failed` list; treat it as empty.
 
 ## A payable
 
@@ -96,6 +100,22 @@ The record the ERP consumes. You emit **one payable object per bookable payable*
   | `payment_term_id` | `payment_terms.json` |
   | `po_id` | `po_master.json` |
 - **Ground every value** to the document; leave unknown fields empty rather than inventing them.
+
+## Pipeline metadata keys
+
+The pipeline may add keys wrapped in double underscores to a payable. They describe how the payable was produced, are not document values, and are ignored by `erp.py`:
+
+- **`__reconciliation__`** — what the reconciler changed (`src/reconciler.py`), e.g. a rewritten line `unit_price` or a dropped duplicate charge.
+- **`__review__`** — present when the payable must be checked by a person before booking:
+
+  ```jsonc
+  "__review__": {
+    "needed": true,
+    "reasons": ["llm_response_truncated: repaired JSON after 4 providers"]
+  }
+  ```
+
+  `llm_response_truncated` means every LLM provider in the cascade returned JSON that only parsed after repair (usually output cut off mid-array, which can drop line items), so the first repaired response was kept. The key is absent when no review is needed.
 
 ## Checking your work
 
