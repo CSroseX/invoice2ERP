@@ -66,19 +66,20 @@ Surya OCR was evaluated for integration but has been **dropped** from the benchm
 
 ---
 
-## 4. Next High-Level Steps
+## 4. Decision and Status
 
-### Step 1: Comparative Quality & Accuracy Analysis
-- Perform a systematic evaluation across the 5 target PDFs comparing:
-  1. **Character Error Rate (CER) / Word Accuracy**: Precision of amounts, dates, and item codes.
-  2. **Table & Column Integrity**: Whether line-item columns (Qty, Unit Price, Tax, Line Total) remain aligned or collapse into single strings.
-  3. **Multi-page & AWB Handling (`DU-03`)**: Separation of shipping headers vs invoice items.
-  4. **Formula & Calculation Preservation (`INV-37`)**: Retaining multipliers and unit rates without distortion.
+This benchmark is **closed**. The steps it originally planned (a quality comparison on these
+5 PDFs, then picking and integrating an engine) were not carried out in that form.
 
-### Step 2: Architecture Decision & Production Recommendation
-- Synthesize findings into a final architectural decision matrix:
-  - **Latency vs Quality Trade-off**: Balancing runtime (docTR ~2.5 min vs Docling ~30 min) against structural table understanding.
-  - **Selected Engine**: Select the optimal engine (or hybrid strategy: fast text-layer extraction with selective deep OCR fallback).
+**Decision: EasyOCR is the only supported OCR engine** (commit `e395f80`). The pipeline keeps
+PyMuPDF's native text layer for digital PDFs and uses EasyOCR only for scanned pages.
+EasyOCR installs from pip wheels on Linux, macOS and Windows with no native build steps,
+which the PaddleOCR fallback could not guarantee (#14). The PaddleOCR fallback has been removed.
 
-### Step 3: Pipeline Integration
-- Integrate the selected engine into the ingestion workflow (`src/extractor.py`, `src/ocr_engine.py`) ensuring zero regression on clean digital PDFs and robust recovery on complex/scanned invoices.
+The harness in `tools/ocr_benchmark/` and the outputs in `measurements/ocr_benchmark/` are
+kept for reference. The 5-PDF runs above show which engines run, but they are not an
+accuracy comparison: there was no verified ground truth to score them against.
+
+**Follow-up:** a full-corpus engine comparison (all 42 documents, scored on ERP pass rate
+and field accuracy) is tracked in #18. It depends on human-verified ground truth (#10, under #17).
+The OCR engine will only be revisited if that comparison shows a clear win over EasyOCR.
