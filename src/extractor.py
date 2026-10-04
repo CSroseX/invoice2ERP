@@ -51,6 +51,46 @@ logger = logging.getLogger(__name__)
 _matcher = MasterDataMatcher()
 
 
+def _get_parsed_llm_payable(ocr_text: str, filename: str) -> tuple[dict | None, dict, str, list]:
+    """Call the provider cascade until one provider returns JSON that parses without repair.
+
+    A response that only parses after repair_json_string() was usually cut off mid-output
+    (a repaired truncation silently drops line items), so the same payload is retried on
+    every provider not yet tried. Returns (payable, usage, provider, tried), where tried is
+    [(provider, raw_json, usage), ...] in call order; payable is None if no provider
+    returned clean JSON.
+    """
+    tried: list[tuple[str, str, dict]] = []
+    while True:
+        try:
+            raw_json, usage, provider = get_raw_llm_response(
+                ocr_text, filename=filename, exclude=[name for name, _, _ in tried]
+            )
+        except RuntimeError:
+            if not tried:
+                raise
+            return None, {}, "", tried  # every remaining provider failed or none are left
+        tried.append((provider, raw_json, usage))
+        try:
+            return json.loads(raw_json, strict=False), usage, provider, tried
+        except Exception:
+            logger.warning(
+                "LLM response from %s for %s needs JSON repair; retrying on other providers",
+                provider, filename or "DOCUMENT",
+            )
+
+
+def _repair_first(tried: list[tuple[str, str, dict]]) -> tuple[dict, dict, str]:
+    """Parse the first response that repair_json_string() can turn into valid JSON."""
+    error: Exception | None = None
+    for provider, raw_json, usage in tried:
+        try:
+            return json.loads(repair_json_string(raw_json), strict=False), usage, provider
+        except Exception as e:
+            error = error or e
+    raise error
+
+
 def extract_payable_from_text(
     ocr_text: str, filename: str = "", allow_fallback: bool = False, audit: dict | None = None
 ) -> dict:
@@ -68,15 +108,17 @@ def extract_payable_from_text(
 
     if has_openrouter or has_groq or has_cloudflare or has_gemini:
         try:
-            raw_json, usage, provider = get_raw_llm_response(ocr_text, filename=filename)
+            payable_data, usage, provider, providers_tried = _get_parsed_llm_payable(ocr_text, filename)
+            json_repaired = payable_data is None
+            if json_repaired:
+                # No provider returned clean JSON: keep the first repairable response, flag it for review.
+                payable_data, usage, provider = _repair_first(providers_tried)
             logger.info("LLM usage for %s: %s", filename or "DOCUMENT", usage)
-            audit.update(provider=provider, model=provider_model(provider), tokens=usage, json_repaired=False)
-            try:
-                payable_data = json.loads(raw_json, strict=False)
-            except Exception:
-                repaired_str = repair_json_string(raw_json)
-                payable_data = json.loads(repaired_str, strict=False)
-                audit["json_repaired"] = True
+            audit.update(
+                provider=provider, model=provider_model(provider), tokens=usage, json_repaired=json_repaired,
+                providers_tried=[name for name, _, _ in providers_tried],
+                json_repair_retries=len(providers_tried) - 1, needs_review=json_repaired,
+            )
             payable_data = apply_currency_stripping(payable_data)
             payable_data = apply_locale_decimal_parsing(payable_data)
             payable_data = apply_fix3_and_fix4_postprocessing(payable_data, ocr_text)
@@ -91,6 +133,14 @@ def extract_payable_from_text(
             )
             if reconciliation_audit:
                 grounded_payable["__reconciliation__"] = reconciliation_audit
+            if json_repaired:
+                grounded_payable["__review__"] = {
+                    "needed": True,
+                    "reasons": [
+                        f"llm_response_truncated: repaired JSON after {len(providers_tried)} "
+                        f"provider{'s' if len(providers_tried) != 1 else ''}"
+                    ],
+                }
             return _matcher.resolve_payable(grounded_payable, text_context=ocr_text)
         except Exception as e:
             if not allow_fallback:
@@ -133,6 +183,7 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
 
     payables = []
     declined = []
+    failed = []
     segments = []
 
     for idx, seg_text in enumerate(subdoc_texts, 1):
@@ -149,9 +200,15 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
                 seg_audit.update(outcome="payable", erp_pass=_erp_pass(payable))
             except Exception as e:
                 print(f"Error extracting payable from {seg_file_label}: {e}", file=sys.stderr)
-                declined.append({"doc_type": class_res.doc_type, "reason": f"Extraction failed: {e}"})
                 # Error type only: provider error messages can echo request content.
-                seg_audit.update(outcome="failed", error_type=type(e.__cause__ or e).__name__)
+                error_type = type(e.__cause__ or e).__name__
+                failed.append({
+                    "segment": idx,
+                    "doc_type": class_res.doc_type,
+                    "error_type": error_type,
+                    "reason": f"Extraction failed ({error_type}); see the processing log for details",
+                })
+                seg_audit.update(outcome="failed", error_type=error_type)
         else:
             declined.append({"doc_type": class_res.doc_type, "reason": "; ".join(class_res.reasons)})
             seg_audit.update(outcome="declined")
@@ -176,7 +233,8 @@ def process_document_file(pdf_or_txt_path: str | Path) -> dict:
     return {
         "file": file_name,
         "payables": payables,
-        "declined": declined
+        "declined": declined,
+        "failed": failed,
     }
 
 

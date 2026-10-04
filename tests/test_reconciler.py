@@ -61,13 +61,40 @@ def test_reconcile_does_not_mutate_input():
     assert payable["line_items"][0]["unit_price"] == "14.29"
 
 
+def _charged_payable(**overrides):
+    # Lines book 100.00 exactly; one header tax of 24.00.
+    return _payable(
+        line_items=[{"quantity": "4", "unit_price": "25.00", "total": "100.00"}],
+        taxes=[{"tax_amount": "24.00"}],
+        **overrides,
+    )
+
+
 def test_charge_equal_to_header_tax_is_blanked():
-    payable = _payable(taxes=[{"tax_amount": "24.00"}], excise_duties="24.00", freight_charges="10.00")
+    # 100 + 24 tax + 10 freight = 134 printed; the 24.00 excise double-counts the tax.
+    payable = _charged_payable(excise_duties="24.00", freight_charges="10.00", gross_total="134.00")
     out, warnings = dedupe_charges_against_header_tax(payable)
 
     assert out["excise_duties"] == ""
     assert out["freight_charges"] == "10.00"
     assert [w["field"] for w in warnings] == ["excise_duties"]
+
+
+def test_genuine_charge_equal_to_header_tax_is_kept():
+    # 100 + 24 tax + 24 freight = 148 printed: the freight is real and only coincides with the tax.
+    payable = _charged_payable(freight_charges="24.00", gross_total="148.00")
+    out, warnings = dedupe_charges_against_header_tax(payable)
+
+    assert out["freight_charges"] == "24.00"
+    assert warnings == []
+
+
+def test_charge_kept_when_gross_missing():
+    payable = _charged_payable(excise_duties="24.00", gross_total="")
+    out, warnings = dedupe_charges_against_header_tax(payable)
+
+    assert out["excise_duties"] == "24.00"
+    assert warnings == []
 
 
 def test_self_consistency_gap_detected():

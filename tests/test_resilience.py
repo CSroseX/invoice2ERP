@@ -110,3 +110,21 @@ def test_abandoned_probe_is_replaced_after_cooldown(monkeypatch):
     assert breaker.can_execute()  # this probe never reports back
     now[0] += 61
     assert breaker.can_execute()
+def test_circuit_breaker_counts_concurrent_failures():
+    import threading
+
+    breaker = resilience.CircuitBreaker("test", failure_threshold=3)
+
+    def fail_many():
+        for _ in range(500):
+            breaker.record_failure()
+
+    threads = [threading.Thread(target=fail_many) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert breaker.failures == 8 * 500
+    assert breaker.state == "OPEN"
+    assert not breaker.can_execute()

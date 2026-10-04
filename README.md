@@ -50,6 +50,8 @@ PDF → OCR & Layout → Segmentation → Classification → AI Extraction
 6. **Master Data Resolution** ([`src/master_matcher.py`](src/master_matcher.py)) — fuzzy-matches suppliers, tax codes, and payment terms against reference data at a strict ≥85% similarity threshold; below that, the field is left unresolved rather than guessed.
 7. **ERP Oracle Check** ([`erp.py`](erp.py)) — a sealed, deterministic recomputation of the gross total from raw components. This is the actual grading contract and is never modified by the pipeline.
 
+Each input document yields one `output/<stem>.json`: `{"file", "payables", "declined", "failed"}`. `declined` lists segments the classifier judged not to be payables; `failed` lists segments whose extraction errored (provider outage, unparseable response), so a processing failure is never mistaken for a document decision. The full shape is in [`AUTODRAFT_SCHEMA.md`](AUTODRAFT_SCHEMA.md).
+
 ## Running it
 
 **Public showcase (read-only).** `app.py` in this repository is a read-only Streamlit viewer over pre-computed output — it renders extraction results for a curated set of documents and has no code path that triggers live processing, by design, for public deployment.
@@ -58,6 +60,8 @@ PDF → OCR & Layout → Segmentation → Classification → AI Extraction
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+The sidebar also has a **Needs review** view (`?view=review`) listing every output item that needs a person: segments whose extraction failed, payables the pipeline flagged with `__review__`, and payables the ERP oracle does not book at their printed gross. It shows the PDF page beside the extracted fields. Decisions (Approve / Reject / Needs re-run, with a note) are appended to `review/decisions.jsonl`, but only when the app is started with `INVOICE2ERP_REVIEW_EDIT=1`; the public deployment shows the controls disabled.
 
 **Full pipeline (local).** The extraction pipeline (`src/extractor.py`, `src/ocr_engine.py`, `src/segmenter.py`, `src/classifier.py`) is a set of composable modules, not a bundled CLI — call `extract_payable_from_text()` from a script, or check a single already-extracted payable against the ERP oracle directly:
 
@@ -110,6 +114,7 @@ src/
   reconciler.py        Document-corroborated line reconciliation
   master_matcher.py    Phase 6 — master data fuzzy resolution
   resilience.py        Circuit breaker & retry logic for LLM providers
+  review.py            Review queue + decisions behind the app's "Needs review" view
 documents/             Source PDFs
 output/                Generated autodraft JSON, one per input document
 master_data/           Reference datasets for supplier/tax/PO matching
