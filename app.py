@@ -6,6 +6,9 @@ Public, read-only Streamlit deployment. Renders pre-computed pipeline output
 the full pipeline (src/extractor.py, src/ocr_engine.py, etc.) is unaffected and
 runnable locally, but this UI has no path that invokes it.
 
+The Showcase also includes an OCR engine comparison read from the saved benchmark in
+measurements/ocr_benchmark/ (src/ocr_comparison.py).
+
 A second view, "Needs review" (sidebar, or ?view=review), lists every output item
 that needs a human (src/review.py). Recording decisions is disabled unless the
 INVOICE2ERP_REVIEW_EDIT=1 env var is set, so the public deployment stays read-only.
@@ -16,13 +19,14 @@ import json
 import sys
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
 import pymupdf as fitz
 
-from src import review
+from src import ocr_comparison, review
 
 CURATED_FILES = [
     "DU-02.pdf",
@@ -32,6 +36,63 @@ CURATED_FILES = [
     "DU-05s.pdf",
     "DU-08.pdf",
 ]
+
+
+@st.cache_data(show_spinner=False)
+def load_ocr_benchmark() -> list[ocr_comparison.EngineRun]:
+    return ocr_comparison.load_runs()
+
+
+# Translucent so the highlight reads in both light and dark themes.
+_BEST = "background-color: rgba(40, 167, 69, 0.25); font-weight: 600"
+
+
+def render_ocr_comparison() -> None:
+    """Stage 1 evidence: how the benchmarked OCR engines compare on the saved 5-PDF benchmark."""
+    runs = load_ocr_benchmark()
+    if not runs:
+        return
+    st.markdown("## OCR Engine Comparison")
+    st.caption(
+        "Why Stage 1 uses EasyOCR: four engines benchmarked on five hard documents (a 12-page "
+        "customs bundle, scans, multi-column tables, a utility bill). Results are read from "
+        "`measurements/ocr_benchmark/`; nothing is re-run here."
+    )
+
+    rows = ocr_comparison.summary_rows(runs)
+    numbers = pd.DataFrame(rows).set_index("Engine")
+    time_cols = ["Median time per PDF (s)", "Slowest PDF (s)"]
+    best = pd.DataFrame(False, index=numbers.index, columns=numbers.columns)
+    for c in time_cols:
+        best[c] = numbers[c] == numbers[c].min()
+    best["Amounts read"] = numbers["Amounts read"] == numbers["Amounts read"].max()
+    # Times are shown as text so the cached engine reads "cached" rather than an empty cell.
+    shown = numbers.astype({c: object for c in time_cols})
+    for c in time_cols:
+        shown[c] = [("cached" if pd.isna(v) else f"{v:,.1f}") for v in numbers[c]]
+    styled = shown.style.apply(lambda _: best.replace({True: _BEST, False: ""}), axis=None)
+    st.dataframe(styled, use_container_width=True)
+    st.caption(
+        "Green marks the best value in each column. **Amounts read** counts distinct numbers with two "
+        "decimals (e.g. 407.95) in each engine's text: an engine that drops a table reads fewer. "
+        "**current** shows *cached* because the benchmark read its saved text instead of re-running "
+        "OCR. Paddle's slowest PDF (HLD-10, ~13 h) looks like a stalled run, so compare its median. "
+        "Field-level accuracy needs human-verified answers for each document (issue #10)."
+    )
+
+    with st.expander("Compare the extracted text for one document"):
+        stems = list(runs[0].texts)
+        stem = st.selectbox("Document", stems, key="ocr_doc")
+        cols = st.columns(len(runs))
+        for col, run in zip(cols, runs):
+            with col:
+                secs = run.seconds.get(stem)
+                timing = "cached" if run.engine in ocr_comparison.CACHED_ENGINES else f"{secs:,.1f}s"
+                st.markdown(f"**{run.engine}**")
+                st.caption(f"{run.status.get(stem, 'missing')} · {timing} · "
+                           f"{len(ocr_comparison.amounts_in(run.texts.get(stem, '')))} amounts")
+                with st.container(height=420):
+                    st.text(run.texts.get(stem, "") or "(no text)")
 
 
 @st.cache_data(show_spinner=False)
@@ -413,6 +474,13 @@ st.markdown(
     f'</div>',
     unsafe_allow_html=True,
 )
+
+st.divider()
+
+# ---------------------------------------------------------------------------
+# OCR ENGINE COMPARISON — evidence for Stage 1
+# ---------------------------------------------------------------------------
+render_ocr_comparison()
 
 st.divider()
 

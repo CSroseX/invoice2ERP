@@ -84,13 +84,13 @@ The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `
 
 The `app.py` Streamlit UI is in **read-only showcase mode** — live processing (background workers, sidebar controls) is intentionally disabled. The UI reads from pre-generated `output/*.json` files only. The full processing pipeline code exists in `_process_single_pdf()` but is short-circuited at the top of that function.
 
-The app has two views, switched in the sidebar: **Showcase** (curated documents, `CURATED_FILES`) and **Needs review** (`?view=review`), which lists every item in `output/*.json` with `failed` entries, a `__review__.needed` payable, or a payable failing the ERP oracle, with counts per category, the PDF page next to the extracted fields, and the latest human decision. The loading/classification and decision logic lives in `src/review.py` (tested offline in `tests/test_review.py`). Recording decisions (Approve / Reject / Needs re-run + note, appended to the git-ignored `review/decisions.jsonl`) is only enabled when `INVOICE2ERP_REVIEW_EDIT=1` is set; otherwise the controls are shown disabled.
+The app has two views, switched in the sidebar: **Showcase** (pipeline overview, an **OCR Engine Comparison** table right after the Pipeline section, and curated documents, `CURATED_FILES`) and **Needs review** (`?view=review`), which lists every item in `output/*.json` with `failed` entries, a `__review__.needed` payable, or a payable failing the ERP oracle, with counts per category, the PDF page next to the extracted fields, and the latest human decision. The loading/classification and decision logic lives in `src/review.py` (tested offline in `tests/test_review.py`). Recording decisions (Approve / Reject / Needs re-run + note, appended to the git-ignored `review/decisions.jsonl`) is only enabled when `INVOICE2ERP_REVIEW_EDIT=1` is set; otherwise the controls are shown disabled.
 
 ## Tools & Measurements
 
 - `tools/measure_payables.py` — replays every payable in `output/*.json` through `erp_book()` offline and writes `measurements/payables_baseline.csv`. Use it to measure accuracy changes; it needs no API keys.
 - `tools/diag_five.py` — prints `erp_book()` internals for named payables, for diagnosing failures.
-- `tools/ocr_benchmark/` — OCR-engine benchmark harness; results in `measurements/ocr_benchmark/`, write-up in `docs/ocr_benchmark_and_project_roadmap.md`.
+- `tools/ocr_benchmark/` — OCR-engine benchmark harness; results in `measurements/ocr_benchmark/`, write-up in `docs/ocr_benchmark_and_project_roadmap.md`. The app's comparison table reads those saved results via `src/ocr_comparison.py` (tested in `tests/test_ocr_comparison.py`); it never re-runs an engine.
 - `parsed_files/<stem>.txt` — cached OCR text, usable for offline tests without an OCR engine.
 
 ## Docker
