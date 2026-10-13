@@ -20,7 +20,7 @@ pip install -r requirements-benchmark.txt # extra OCR engines for tools/ocr_benc
 ```bash
 python -m pytest tests -v
 ```
-Unit tests run offline. The live golden-file test (`tests/test_accuracy.py::test_golden_file_extraction`) is skipped unless an LLM provider key is configured, and also needs the OCR dependencies from `requirements-full.txt`.
+Unit tests run offline. CI (`.github/workflows/tests.yml`) runs them on Python 3.12 for every pull request and push to `main`, installing only `requirements.txt` + `pytest`. The live golden-file test (`tests/test_accuracy.py::test_golden_file_extraction`) is skipped unless an LLM provider key is configured, and also needs the OCR dependencies from `requirements-full.txt`.
 
 **Run the ERP oracle directly on a JSON payload:**
 ```bash
@@ -95,7 +95,7 @@ The app has two views, switched in the sidebar: **Showcase** (pipeline overview,
 
 ## Docker
 
-`Dockerfile` is based on `python:3.12-slim`, needs no system packages, and runs as a non-root user with a Streamlit health check. Default target `showcase` (read-only app, `requirements.txt`); `--target full` adds the pipeline dependencies with CPU-only PyTorch. `docker-compose.yml` builds the showcase target.
+`Dockerfile` is based on `python:3.12-slim`, needs no system packages, and runs as a non-root user with a Streamlit health check. Default target `showcase` (read-only app, `requirements.txt`); `--target full` adds the pipeline dependencies with CPU-only PyTorch. `docker-compose.yml` builds the showcase target. The image must include `output/*.json`, `documents/`, `measurements/ocr_benchmark/` and `master_data/`, because the read-only app reads them; `tests/test_deployment.py` checks `.dockerignore` for this.
 
 ## Master Data
 
