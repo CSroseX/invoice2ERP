@@ -22,6 +22,13 @@ python -m pytest tests -v
 ```
 Unit tests run offline. CI (`.github/workflows/tests.yml`) runs them on Python 3.12 for every pull request and push to `main`, installing only `requirements.txt` + `pytest`. The live golden-file test (`tests/test_accuracy.py::test_golden_file_extraction`) is skipped unless an LLM provider key is configured, and also needs the OCR dependencies from `requirements-full.txt`.
 
+**Regenerate `output/*.json`** (needs an LLM key; uses `parsed_files/<stem>.txt` when present, `--reocr` forces OCR from the PDF, which needs `requirements-full.txt`):
+```bash
+python -m src.batch                       # every documents/*.pdf
+python -m src.batch documents/DU-06.pdf   # selected documents
+```
+`python -m src.extractor <file>` only prints one result to stdout. Note `src/ocr_engine.extract_text()` never reads `parsed_files/`; it re-OCRs every scanned page.
+
 **Run the ERP oracle directly on a JSON payload:**
 ```bash
 python erp.py path/to/payable.json
@@ -82,7 +89,7 @@ The `primary_provider` field in `AppSettings` (env `PRIMARY_PROVIDER`, default `
 
 ## Current State
 
-The `app.py` Streamlit UI is in **read-only showcase mode** — live processing (background workers, sidebar controls) is intentionally disabled. The UI reads from pre-generated `output/*.json` files only. The full processing pipeline code exists in `_process_single_pdf()` but is short-circuited at the top of that function.
+The `app.py` Streamlit UI is in **read-only showcase mode** — live processing (background workers, sidebar controls) is intentionally disabled. The UI reads from pre-generated `output/*.json` files only, which `python -m src.batch` writes.
 
 The app has two views, switched in the sidebar: **Showcase** (pipeline overview, an **OCR Engine Comparison** table right after the Pipeline section, and curated documents, `CURATED_FILES`) and **Needs review** (`?view=review`), which lists every item in `output/*.json` with `failed` entries, a `__review__.needed` payable, or a payable failing the ERP oracle, with counts per category, the PDF page next to the extracted fields, and the latest human decision. The loading/classification and decision logic lives in `src/review.py` (tested offline in `tests/test_review.py`). Recording decisions (Approve / Reject / Needs re-run + note, appended to the git-ignored `review/decisions.jsonl`) is only enabled when `INVOICE2ERP_REVIEW_EDIT=1` is set; otherwise the controls are shown disabled.
 

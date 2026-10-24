@@ -63,7 +63,15 @@ streamlit run app.py
 
 The sidebar also has a **Needs review** view (`?view=review`) listing every output item that needs a person: segments whose extraction failed, payables the pipeline flagged with `__review__`, and payables the ERP oracle does not book at their printed gross. It shows the PDF page beside the extracted fields. Decisions (Approve / Reject / Needs re-run, with a note) are appended to `review/decisions.jsonl`, but only when the app is started with `INVOICE2ERP_REVIEW_EDIT=1`; the public deployment shows the controls disabled.
 
-**Full pipeline (local).** The extraction pipeline (`src/extractor.py`, `src/ocr_engine.py`, `src/segmenter.py`, `src/classifier.py`) is a set of composable modules, not a bundled CLI — call `extract_payable_from_text()` from a script, or check a single already-extracted payable against the ERP oracle directly:
+**Full pipeline (local).** The batch runner regenerates `output/<stem>.json` for every PDF in `documents/` (or only the PDFs you name). It reads each document's cached OCR text from `parsed_files/<stem>.txt` when present, so reruns measure extraction changes rather than OCR drift; `--reocr` forces OCR from the PDF. It exits non-zero if any document raised, and leaves that document's existing output file untouched:
+
+```bash
+python -m src.batch                      # all documents/*.pdf
+python -m src.batch documents/DU-06.pdf  # selected documents
+python tools/measure_payables.py         # ERP pass/fail per payable -> measurements/payables_baseline.csv
+```
+
+`python -m src.extractor <file>` prints one document's result to stdout without writing it. To check a single already-extracted payable against the ERP oracle directly:
 
 ```bash
 git clone https://github.com/CSroseX/invoice2ERP.git
