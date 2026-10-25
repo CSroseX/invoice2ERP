@@ -8,7 +8,7 @@
       "invoice_type": "CREDIT_MEMO",
       "currency": "EUR",
       "supplier": {
-        "name": "Tavolo OU",
+        "name": "Tavolo",
         "supplier_id": "",
         "address": "Rua do Ouro 15, 10134 Kesklinna, Tallinn, Harju maakond, Eesti",
         "vat_id": "78885507"
@@ -55,5 +55,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

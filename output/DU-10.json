@@ -4,13 +4,13 @@
     {
       "invoice_number": "5900366703",
       "invoice_date": "2026-04-15",
-      "due_date": "2026-05-15",
+      "due_date": "2026-05-14",
       "invoice_type": "CREDIT_MEMO",
       "currency": "GBP",
       "supplier": {
         "name": "Northwind Services UK Limited",
         "supplier_id": "",
-        "address": "Jalan Ampang 157, London SE1 4GT, UNITED KINGDOM",
+        "address": "Jalan Ampang 157, Jalan Ampang 175, London SE1 4GT, UNITED KINGDOM",
         "vat_id": "GB726874417"
       },
       "buyer": {
@@ -44,7 +44,7 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "1.00",
-          "unit_price": "457.24",
+          "unit_price": "2743.44",
           "total": "2743.44",
           "discount": "0.00",
           "discount_percentage": "0.00",
@@ -65,8 +65,20 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 0,
+            "field": "unit_price",
+            "before": "457.24",
+            "after": "2743.44",
+            "trigger": "qty*unit_price=457.24 disagreed with printed line total=2743.44; document's subtotal+tax==gross corroborates the residual"
+          }
+        ]
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

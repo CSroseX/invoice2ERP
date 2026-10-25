@@ -36,8 +36,8 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "1.00",
-          "unit_price": "63479.69",
-          "total": "63479.69",
+          "unit_price": "",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "24.00",
@@ -136,7 +136,7 @@
           "taxes": []
         },
         {
-          "description": "Parking fee OHISTEENUSED OPEN AREA discount 20%",
+          "description": "Parking fee UHISTEENUSED OPEN AREA discount 20%",
           "item_type": "GOODS",
           "uom": "",
           "quantity": "1.00",
@@ -356,8 +356,17 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "self_consistency_gap": {
+          "reason": "header footed (subtotal+tax==gross) but sum(line totals) != subtotal",
+          "printed_subtotal": 127564.34,
+          "sum_of_line_totals": 114271.39,
+          "gap": 13292.95
+        }
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

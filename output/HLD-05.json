@@ -24,7 +24,7 @@
       "gross_total": "1796.54",
       "subtotal": "1049.60",
       "total_tax_amount": "176.87",
-      "discount_amount": "0.00",
+      "discount_amount": "",
       "freight_charges": "",
       "insurance_charges": "",
       "extra_charges": "",
@@ -65,7 +65,7 @@
           "uom": "BAR",
           "quantity": "",
           "unit_price": "24.53",
-          "total": "147.18",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -218,5 +218,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

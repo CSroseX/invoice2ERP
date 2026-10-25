@@ -44,7 +44,7 @@
           "item_type": "GOODS",
           "uom": "KG",
           "quantity": "10.00",
-          "unit_price": "0.52",
+          "unit_price": "",
           "total": "5.21",
           "discount": "",
           "discount_percentage": "",
@@ -57,7 +57,7 @@
           "item_type": "GOODS",
           "uom": "KG",
           "quantity": "35.00",
-          "unit_price": "32.43",
+          "unit_price": "32.427143",
           "total": "1134.95",
           "discount": "",
           "discount_percentage": "",
@@ -70,7 +70,7 @@
           "item_type": "GOODS",
           "uom": "KG",
           "quantity": "100.00",
-          "unit_price": "2.63",
+          "unit_price": "2.632",
           "total": "263.20",
           "discount": "",
           "discount_percentage": "",
@@ -93,7 +93,7 @@
         },
         {
           "description": "Tomning 660L minicontainer",
-          "item_type": "GOODS",
+          "item_type": "SERVICE",
           "uom": "STK",
           "quantity": "1.00",
           "unit_price": "172.00",
@@ -234,8 +234,27 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 1,
+            "field": "unit_price",
+            "before": "32.43",
+            "after": "32.427143",
+            "trigger": "qty*unit_price=1135.05 disagreed with printed line total=1134.95; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 2,
+            "field": "unit_price",
+            "before": "2.63",
+            "after": "2.632",
+            "trigger": "qty*unit_price=263.0 disagreed with printed line total=263.2; document's subtotal+tax==gross corroborates the residual"
+          }
+        ]
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

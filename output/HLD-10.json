@@ -8,9 +8,9 @@
       "invoice_type": "INVOICE",
       "currency": "EUR",
       "supplier": {
-        "name": "Northwind Operations OU",
+        "name": "Speedwell Estonia AS",
         "supplier_id": "",
-        "address": "High Street 36, 75310 Harju maakond, Estonia",
+        "address": "High Street 36, 75310 Harju maakond, Eesti",
         "vat_id": ""
       },
       "buyer": {
@@ -44,7 +44,7 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "4.00",
-          "unit_price": "65.26",
+          "unit_price": "24.1825",
           "total": "96.73",
           "discount": "",
           "discount_percentage": "",
@@ -57,7 +57,7 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "3.00",
-          "unit_price": "38.00",
+          "unit_price": "52.593333",
           "total": "157.78",
           "discount": "",
           "discount_percentage": "",
@@ -91,8 +91,33 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 0,
+            "field": "unit_price",
+            "before": "65.26",
+            "after": "24.1825",
+            "trigger": "qty*unit_price=261.04 disagreed with printed line total=96.73; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 1,
+            "field": "unit_price",
+            "before": "38.00",
+            "after": "52.593333",
+            "trigger": "qty*unit_price=114.0 disagreed with printed line total=157.78; document's subtotal+tax==gross corroborates the residual"
+          }
+        ],
+        "self_consistency_gap": {
+          "reason": "header footed (subtotal+tax==gross) but sum(line totals) != subtotal",
+          "printed_subtotal": 223.98,
+          "sum_of_line_totals": 320.87,
+          "gap": -96.89
+        }
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

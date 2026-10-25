@@ -10,7 +10,7 @@
       "supplier": {
         "name": "Northwind Services UK Ltd",
         "supplier_id": "",
-        "address": "Rua do Ouro 175, London, SE1 4GT",
+        "address": "Rua do Ouro 175, London, SE1 4GT, UNITED KINGDOM",
         "vat_id": "474927490"
       },
       "buyer": {
@@ -73,5 +73,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

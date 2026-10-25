@@ -32,15 +32,15 @@
       "taxes": [
         {
           "tax_type": "VAT",
-          "tax_name": "VAT",
-          "tax_rate": "7.00",
+          "tax_name": "",
+          "tax_rate": "",
           "tax_amount": "549.36",
-          "tax_type_code": "DE_070_VAT"
+          "tax_type_code": ""
         },
         {
           "tax_type": "WITHHOLDING TAX",
-          "tax_name": "WITHHOLDING TAX",
-          "tax_rate": "",
+          "tax_name": "",
+          "tax_rate": "-3.00",
           "tax_amount": "-235.44",
           "tax_type_code": ""
         }
@@ -51,7 +51,7 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "12.00",
-          "unit_price": "600.00",
+          "unit_price": "",
           "total": "7200.00",
           "discount": "",
           "discount_percentage": "",
@@ -67,7 +67,7 @@
           "unit_price": "648.00",
           "total": "648.00",
           "discount": "",
-          "discount_percentage": "",
+          "discount_percentage": "9.00",
           "tax_rate": "",
           "tax_amount": "",
           "taxes": []
@@ -75,5 +75,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

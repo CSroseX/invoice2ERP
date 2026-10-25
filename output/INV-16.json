@@ -32,7 +32,7 @@
       "taxes": [
         {
           "tax_type": "VAT",
-          "tax_name": "KM",
+          "tax_name": "",
           "tax_rate": "22.00",
           "tax_amount": "4.77",
           "tax_type_code": "EST_220_VAT"
@@ -68,5 +68,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

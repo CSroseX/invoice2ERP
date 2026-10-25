@@ -24,15 +24,15 @@
       "gross_total": "594.30",
       "subtotal": "479.27",
       "total_tax_amount": "115.03",
-      "discount_amount": "",
-      "freight_charges": "",
-      "insurance_charges": "",
-      "extra_charges": "",
-      "excise_duties": "",
+      "discount_amount": "0.00",
+      "freight_charges": "0.00",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
       "taxes": [
         {
           "tax_type": "VAT",
-          "tax_name": "Kiibemaks 24%",
+          "tax_name": "Kiibemaks",
           "tax_rate": "24.00",
           "tax_amount": "115.03",
           "tax_type_code": "EST_240_VAT"
@@ -46,8 +46,8 @@
           "quantity": "1.00",
           "unit_price": "479.28",
           "total": "479.28",
-          "discount": "",
-          "discount_percentage": "",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
           "tax_rate": "",
           "tax_amount": "",
           "taxes": []
@@ -58,9 +58,9 @@
           "uom": "",
           "quantity": "1.00",
           "unit_price": "0.01",
-          "total": "0.01",
-          "discount": "",
-          "discount_percentage": "",
+          "total": "-0.01",
+          "discount": "0.00",
+          "discount_percentage": "0.00",
           "tax_rate": "",
           "tax_amount": "",
           "taxes": []
@@ -68,5 +68,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }
