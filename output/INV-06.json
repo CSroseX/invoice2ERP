@@ -19,7 +19,7 @@
         "location_code": "LOC_MY_001"
       },
       "payment_term_id": "",
-      "po_number": "",
+      "po_number": "75884754",
       "po_id": "",
       "gross_total": "4683.98",
       "subtotal": "",
@@ -380,5 +380,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

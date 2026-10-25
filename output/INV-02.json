@@ -32,7 +32,7 @@
       "taxes": [
         {
           "tax_type": "VAT",
-          "tax_name": "Kaibemaks",
+          "tax_name": "",
           "tax_rate": "20.00",
           "tax_amount": "117.72",
           "tax_type_code": "GB_200_VAT"
@@ -149,7 +149,7 @@
           "uom": "",
           "quantity": "4.00",
           "unit_price": "0.10",
-          "total": "0.40",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -162,7 +162,7 @@
           "uom": "",
           "quantity": "2.00",
           "unit_price": "3.60",
-          "total": "7.20",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -234,8 +234,17 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "self_consistency_gap": {
+          "reason": "header footed (subtotal+tax==gross) but sum(line totals) != subtotal",
+          "printed_subtotal": 490.51,
+          "sum_of_line_totals": 642.2,
+          "gap": -151.69
+        }
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

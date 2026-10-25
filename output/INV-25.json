@@ -19,16 +19,16 @@
         "location_code": "LOC_EE_001"
       },
       "payment_term_id": "Net_30",
-      "po_number": "",
+      "po_number": "9448",
       "po_id": "",
       "gross_total": "176.00",
       "subtotal": "143.09",
       "total_tax_amount": "32.91",
       "discount_amount": "0.00",
       "freight_charges": "0.00",
-      "insurance_charges": "",
-      "extra_charges": "",
-      "excise_duties": "",
+      "insurance_charges": "0.00",
+      "extra_charges": "0.00",
+      "excise_duties": "0.00",
       "taxes": [],
       "line_items": [
         {
@@ -39,7 +39,7 @@
           "unit_price": "0.40",
           "total": "160.00",
           "discount": "0.00",
-          "discount_percentage": "",
+          "discount_percentage": "0.00",
           "tax_rate": "23.00",
           "tax_amount": "",
           "taxes": []
@@ -52,9 +52,9 @@
           "unit_price": "0.00",
           "total": "0.00",
           "discount": "0.00",
-          "discount_percentage": "",
+          "discount_percentage": "0.00",
           "tax_rate": "23.00",
-          "tax_amount": "",
+          "tax_amount": "0.00",
           "taxes": []
         },
         {
@@ -65,13 +65,22 @@
           "unit_price": "0.08",
           "total": "16.00",
           "discount": "0.00",
-          "discount_percentage": "",
+          "discount_percentage": "0.00",
           "tax_rate": "23.00",
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "self_consistency_gap": {
+          "reason": "header footed (subtotal+tax==gross) but sum(line totals) != subtotal",
+          "printed_subtotal": 143.09,
+          "sum_of_line_totals": 176.0,
+          "gap": -32.91
+        }
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

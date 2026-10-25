@@ -10,7 +10,7 @@
       "supplier": {
         "name": "Larkspur Distribution Meridian Print",
         "supplier_id": "",
-        "address": "Gartenweg 173, M5 Office Park, Unit 7, Block B, Maitland, Western Cape, Cape Town 7405, South Africa",
+        "address": "Gartenweg 173, M5 Office Park, Unit 7, Block B, Maitland, WESTERN CAPE CAPE TOWN 7405, SOUTH AFRICA",
         "vat_id": "9446639440"
       },
       "buyer": {
@@ -32,7 +32,7 @@
       "taxes": [
         {
           "tax_type": "VAT",
-          "tax_name": "",
+          "tax_name": "VAT",
           "tax_rate": "15.00",
           "tax_amount": "2573.55",
           "tax_type_code": "ZAF_150_VAT"
@@ -43,8 +43,8 @@
           "description": "Standard Criminal Verification",
           "item_type": "GOODS",
           "uom": "",
-          "quantity": "133.00",
-          "unit_price": "129.00",
+          "quantity": "",
+          "unit_price": "17157.00",
           "total": "17157.00",
           "discount": "",
           "discount_percentage": "",
@@ -55,5 +55,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

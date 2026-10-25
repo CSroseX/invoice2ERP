@@ -23,7 +23,7 @@
       "po_id": "",
       "gross_total": "771.66",
       "subtotal": "771.66",
-      "total_tax_amount": "0.00",
+      "total_tax_amount": "",
       "discount_amount": "0.00",
       "freight_charges": "0.00",
       "insurance_charges": "0.00",
@@ -36,16 +36,28 @@
           "item_type": "GOODS",
           "uom": "PC",
           "quantity": "100.00",
-          "unit_price": "771.66",
+          "unit_price": "7.7166",
           "total": "771.66",
           "discount": "0.00",
           "discount_percentage": "0.00",
-          "tax_rate": "0.00",
-          "tax_amount": "0.00",
+          "tax_rate": "",
+          "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 0,
+            "field": "unit_price",
+            "before": "771.66",
+            "after": "7.7166",
+            "trigger": "qty*unit_price=77166.0 disagreed with printed line total=771.66; document's subtotal+tax==gross corroborates the residual"
+          }
+        ]
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

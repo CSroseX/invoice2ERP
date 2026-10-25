@@ -8,9 +8,9 @@
       "invoice_type": "INVOICE",
       "currency": "SGD",
       "supplier": {
-        "name": "AD Notions INT'L PTE LTD",
+        "name": "AD Notions INT'L PTE, LTD",
         "supplier_id": "",
-        "address": "20 Sin Ming Lane, Midview City, #08-81, Singapore 573968",
+        "address": "20 Sin Ming Lane, Midview City #08-81, Singapore 573968",
         "vat_id": ""
       },
       "buyer": {
@@ -47,5 +47,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

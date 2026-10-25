@@ -29,41 +29,19 @@
       "insurance_charges": "0.00",
       "extra_charges": "40.00",
       "excise_duties": "31889.09",
-      "taxes": [
-        {
-          "tax_type": "VAT",
-          "tax_name": "KM VAT",
-          "tax_rate": "0.00",
-          "tax_amount": "0.00",
-          "tax_type_code": "EST_000_VAT"
-        },
-        {
-          "tax_type": "Import duties",
-          "tax_name": "DIREITOS ADUANEIROS CEE",
-          "tax_rate": "",
-          "tax_amount": "31889.09",
-          "tax_type_code": ""
-        },
-        {
-          "tax_type": "Customs VAT",
-          "tax_name": "IVA 6%",
-          "tax_rate": "6.00",
-          "tax_amount": "5878.23",
-          "tax_type_code": "PT_060_IVA"
-        }
-      ],
+      "taxes": [],
       "line_items": [
         {
           "description": "Import duties",
-          "item_type": "TAX",
+          "item_type": "GOODS",
           "uom": "",
           "quantity": "1.00",
           "unit_price": "31889.09",
           "total": "31889.09",
           "discount": "0.00",
-          "discount_percentage": "",
-          "tax_rate": "",
-          "tax_amount": "",
+          "discount_percentage": "0.00",
+          "tax_rate": "0.00",
+          "tax_amount": "0.00",
           "taxes": []
         },
         {
@@ -74,26 +52,14 @@
           "unit_price": "5878.23",
           "total": "5878.23",
           "discount": "0.00",
-          "discount_percentage": "",
-          "tax_rate": "",
-          "tax_amount": "",
-          "taxes": []
-        },
-        {
-          "description": "Service fee",
-          "item_type": "FREIGHT",
-          "uom": "",
-          "quantity": "1.00",
-          "unit_price": "40.00",
-          "total": "40.00",
-          "discount": "0.00",
-          "discount_percentage": "",
-          "tax_rate": "",
-          "tax_amount": "",
+          "discount_percentage": "0.00",
+          "tax_rate": "0.00",
+          "tax_amount": "0.00",
           "taxes": []
         }
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

@@ -43,8 +43,8 @@
           "description": "Handling Out (per CBM)",
           "item_type": "SERVICE",
           "uom": "CBM",
-          "quantity": "0.27",
-          "unit_price": "500.00",
+          "quantity": "",
+          "unit_price": "508.148148",
           "total": "137.20",
           "discount": "0.00",
           "discount_percentage": "0.00",
@@ -81,9 +81,9 @@
         {
           "description": "Storage charges",
           "item_type": "SERVICE",
-          "uom": "CBM",
-          "quantity": "40.54",
-          "unit_price": "30.00",
+          "uom": "",
+          "quantity": "30.00",
+          "unit_price": "40.535667",
           "total": "1216.07",
           "discount": "0.00",
           "discount_percentage": "0.00",
@@ -94,9 +94,9 @@
         {
           "description": "Storage charges",
           "item_type": "SERVICE",
-          "uom": "CBM",
-          "quantity": "22.31",
-          "unit_price": "30.00",
+          "uom": "",
+          "quantity": "30.00",
+          "unit_price": "22.308667",
           "total": "669.26",
           "discount": "0.00",
           "discount_percentage": "0.00",
@@ -107,9 +107,9 @@
         {
           "description": "Storage charges",
           "item_type": "SERVICE",
-          "uom": "CBM",
-          "quantity": "1646.21",
-          "unit_price": "30.00",
+          "uom": "",
+          "quantity": "30.00",
+          "unit_price": "1646.211667",
           "total": "49386.35",
           "discount": "0.00",
           "discount_percentage": "0.00",
@@ -130,8 +130,41 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 0,
+            "field": "unit_price",
+            "before": "500.00",
+            "after": "508.148148",
+            "trigger": "qty*unit_price=135.0 disagreed with printed line total=137.2; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 3,
+            "field": "unit_price",
+            "before": "40.54",
+            "after": "40.535667",
+            "trigger": "qty*unit_price=1216.2 disagreed with printed line total=1216.07; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 4,
+            "field": "unit_price",
+            "before": "22.31",
+            "after": "22.308667",
+            "trigger": "qty*unit_price=669.3 disagreed with printed line total=669.26; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 5,
+            "field": "unit_price",
+            "before": "1646.21",
+            "after": "1646.211667",
+            "trigger": "qty*unit_price=49386.3 disagreed with printed line total=49386.35; document's subtotal+tax==gross corroborates the residual"
+          }
+        ]
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

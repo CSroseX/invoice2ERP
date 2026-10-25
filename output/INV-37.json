@@ -6,7 +6,7 @@
       "invoice_date": "2018-06-12",
       "due_date": "",
       "invoice_type": "INVOICE",
-      "currency": "",
+      "currency": "USD",
       "supplier": {
         "name": "REIMBURSEMENT ASSOCIATES, LLP",
         "supplier_id": "",
@@ -31,9 +31,9 @@
       "excise_duties": "",
       "taxes": [
         {
-          "tax_type": "Sales Tax",
+          "tax_type": "SALES TAX",
           "tax_name": "",
-          "tax_rate": "0.06",
+          "tax_rate": "",
           "tax_amount": "",
           "tax_type_code": ""
         }
@@ -44,8 +44,8 @@
           "item_type": "GOODS",
           "uom": "KWH",
           "quantity": "24.00",
-          "unit_price": "0.10",
-          "total": "2.35",
+          "unit_price": "2.35",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -57,7 +57,7 @@
           "item_type": "GOODS",
           "uom": "KWH",
           "quantity": "191.00",
-          "unit_price": "0.10",
+          "unit_price": "0.097958",
           "total": "18.71",
           "discount": "",
           "discount_percentage": "",
@@ -70,7 +70,7 @@
           "item_type": "GOODS",
           "uom": "KWH",
           "quantity": "15816.00",
-          "unit_price": "0.10",
+          "unit_price": "0.097958",
           "total": "1549.31",
           "discount": "",
           "discount_percentage": "",
@@ -97,7 +97,7 @@
           "uom": "Ton",
           "quantity": "3.50",
           "unit_price": "63.93",
-          "total": "61.73",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -110,7 +110,7 @@
           "uom": "Ton",
           "quantity": "2.00",
           "unit_price": "63.93",
-          "total": "319.65",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -130,8 +130,33 @@
           "tax_amount": "",
           "taxes": []
         }
-      ]
+      ],
+      "__reconciliation__": {
+        "line_reconciliations": [
+          {
+            "line_index": 1,
+            "field": "unit_price",
+            "before": "0.10",
+            "after": "0.097958",
+            "trigger": "qty*unit_price=19.1 disagreed with printed line total=18.71; document's subtotal+tax==gross corroborates the residual"
+          },
+          {
+            "line_index": 2,
+            "field": "unit_price",
+            "before": "0.10",
+            "after": "0.097958",
+            "trigger": "qty*unit_price=1581.6 disagreed with printed line total=1549.31; document's subtotal+tax==gross corroborates the residual"
+          }
+        ],
+        "self_consistency_gap": {
+          "reason": "header footed (subtotal+tax==gross) but sum(line totals) != subtotal",
+          "printed_subtotal": 2380.71,
+          "sum_of_line_totals": 2098.0299999999997,
+          "gap": 282.68
+        }
+      }
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

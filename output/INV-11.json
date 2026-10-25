@@ -10,8 +10,8 @@
       "supplier": {
         "name": "Northwind Operations OU",
         "supplier_id": "",
-        "address": "Lindenstrasse 15, 10134 TALLINN",
-        "vat_id": "EE398766194"
+        "address": "Parnu mnt 10, Tallinn",
+        "vat_id": "EE063536009"
       },
       "buyer": {
         "company_code": "BOLTGROUP",
@@ -41,7 +41,7 @@
       "line_items": [
         {
           "description": "AGREED PICKUP FEE",
-          "item_type": "FREIGHT",
+          "item_type": "SERVICE",
           "uom": "",
           "quantity": "1.00",
           "unit_price": "5.00",
@@ -54,11 +54,11 @@
         },
         {
           "description": "TARNEKULUD",
-          "item_type": "FREIGHT",
+          "item_type": "SERVICE",
           "uom": "",
           "quantity": "1.00",
-          "unit_price": "53.40",
-          "total": "53.40",
+          "unit_price": "",
+          "total": "",
           "discount": "",
           "discount_percentage": "",
           "tax_rate": "",
@@ -67,7 +67,7 @@
         },
         {
           "description": "AGREED DELIVERY FEE",
-          "item_type": "FREIGHT",
+          "item_type": "SERVICE",
           "uom": "",
           "quantity": "1.00",
           "unit_price": "5.00",
@@ -79,8 +79,8 @@
           "taxes": []
         },
         {
-          "description": "BAF 6,93%",
-          "item_type": "FREIGHT",
+          "description": "BAF",
+          "item_type": "SERVICE",
           "uom": "",
           "quantity": "1.00",
           "unit_price": "3.70",
@@ -107,5 +107,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }

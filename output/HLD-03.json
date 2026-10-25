@@ -10,7 +10,7 @@
       "supplier": {
         "name": "Elackpine Unipessoal Lda",
         "supplier_id": "",
-        "address": "Kadaka tee 224, 1250-148 Lisboa",
+        "address": "Rua Kadaka tee 224, 1250-148 Lisboa",
         "vat_id": "PT9840S"
       },
       "buyer": {
@@ -44,7 +44,7 @@
           "item_type": "GOODS",
           "uom": "",
           "quantity": "135.00",
-          "unit_price": "0.91",
+          "unit_price": "",
           "total": "123.36",
           "discount": "63.85",
           "discount_percentage": "61.76",
@@ -55,5 +55,6 @@
       ]
     }
   ],
-  "declined": []
+  "declined": [],
+  "failed": []
 }
