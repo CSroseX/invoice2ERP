@@ -64,7 +64,7 @@ The pipeline runs in 7 sequential phases per document:
 
 **Key constraint:** `erp.py` is the grading oracle — it must not be modified. All extraction work must satisfy its exact accounting formula.
 
-**Current accuracy:** the committed `output/*.json` predates the reconciler and gives 27/52 payables passing the ERP oracle (`measurements/payables_baseline.csv`). Commit 2981e70 reports 31/52 after replaying reconciliation and grounding over those payables; the output files have not been regenerated since.
+**Current accuracy:** `output/*.json` was regenerated on 2026-10-25 with `python -m src.batch` (cached OCR text, every segment on OpenRouter `meta-llama/llama-3.3-70b-instruct`): 32/52 payables pass the ERP oracle (`measurements/payables_baseline.csv`), up from 27/52 in the 2026-09 output. Both counts include payables with an empty `gross_total`, which `tools/measure_payables.py` scores as PASS when the oracle books 0 (5 now, 2 before); with a printed gross required it is 27/52 vs 25/52. The script's hard-coded "expected 52/27/25" check therefore reports a discrepancy after any regeneration; the CSV is still written. LLM output varies between runs (DU-06 failed in one run and passed in the next), so compare runs per payable, not by one total.
 
 ## Configuration
 
